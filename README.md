@@ -4,17 +4,18 @@ A web app for predicting and displaying accurate bus travel times within the Dub
 
 ## Technologies
 
-* Django 3.2.4
-* MySQL
-* Bootstrap v5
-* Jupyter Notebooks
+- Django 3.2.4
+- MySQL
+- Bootstrap v5
+- Jupyter Notebooks
 
 ## Instalation
 
 ### Backend
 
 1. Make sure you have Anaconda or Miniconda installed. Miniconda is a minimal installer for conda. This will be useful to set up a virtual environment to install the requirements.
-* To install Miniconda follow [link these instructions!(https://docs.conda.io/en/latest/miniconda.html)] acording to your operating system.
+
+- To install Miniconda follow [link these instructions!(https://docs.conda.io/en/latest/miniconda.html)] acording to your operating system.
 
 2. Use the package and environment manager [conda](https://docs.conda.io/en/latest/) to create a virtual environment with Python 3.8.
 
@@ -25,7 +26,7 @@ conda create --name <name_of_environment> python=3.8
 3. Activate the environment.
 
 ```bash
-conda activate <name_of_environment> 
+conda activate <name_of_environment>
 ```
 
 4. In the root folder of this project, install the `requirements.txt` file which has all the packages required for running the app.
@@ -46,6 +47,7 @@ black .
 ```
 
 ### Frontend
+
 #### Linting & formatting frontend code
 
 We use `prettier` to lint frontend code (Javascript, HTML and CSS)
