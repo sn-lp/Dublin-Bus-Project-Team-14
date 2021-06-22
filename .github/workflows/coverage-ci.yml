@@ -1,4 +1,4 @@
-name: Django CI steps
+name: Coverage CI steps
 
 # Controls when the action will run.
 on:
@@ -27,12 +27,12 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.8
-      # Install all required dependencies
-      - name: Install dependencies
-        run: cd dublinbus && pip install -r requirements.txt
-      # --check returns 0 if there's no modifications needed or 1 if there's linting issues
-      - name: Run black --check .
-        run: black --check .
-      # Execute all Django tests
-      - name: Run Django tests
-        run: python manage.py test
+      # Install coverage.py
+      - name: Install required dependencie
+        run: cd dublinbus && pip install coverage
+      # Run coverage
+      - name: Run coverage
+        run: coverage run --source='.' manage.py test main
+      # Get coverage report
+      - name: Run coverage.py report
+        run: coverage report
