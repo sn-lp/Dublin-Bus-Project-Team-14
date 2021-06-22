@@ -32,7 +32,7 @@ jobs:
         run: cd dublinbus && pip install coverage
       # Run coverage
       - name: Run coverage
-        run: coverage run --source='.' manage.py test main
+        run: cd dublinbus && coverage run --source='.' manage.py test main
       # Get coverage report
       - name: Run coverage.py report
-        run: coverage report
+        run: cd dublinbus && coverage report
