@@ -9,13 +9,13 @@ A web app for predicting and displaying accurate bus travel times within the Dub
 - Bootstrap v5
 - Jupyter Notebooks
 
-## Instalation
+## Installation
 
 ### Backend
 
 1. Make sure you have Anaconda or Miniconda installed. Miniconda is a minimal installer for conda. This will be useful to set up a virtual environment to install the requirements.
 
-- To install Miniconda follow [link these instructions!(https://docs.conda.io/en/latest/miniconda.html)] acording to your operating system.
+- To install Miniconda follow [these instructions](https://docs.conda.io/en/latest/miniconda.html) acording to your operating system.
 
 2. Use the package and environment manager [conda](https://docs.conda.io/en/latest/) to create a virtual environment with Python 3.8.
 

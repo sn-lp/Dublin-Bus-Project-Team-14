@@ -20,5 +20,7 @@ from main import views as main_views
 
 urlpatterns = [
     path("", main_views.index, name="home"),
+    path("realtime/", main_views.real_time, name="realtime"),
+    path("busroutes/", main_views.bus_routes, name="busroutes"),
     path("admin/", admin.site.urls),
 ]

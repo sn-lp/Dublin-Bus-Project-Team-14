@@ -1,0 +1,2 @@
+# ignore html files because it will try to format django tags in a different way and make it difficult to read
+*.html
