@@ -32,7 +32,6 @@ conda activate <name_of_environment>
 4. In the root folder of this project, install the `requirements.txt` file which has all the packages required for running the app.
 
 ```bash
-cd dublinbus/
 pip install -r requirements.txt
 ```
 
