@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Dublin Bus travel time predictions" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}{{ title }}{% endblock %}</title>
+  </head>
+
+  <body>
+    <nav id="navbar">
+      {% block navbar %}
+      <ul>
+        <li><a href="/">Journey Planner</a></li>
+        <li><a href="/realtime/">Real Time Info</a></li>
+        <li><a href="/busroutes/">Routes</a></li>
+      </ul>
+      {% endblock %}
+    </nav>
+
+    <main id="content">{% block content %}{% endblock %}</main>
+  </body>
+
+  <footer>2021</footer>
+</html>
