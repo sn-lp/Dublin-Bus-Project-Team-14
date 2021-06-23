@@ -1,25 +1,50 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content="Dublin Bus travel time predictions" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="{% static 'main/css/bootstrap.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'main/MDB/css/mdb.min.css' %}" />
     <title>{% block title %}{{ title }}{% endblock %}</title>
   </head>
 
   <body>
-    <nav id="navbar">
-      {% block navbar %}
-      <ul>
-        <li><a href="/">Journey Planner</a></li>
-        <li><a href="/realtime/">Real Time Info</a></li>
-        <li><a href="/busroutes/">Routes</a></li>
-      </ul>
-      {% endblock %}
-    </nav>
 
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color:#25B5F1">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="https://www.dublinbus.ie/"><img
+          src="{% static 'img/db_logo.png' %}"
+          class="me-2"
+          height="50"
+          alt=""
+          loading="lazy"
+        /></a>
+        
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" href="/">Journey Planner</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/realtime/">Real Time Info</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/busroutes/">Routes</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    
     <main id="content">{% block content %}{% endblock %}</main>
+
+    <script src="{% static 'main/js/bootstrap.js' %}"></script>
+    <script src="{% static 'main/MDB/js/mdb.min.js' %}"></script>
+
   </body>
 
-  <footer>2021</footer>
+  <footer>UCD Computer Science 2021</footer>
 </html>
