@@ -33,9 +33,6 @@ jobs:
       # Run coverage
       - name: Run coverage
         run: cd dublinbus && coverage run --source='.' manage.py test main
-        env:
-          SECRET_KEY: django-insecure-1)#fo!fd3$fvtg+#7bo-0r_f4#!5_)zp2mtezez&eat@27okx=
-          DEBUG: True
       # Get coverage report
       - name: Run coverage.py report
         run: cd dublinbus && coverage report
