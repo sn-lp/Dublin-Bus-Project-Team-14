@@ -30,7 +30,6 @@ jobs:
       # Install requirements and coverage.py
       - name: Install required dependencies
         run: pip install -r dublinbus/requirements.txt && pip install coverage
-      - name: "Hello world when it's Monday"
         env:
           SECRET_KEY: django-insecure-1)#fo!fd3$fvtg+#7bo-0r_f4#!5_)zp2mtezez&eat@27okx=
           DEBUG: True
