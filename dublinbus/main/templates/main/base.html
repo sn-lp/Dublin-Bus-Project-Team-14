@@ -17,14 +17,11 @@
       <div class="container-fluid">
         <a class="navbar-brand" href="https://www.dublinbus.ie/"><img
           src="{% static 'img/db_logo.png' %}"
-          class="me-2"
           height="50"
-          alt=""
-          loading="lazy"
         /></a>
         
         <div class="collapse navbar-collapse" id="navbarText">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <ul class="navbar-nav me-auto mb-2 mb-sm-0">
             <li class="nav-item">
               <a class="nav-link" aria-current="page" href="/">Journey Planner</a>
             </li>
@@ -38,11 +35,13 @@
         </div>
       </div>
     </nav>
-    
+
     <main id="content">{% block content %}{% endblock %}</main>
 
     <script src="{% static 'main/js/bootstrap.js' %}"></script>
     <script src="{% static 'main/MDB/js/mdb.min.js' %}"></script>
+    <script src="{% static 'app.js' %}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=APIKEY&callback=initMap&libraries=&v=weekly" async></script>
 
   </body>
 
