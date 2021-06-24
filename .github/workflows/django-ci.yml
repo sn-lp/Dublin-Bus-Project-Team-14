@@ -30,6 +30,9 @@ jobs:
       # Install all required dependencies
       - name: Install dependencies
         run: pip install -r dublinbus/requirements.txt
+        env:
+          SECRET_KEY: django-insecure-1)#fo!fd3$fvtg+#7bo-0r_f4#!5_)zp2mtezez&eat@27okx=
+          DEBUG: True
       # --check returns 0 if there's no modifications needed or 1 if there's linting issues
       - name: Run black --check .
         run: black --check .
