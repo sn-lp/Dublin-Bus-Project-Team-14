@@ -29,7 +29,7 @@ jobs:
           python-version: 3.8
       # Install requirements and coverage.py
       - name: Install required dependencies
-        run: pip install -r dublinbus/requirements.txt && pip install coverage
+        run: pip install -r requirements.txt && pip install coverage
       # Run coverage
       - name: Run coverage
         run: cd dublinbus && coverage run --source='.' manage.py test main
