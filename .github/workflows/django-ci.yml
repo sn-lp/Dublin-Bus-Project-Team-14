@@ -36,3 +36,5 @@ jobs:
       # Execute all Django tests
       - name: Run Django tests
         run: cd dublinbus && python manage.py test
+        env:
+          GOOGLEMAPS_APIKEY: ${{ secrets.GOOGLEMAPS_APIKEY }}

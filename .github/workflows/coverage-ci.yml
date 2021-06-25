@@ -33,6 +33,8 @@ jobs:
       # Run coverage
       - name: Run coverage
         run: cd dublinbus && coverage run --source='.' manage.py test main
+        env:
+          GOOGLEMAPS_APIKEY: ${{ secrets.GOOGLEMAPS_APIKEY }}
       # Get coverage report
       - name: Run coverage.py report
         run: cd dublinbus && coverage report
