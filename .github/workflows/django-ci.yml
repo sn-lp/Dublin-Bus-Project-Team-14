@@ -29,7 +29,7 @@ jobs:
           python-version: 3.8
       # Install all required dependencies
       - name: Install dependencies
-        run: pip install -r dublinbus/requirements.txt
+        run: pip install -r requirements.txt
       # --check returns 0 if there's no modifications needed or 1 if there's linting issues
       - name: Run black --check .
         run: black --check .
