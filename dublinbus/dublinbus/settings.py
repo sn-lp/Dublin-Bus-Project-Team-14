@@ -34,7 +34,10 @@ if os.getenv("DEBUG_VALUE"):
 else:
     DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "dublin-bus-team14.herokuapp.com"]
+if os.getenv("ALLOWED_HOST"):
+    ALLOWED_HOSTS = [os.environ["ALLOWED_HOST"]]
+else:
+    ALLOWED_HOSTS = ["127.0.0.1"]
 
 
 # Application definition
