@@ -15,18 +15,29 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+# Extra places for collectstatic to find static files.
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "main/static"),)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-1)#fo!fd3$fvtg+#7bo-0r_f4#!5_)zp2mtezez&eat@27okx="
+if os.getenv("SECRET_KEY"):
+    SECRET_KEY = os.environ["SECRET_KEY"]
+else:
+    SECRET_KEY = "django-insecure-1)#fo!fd3$fvtg+#7bo-0r_f4#!5_)zp2mtezez&eat@27okx="
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if os.getenv("DEBUG_VALUE"):
+    DEBUG = os.environ["DEBUG_VALUE"]
+else:
+    DEBUG = True
 
-ALLOWED_HOSTS = []
+if os.getenv("ALLOWED_HOST"):
+    ALLOWED_HOSTS = [os.environ["ALLOWED_HOST"]]
+else:
+    ALLOWED_HOSTS = ["127.0.0.1"]
 
 
 # Application definition
@@ -49,6 +60,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = "dublinbus.urls"
@@ -119,7 +131,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = "/static/"
+STATIC_URL = "/main/static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
