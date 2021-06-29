@@ -29,9 +29,10 @@ conda create --name <name_of_environment> python=3.8
 conda activate <name_of_environment>
 ```
 
-4. In the root folder of this project, install the `requirements.txt` file which has all the packages required for running the app.
+4. Install the `requirements.txt` file which has all the packages required for running the app.
 
 ```bash
+cd dublinbus/
 pip install -r requirements.txt
 ```
 
@@ -61,6 +62,7 @@ To run `prettier`:
 If you change the frontend/template code, please run the following command before committing new changes:
 
 ```bash
+cd dublinbus/
 prettier --write .
 ```
 
