@@ -32,4 +32,4 @@ jobs:
         run: npm install -g prettier
       # --check returns 0 if there's no modifications needed or 1 if there's linting issues
       - name: Run prettier --check .
-        run: prettier --check .
+        run: cd dublinbus && prettier --check .
