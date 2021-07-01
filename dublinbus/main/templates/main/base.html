@@ -9,6 +9,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'main/css/bootstrap.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'main/MDB/css/mdb.min.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'materialdesign/material-components-web.min.css' %}" >
+    <script src="{% static 'materialdesign/material-components-web.min.js' %}"></script>
     <script src="{% static 'main/js/bootstrap.js' %}"></script>
     <script src="{% static 'main/MDB/js/mdb.min.js' %}"></script>
     <script src="{% static 'app.js' %}"></script>
@@ -16,16 +18,23 @@
   </head>
 
   <body>
+    <div id="mySidenav" class="sidenav d-lg-none">
+      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+      <a href="/">Journey Planner</a>
+      <a href="/realtime/">Real Time Info</a>
+      <a href="/busroutes/">Routes</a>
+    </div>
 
     <nav class="navbar navbar-expand-lg navbar-light" style="background-color:#25B5F1">
       <div class="container-fluid">
-        <a class="navbar-brand" href="https://www.dublinbus.ie/"><img
+        <span style="font-size:30px;cursor:pointer" class="d-lg-none" onclick="openNav()">&#9776; </span>
+        <a class="navbar-brand mx-auto" href="https://www.dublinbus.ie/"><img
           src="{% static 'img/db_logo.png' %}"
           height="50"
         /></a>
         
         <div class="collapse navbar-collapse" id="navbarText">
-          <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+          <ul class="navbar-nav me-auto mb-2 mb-sm-0" style="padding-left: 30px;">
             <li class="nav-item">
               <a class="nav-link" aria-current="page" href="/">Journey Planner</a>
             </li>
@@ -42,9 +51,8 @@
 
     <main id="container-fluid">{% block content %}{% endblock %}</main>
 
-    
     <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLEMAPS_APIKEY }}&callback=initMap&libraries=&v=weekly" async></script>
-
+    
   </body>
 
   <footer>UCD Computer Science 2021</footer>

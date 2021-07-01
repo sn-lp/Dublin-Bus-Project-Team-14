@@ -1,6 +1,9 @@
 # ignore html files because it will try to format django tags in a different way and make it difficult to read
 *.html
 /main/static/main/js/*.js
+/main/static/main/js/*.map
 /main/static/main/css/*.css
 /main/static/main/MDB/js/*.js
 /main/static/main/MDB/css/*.css
+/main/static/materialdesign/*.css
+/main/static/materialdesign/*.js
