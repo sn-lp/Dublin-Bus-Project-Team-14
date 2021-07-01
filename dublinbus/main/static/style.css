@@ -1,14 +1,29 @@
 /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
 #map {
-  height: calc(100vh - 110px);
+  height: calc(100vh - 30px);
   width: 100%;
 }
 
-/* Optional: Makes the sample page fill the window. */
-html,
-body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
+
+.mdc-top-app-bar__row{
+  background-color: #25B5F1;
+}
+
+.mdc-list a{
+  font-size: x-large;
+  padding-top: 4vh;
+}
+
+.mdc-top-app-bar--fixed a {
+  font-size: large;
+  padding-left: 30px;
+}
+
+.mdc-top-app-bar--fixed, a:hover {
+  color: white;
+}
+
+.mdc-top-app-bar--fixed, a:visited {
+  color: black;
 }
