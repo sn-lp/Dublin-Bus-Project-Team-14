@@ -5,12 +5,11 @@
   width: 100%;
 }
 
-
-.mdc-top-app-bar__row{
-  background-color: #25B5F1;
+.mdc-top-app-bar__row {
+  background-color: #25b5f1;
 }
 
-.mdc-list a{
+.mdc-list a {
   font-size: x-large;
   padding-top: 4vh;
 }
@@ -20,10 +19,12 @@
   padding-left: 30px;
 }
 
-.mdc-top-app-bar--fixed, a:hover {
+.mdc-top-app-bar--fixed,
+a:hover {
   color: white;
 }
 
-.mdc-top-app-bar--fixed, a:visited {
+.mdc-top-app-bar--fixed,
+a:visited {
   color: black;
 }
