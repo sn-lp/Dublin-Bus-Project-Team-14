@@ -18,6 +18,15 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:5.6.51
+        env:
+          MYSQL_DATABASE: dublin_bus
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DEVELOPMENT_DATABASE_PASSWORD }}
+        ports:
+          - 3306:3306
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -30,20 +39,6 @@ jobs:
       # Install requirements and coverage.py
       - name: Install required dependencies
         run: pip install -r dublinbus/requirements.txt && pip install coverage
-
-      # Following https://github.com/marketplace/actions/setup-mysql to set up a MySQL database in docker for github actions to run our CI properly  
-      # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
-      - name: Shutdown Ubuntu MySQL (SUDO)
-        run: sudo service mysql stop
-      - name: Set up MySQL
-        uses: mirromutth/mysql-action@v1.1
-        with:
-          host port: 3306
-          container port: 3306
-          mysql version: '5.6.50' # the version of the MySQL local and production instances
-          mysql database: 'dublin_bus'
-          mysql root password: ${{ secrets.DEVELOPMENT_DATABASE_PASSWORD }}
-
       # Run coverage
       - name: Run coverage
         run: cd dublinbus && coverage run --source='.' manage.py test main
