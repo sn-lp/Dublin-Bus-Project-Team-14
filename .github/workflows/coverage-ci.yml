@@ -39,6 +39,7 @@ jobs:
           DEVELOPMENT_DATABASE_PASSWORD: ${{ secrets.DEVELOPMENT_DATABASE_PASSWORD }}
           DEVELOPMENT_DATABASE_HOST: ${{ secrets.DEVELOPMENT_DATABASE_HOST }}
           DEVELOPMENT_DATABASE_PORT: ${{ secrets.DEVELOPMENT_DATABASE_PORT }}
+          MYSQL_HOST: mysql
 
       # Get coverage report
       - name: Run coverage.py report
