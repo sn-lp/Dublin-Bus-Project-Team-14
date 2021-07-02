@@ -45,10 +45,8 @@ jobs:
           container port: 3306
           mysql version: '5.6.50' # the version of the MySQL local and production instances
           mysql database: 'dublin_bus'
-          mysql root password: ''
-          mysql user: ${{ secrets.DEVELOPMENT_DATABASE_USER }} # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
-          mysql password: ${{ secrets.DEVELOPMENT_DATABASE_PASSWORD }} # Required if "mysql user" exists. The password for the "mysql user"
-      
+          mysql root password: ${{ secrets.DEVELOPMENT_DATABASE_PASSWORD }}
+          
       # Execute all Django tests
       - name: Run Django tests
         run: cd dublinbus && python manage.py test
