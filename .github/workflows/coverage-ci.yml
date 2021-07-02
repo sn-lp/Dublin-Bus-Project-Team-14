@@ -30,6 +30,22 @@ jobs:
       # Install requirements and coverage.py
       - name: Install required dependencies
         run: pip install -r dublinbus/requirements.txt && pip install coverage
+
+      # Following https://github.com/marketplace/actions/setup-mysql to set up a MySQL database in docker for github actions to run our CI properly  
+      # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop
+      - name: Set up MySQL
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          host port: ${{ secrets.DEVELOPMENT_DATABASE_HOST }}
+          container port: 3306
+          mysql version: '5.6.50' # the version of the MySQL local and production instances
+          mysql database: 'dublin_bus'
+          mysql root password: ''
+          mysql user: ${{ secrets.DEVELOPMENT_DATABASE_USER }} # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
+          mysql password: ${{ secrets.DEVELOPMENT_DATABASE_PASSWORD }} # Required if "mysql user" exists. The password for the "mysql user"
+
       # Run coverage
       - name: Run coverage
         run: cd dublinbus && coverage run --source='.' manage.py test main
@@ -39,7 +55,6 @@ jobs:
           DEVELOPMENT_DATABASE_PASSWORD: ${{ secrets.DEVELOPMENT_DATABASE_PASSWORD }}
           DEVELOPMENT_DATABASE_HOST: ${{ secrets.DEVELOPMENT_DATABASE_HOST }}
           DEVELOPMENT_DATABASE_PORT: ${{ secrets.DEVELOPMENT_DATABASE_PORT }}
-          MYSQL_HOST: mysql
 
       # Get coverage report
       - name: Run coverage.py report
