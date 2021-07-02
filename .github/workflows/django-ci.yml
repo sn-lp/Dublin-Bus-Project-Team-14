@@ -38,3 +38,7 @@ jobs:
         run: cd dublinbus && python manage.py test
         env:
           GOOGLEMAPS_APIKEY: ${{ secrets.GOOGLEMAPS_APIKEY }}
+          DEVELOPMENT_DATABASE_USER: ${{ secrets.DEVELOPMENT_DATABASE_USER }}
+          DEVELOPMENT_DATABASE_PASSWORD: ${{ secrets.DEVELOPMENT_DATABASE_PASSWORD }}
+          DEVELOPMENT_DATABASE_HOST: ${{ secrets.DEVELOPMENT_DATABASE_HOST }}
+          DEVELOPMENT_DATABASE_PORT: ${{ secrets.DEVELOPMENT_DATABASE_PORT }}

@@ -35,6 +35,11 @@ jobs:
         run: cd dublinbus && coverage run --source='.' manage.py test main
         env:
           GOOGLEMAPS_APIKEY: ${{ secrets.GOOGLEMAPS_APIKEY }}
+          DEVELOPMENT_DATABASE_USER: ${{ secrets.DEVELOPMENT_DATABASE_USER }}
+          DEVELOPMENT_DATABASE_PASSWORD: ${{ secrets.DEVELOPMENT_DATABASE_PASSWORD }}
+          DEVELOPMENT_DATABASE_HOST: ${{ secrets.DEVELOPMENT_DATABASE_HOST }}
+          DEVELOPMENT_DATABASE_PORT: ${{ secrets.DEVELOPMENT_DATABASE_PORT }}
+
       # Get coverage report
       - name: Run coverage.py report
         run: cd dublinbus && coverage report
