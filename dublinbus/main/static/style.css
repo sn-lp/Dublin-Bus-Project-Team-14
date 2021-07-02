@@ -1,7 +1,7 @@
 /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
 #map {
-  height: calc(100vh - 30px);
+  height: calc(100vh - 35px);
   width: 100%;
 }
 

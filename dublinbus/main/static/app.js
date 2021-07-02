@@ -4,9 +4,12 @@ function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: 53.3498, lng: -6.2603 },
     zoom: 12,
+    disableDefaultUI: true,
   });
 }
 
+
+//MDC Nav-bar and Drawer
 const drawer = mdc.drawer.MDCDrawer.attachTo(
   document.querySelector(".mdc-drawer")
 );
