@@ -116,8 +116,6 @@ database_port = get_database_env_variables(
     "PRODUCTION_DATABASE_PORT", "DEVELOPMENT_DATABASE_PORT"
 )
 
-print(database_host)
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
