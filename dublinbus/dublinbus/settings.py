@@ -97,13 +97,24 @@ def get_database_env_variables(production_variable, development_variable):
         return os.environ[development_variable]
     else:
         # this will raise an exception if the env variables are not created
-        raise Exception(f"Could not find {production_variable} or {development_variable}")
+        raise Exception(
+            f"Could not find {production_variable} or {development_variable}"
+        )
+
 
 database_name = "dublin_bus"
-database_user = get_database_env_variables("PRODUCTION_DATABASE_USER", "DEVELOPMENT_DATABASE_USER")
-database_password = get_database_env_variables("PRODUCTION_DATABASE_PASSWORD", "DEVELOPMENT_DATABASE_PASSWORD")
-database_host = get_database_env_variables("PRODUCTION_DATABASE_HOST", "DEVELOPMENT_DATABASE_HOST")
-database_port = get_database_env_variables("PRODUCTION_DATABASE_PORT", "DEVELOPMENT_DATABASE_PORT")
+database_user = get_database_env_variables(
+    "PRODUCTION_DATABASE_USER", "DEVELOPMENT_DATABASE_USER"
+)
+database_password = get_database_env_variables(
+    "PRODUCTION_DATABASE_PASSWORD", "DEVELOPMENT_DATABASE_PASSWORD"
+)
+database_host = get_database_env_variables(
+    "PRODUCTION_DATABASE_HOST", "DEVELOPMENT_DATABASE_HOST"
+)
+database_port = get_database_env_variables(
+    "PRODUCTION_DATABASE_PORT", "DEVELOPMENT_DATABASE_PORT"
+)
 
 DATABASES = {
     "default": {
