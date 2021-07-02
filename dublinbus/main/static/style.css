@@ -28,3 +28,21 @@ a:hover {
 a:visited {
   color: black;
 }
+
+h3 {
+  float: right;
+  color: black;
+}
+
+/* Journey Window UI */
+#journeyWindowDiv {
+  background-color: #fff;
+  border: 2px solid #fff;
+  borderradius: 3px;
+  boxshadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  margintop: 8px;
+  marginbottom: 22px;
+  textalign: center;
+  padding: 20px;
+}
