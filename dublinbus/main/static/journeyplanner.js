@@ -21,3 +21,16 @@ var datetime_string = date_vars[0] + "-" + date_vars[1] + "-" + date_vars[2] + "
 
 document.getElementById("departure-time").value = datetime_string;
 document.getElementById("departure-time").min = datetime_string;
+
+
+//Button to hide UI to just show map
+const targetDiv = document.getElementById("over_map");
+const toggleBtn = document.getElementById("map_toggle");
+
+toggleBtn.onclick = function () {
+    if (targetDiv.style.display !== "none") {
+        targetDiv.style.display = "none";
+        } else {
+        targetDiv.style.display = "block";
+        }
+    };
