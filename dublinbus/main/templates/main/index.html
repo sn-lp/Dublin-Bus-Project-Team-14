@@ -7,38 +7,6 @@
 
 {% block content %}
 
-<style>  
-    .datepicker table tr td.active,
-    .datepicker table tr td.active:hover {
-    background-color: #FFCC00;
-    }
-    .mydatetime td, .mydatetime th {
-    color: #FFCC00;
-    }
-    button.btn, button.btn:active, button.btn:target, button.btn:hover {
-    background-color: #FFCC00;
-    border: none;
-    }
-    
-    a, a:hover { color: #FFCC00; }
-
-</style> 
-
-<style>
-  #wrapper { position: relative;}
-
-  #over_map { position: absolute; top: 10vh; left: 3vw; z-index: 0; max-width: 15vw; min-width: fit-content;}
-  .btn-primary {
-    background: #FFCC00;
-    color: black;
-  }
-  /* This is for eliminate the default hover color of bootstrap*/
-  .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open>.dropdown-toggle.btn-primary {
-    color: black;
-    background-color: #FFCC00;
-  }
-</style>
-
 <div id="wrapper">
   <div id="map"></div>
 
@@ -76,4 +44,7 @@
   </div>
 </div>
 
+<script src="{% static 'journeyplanner.js' %}"></script>
+
 {% endblock %}
+

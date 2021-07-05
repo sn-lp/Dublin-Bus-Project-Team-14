@@ -32,4 +32,35 @@ a:visited {
 h3 {
   float: right;
   color: black;
+  margin-top: 7px;
+  margin-left: 10px;
+}
+
+/* JOURNEY PLANNER INTERFACE */
+button.btn, button.btn:active, button.btn:target, button.btn:hover {
+  background-color: #FFCC00;
+  border: none;
+}
+
+#over_map {
+  position: absolute;
+  top: 10vh;
+  left: 3vw;
+  z-index: 0;
+  max-width: 15vw;
+  min-width: fit-content;
+}
+
+.btn-primary {
+  background: #FFCC00;
+  color: black;
+}
+
+#wrapper {
+  position: relative;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open.dropdown-toggle.btn-primary {
+  color: black;
+  background-color: #FFCC00;
 }
