@@ -29,7 +29,7 @@ for (var i = 0; i < date_vars.length; i++) {
   console.log(date_vars[i]);
 }
 
-
+document.getElementById("departure-time").value = date_vars[0] + "-" + date_vars[1] + "-" + date_vars[2] + "T" + date_vars[3] + ":" + date_vars[4];
 
 //Navigation Drawer
 const drawer = mdc.drawer.MDCDrawer.attachTo(
