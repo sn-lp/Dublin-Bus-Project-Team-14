@@ -47,14 +47,32 @@ button.btn, button.btn:active, button.btn:target, button.btn:hover {
   top: 10vh;
   left: 3vw;
   z-index: 0;
-  max-width: 15vw;
-  min-width: fit-content;
+  min-width: 370px;
+  max-width: 370px;
 }
+
+#over_map div, p, input{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 0.7vh;
+  width: 100%;
+}
+
+
+/* CHANGE WIDTH FOR MOBILE DEVICES */
+@media only screen and (max-width: 992px) {
+  #over_map {
+    min-width: 94vw;
+  }
+}
+  
 
 .btn-primary {
   background: #FFCC00;
   color: black;
 }
+
 
 #wrapper {
   position: relative;
