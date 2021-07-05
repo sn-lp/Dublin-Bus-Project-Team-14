@@ -3,57 +3,71 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="description" content="Dublin Bus travel time predictions" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" type="text/css" href="{% static 'main/css/bootstrap.css' %}" />
-    <link rel="stylesheet" type="text/css" href="{% static 'main/MDB/css/mdb.min.css' %}" />
-    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
-    <link rel="stylesheet" type="text/css" href="{% static 'materialdesign/material-components-web.min.css' %}" >
-    <script src="{% static 'materialdesign/material-components-web.min.js' %}"></script>
-    <script src="{% static 'main/js/bootstrap.js' %}"></script>
-    <script src="{% static 'main/MDB/js/mdb.min.js' %}"></script>
-    <script src="{% static 'app.js' %}"></script>
-    <title>{% block title %}{{ title }}{% endblock %}</title>
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="description" content="Dublin Bus travel time predictions" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="icon" type="image/png" href="{% static 'img/db_icon.png' %}">
+      <link rel="stylesheet" type="text/css" href="{% static 'main/css/bootstrap.css' %}" />
+      <link rel="stylesheet" type="text/css" href="{% static 'main/MDB/css/mdb.min.css' %}" />
+      <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+      <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+      <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+      <title>{% block title %}{{ title }}{% endblock %}</title>
+    </head>
+    
   </head>
 
   <body>
-    <div id="mySidenav" class="sidenav d-lg-none">
-      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-      <a href="/">Journey Planner</a>
-      <a href="/realtime/">Real Time Info</a>
-      <a href="/busroutes/">Routes</a>
-    </div>
-
-    <nav class="navbar navbar-expand-lg navbar-light" style="background-color:#25B5F1">
-      <div class="container-fluid">
-        <span style="font-size:30px;cursor:pointer" class="d-lg-none" onclick="openNav()">&#9776; </span>
-        <a class="navbar-brand mx-auto" href="https://www.dublinbus.ie/"><img
-          src="{% static 'img/db_logo.png' %}"
-          height="50"
-        /></a>
-        
-        <div class="collapse navbar-collapse" id="navbarText">
-          <ul class="navbar-nav me-auto mb-2 mb-sm-0" style="padding-left: 30px;">
-            <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="/">Journey Planner</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/realtime/">Real Time Info</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/busroutes/">Routes</a>
-            </li>
-          </ul>
-        </div>
+    
+    <aside class="mdc-drawer mdc-drawer--modal d-lg-none">
+      <div class="mdc-drawer__content">
+        <nav class="mdc-list">
+          <img class="mdc-list-item" src="{% static 'img/db_logo.png' %}" height="45px" /></img>
+          <a class="mdc-list-item mdc-list-item--activated" href="/" tabindex="0" aria-current="page">
+            Journey Planner
+          </a>
+          <a class="mdc-list-item" href="/realtime/" tabindex="0">
+            Real Time Info
+          </a>
+          <a class="mdc-list-item" href="/busroutes/" tabindex="0">
+            Routes
+          </a>
+        </nav>
       </div>
-    </nav>
+    </aside>
+  
+    <div class="mdc-drawer-scrim d-lg-none"></div>
+    <div class="mdc-drawer-app-content">
+      <header class="mdc-top-app-bar mdc-top-app-bar--fixed">
+        <div class="mdc-top-app-bar__row">
+          <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+            <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button d-lg-none" style="color: black;">menu</button>
+
+            <div class="mx-auto d-lg-none">
+              <img src="{% static 'img/db_icon.png' %}" height="45px" /></img>
+            </div>
+        
+            <img class="d-none d-lg-block" src="{% static 'img/db_logo.png' %}" height="45px" /></img>
+            <div class="d-none d-lg-block">
+              <a class="mdc-top-app-bar--fixed" href="/">Journey Planner</a>
+              <a class="mdc-top-app-bar--fixed" href="/realtime/">Real Time Info</a>
+              <a class="mdc-top-app-bar--fixed" href="/busroutes/">Routes</a>
+            </div>
+          </section>
+        </div>
+      </header>
+      
+    </div>
 
     <main id="container-fluid">{% block content %}{% endblock %}</main>
 
     <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLEMAPS_APIKEY }}&callback=initMap&libraries=&v=weekly" async></script>
-    
+    <script src="{% static 'app.js' %}"></script>
+    <script src="{% static 'main/js/bootstrap.js' %}"></script>
+    <script src="{% static 'main/MDB/js/mdb.min.js' %}"></script>
   </body>
 
-  <footer>UCD Computer Science 2021</footer>
+  <footer class="text-center">UCD Computer Science 2021 - Team 14</footer>
 </html>

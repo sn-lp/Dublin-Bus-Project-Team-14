@@ -1,61 +1,30 @@
 /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
 #map {
-  height: calc(100vh - 110px);
+  height: calc(100vh - 30px);
   width: 100%;
 }
 
-/* Optional: Makes the sample page fill the window. */
-html,
-body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
+.mdc-top-app-bar__row {
+  background-color: #25b5f1;
 }
 
-body {
-  font-family: "Lato", sans-serif;
+.mdc-list a {
+  font-size: x-large;
+  padding-top: 4vh;
 }
 
-.sidenav {
-  height: 100%;
-  width: 0;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  background-color: rgb(255, 255, 255);
-  overflow-x: hidden;
-  transition: 0.2s;
-  padding-top: 60px;
+.mdc-top-app-bar--fixed a {
+  font-size: large;
+  padding-left: 30px;
 }
 
-.sidenav a {
-  padding: 8px 8px 8px 32px;
-  text-decoration: none;
-  font-size: 25px;
-  color: #818181;
-  display: block;
-  transition: 0.3s;
+.mdc-top-app-bar--fixed,
+a:hover {
+  color: white;
 }
 
-.sidenav a:hover {
-  color: #f1f1f1;
-}
-
-.sidenav .closebtn {
-  position: absolute;
-  top: 0;
-  right: 25px;
-  font-size: 36px;
-  margin-left: 50px;
-}
-
-@media screen and (max-height: 450px) {
-  .sidenav {
-    padding-top: 15px;
-  }
-  .sidenav a {
-    font-size: 18px;
-  }
+.mdc-top-app-bar--fixed,
+a:visited {
+  color: black;
 }
