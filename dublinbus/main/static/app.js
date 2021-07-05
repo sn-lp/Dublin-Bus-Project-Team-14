@@ -8,19 +8,14 @@ function initMap() {
     zoom: 12,
     disableDefaultUI: true,
   });
-
-  const journeyWindowDiv = document.createElement("div");
-  journeyWindowDiv.id = "journeyWindowDiv";
-  const journeyWindowDivContents = document.createElement("div");
-  journeyWindowDivContents.id = "journeyWindowDivContents";
-  journeyWindowDivContents.innerHTML = `<div class="input-group">
-  <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
-    aria-describedby="search-addon" />
-</div>
-<button type="button" class="btn btn-primary" id="myLocationButton">My Location</button>
-`;
-
-  journeyWindowDiv.appendChild(journeyWindowDivContents);
-
-  map.controls[google.maps.ControlPosition.LEFT_CENTER].push(journeyWindowDiv);
 }
+
+const drawer = mdc.drawer.MDCDrawer.attachTo(
+  document.querySelector(".mdc-drawer")
+);
+const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(
+  document.querySelector(".mdc-top-app-bar")
+);
+topAppBar.listen("MDCTopAppBar:nav", () => {
+  drawer.open = !drawer.open;
+});
