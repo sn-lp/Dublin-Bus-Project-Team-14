@@ -103,7 +103,20 @@ To stop the MySQL instance:
 docker stop mysql
 ```
 
-6. To run the app locally execute the following commands, be aware the local docker MySQL instance must be running before:
+6. Now that the local MySQL instance is running it's time to insert the data into the database.
+
+6.1. Unzip the file `dublinbus/main/migrations/db_data.zip` into the same folder. These are csv files that contain the data to be inserted in the database.
+- note: the files had to be compressed due to Github storage limits.
+
+6.2. Run the following command:
+
+```bash
+cd dublinbus
+python manage.py migrate
+```
+- note: this process will take some time to complete.
+
+7. To run the app locally execute the following commands, be aware the local docker MySQL instance must be running before:
 
 ```bash
 cd dublinbus
