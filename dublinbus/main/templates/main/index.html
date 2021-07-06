@@ -7,6 +7,31 @@
 
 {% block content %}
 
+<script>
+  let autocomplete1;
+  let autocomplete2;
+
+  function initAutocomplete() {
+      autocomplete1 = setAutocomplete(autocomplete1, 'origin');
+      autocomplete2 = setAutocomplete(autocomplete2, 'destination');
+  }
+
+  function setAutocomplete(object, id) {
+      var cityBounds = new google.maps.LatLngBounds(new google.maps.LatLng(53.22, -6.45), new google.maps.LatLng(53.43, -6.00));
+      object = new google.maps.places.Autocomplete(
+          document.getElementById(id),
+          {
+              bounds: cityBounds,
+              types:['establishment'],
+              componenRestrictions:{'country':'ie'},
+              strictbounds: true,
+              fields:['place_id', 'geometry', 'name']
+          });
+      return object;
+  }
+
+</script>
+
 <div id="wrapper">
   <div id="map"></div>
 
@@ -18,7 +43,7 @@
 
     <div class="d-grid gap-2">
       <p class="text-center">OR</p>
-    </div>
+    </div> 
     <form>
       <div class="form-group">
         <input type="text" class="form-control" id="origin" placeholder="Enter Location">

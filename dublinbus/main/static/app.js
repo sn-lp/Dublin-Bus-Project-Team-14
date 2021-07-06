@@ -1,6 +1,5 @@
 //Google Maps
 let map;
-const chicago = { lat: 41.85, lng: -87.65 };
 
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
@@ -8,10 +7,8 @@ function initMap() {
     zoom: 12,
     disableDefaultUI: true,
   });
+  initAutocomplete();
 }
-
-
-
 
 //Navigation Drawer
 const drawer = mdc.drawer.MDCDrawer.attachTo(

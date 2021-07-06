@@ -68,7 +68,7 @@
 
     <main id="container-fluid">{% block content %}{% endblock %}</main>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLEMAPS_APIKEY }}&callback=initMap&libraries=&v=weekly" async></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLEMAPS_APIKEY }}&callback=initMap&libraries=places&v=weekly" async></script>
     <script src="{% static 'app.js' %}"></script>
     <script src="{% static 'main/js/bootstrap.js' %}"></script>
     <script src="{% static 'main/MDB/js/mdb.min.js' %}"></script>
