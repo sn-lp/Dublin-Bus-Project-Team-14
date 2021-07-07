@@ -89,10 +89,41 @@ WSGI_APPLICATION = "dublinbus.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# function to retrieve values from production or development database variables needed to establish the connection
+def get_database_env_variables(production_variable, development_variable):
+    if os.getenv(production_variable, ""):
+        return os.environ[production_variable]
+    elif os.getenv(development_variable, ""):
+        return os.environ[development_variable]
+    else:
+        # this will raise an exception if the env variables are not created
+        raise Exception(
+            f"Could not find {production_variable} or {development_variable}"
+        )
+
+
+database_name = "dublin_bus"
+database_user = get_database_env_variables(
+    "PRODUCTION_DATABASE_USER", "DEVELOPMENT_DATABASE_USER"
+)
+database_password = get_database_env_variables(
+    "PRODUCTION_DATABASE_PASSWORD", "DEVELOPMENT_DATABASE_PASSWORD"
+)
+database_host = get_database_env_variables(
+    "PRODUCTION_DATABASE_HOST", "DEVELOPMENT_DATABASE_HOST"
+)
+database_port = get_database_env_variables(
+    "PRODUCTION_DATABASE_PORT", "DEVELOPMENT_DATABASE_PORT"
+)
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": database_name,
+        "USER": database_user,
+        "PASSWORD": database_password,
+        "HOST": database_host,
+        "PORT": database_port,
     }
 }
 
@@ -140,5 +171,5 @@ STATIC_URL = "/main/static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# We can have all our environment variables here
+# We can have all other environment variables (e.g. API keys) here
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLEMAPS_APIKEY", "")

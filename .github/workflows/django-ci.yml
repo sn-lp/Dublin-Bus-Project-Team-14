@@ -18,6 +18,15 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:5.6.51
+        env:
+          MYSQL_DATABASE: dublin_bus
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DEVELOPMENT_DATABASE_PASSWORD }}
+        ports:
+          - 3306:3306
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -32,9 +41,13 @@ jobs:
         run: pip install -r dublinbus/requirements.txt
       # --check returns 0 if there's no modifications needed or 1 if there's linting issues
       - name: Run black --check .
-        run: black --check .
+        run: black --check .          
       # Execute all Django tests
       - name: Run Django tests
         run: cd dublinbus && python manage.py test
         env:
           GOOGLEMAPS_APIKEY: ${{ secrets.GOOGLEMAPS_APIKEY }}
+          DEVELOPMENT_DATABASE_USER: ${{ secrets.DEVELOPMENT_DATABASE_USER }}
+          DEVELOPMENT_DATABASE_PASSWORD: ${{ secrets.DEVELOPMENT_DATABASE_PASSWORD }}
+          DEVELOPMENT_DATABASE_HOST: ${{ secrets.DEVELOPMENT_DATABASE_HOST }}
+          DEVELOPMENT_DATABASE_PORT: ${{ secrets.DEVELOPMENT_DATABASE_PORT }}
