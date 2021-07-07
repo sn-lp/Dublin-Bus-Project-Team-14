@@ -86,6 +86,7 @@ docker run -p ${DEVELOPMENT_DATABASE_PORT}:3306  --name mysql -e MYSQL_ROOT_PASS
 ```
 - here`mysql` is the name we are giving to the container.
 - we will need to create these environment variables for our production database too.
+- note: if you are using Windows, the way to retrieve the env variable value in this and following commands should be %DEVELOPMENT_DATABASE_PORT%, %DEVELOPMENT_DATABASE_PASSWORD% and %DEVELOPMENT_DATABASE_USER%
 
 4. After the above command, and only the first time as well, run the following command to create a database/schema named "dublin_bus" (we will need to create a schema with the same name in the production DB too):
 ```bash
@@ -103,7 +104,27 @@ To stop the MySQL instance:
 docker stop mysql
 ```
 
-6. To run the app locally execute the following commands, be aware the local docker MySQL instance must be running before:
+6. Now that the local MySQL instance is running it's time to create the tables and insert the data into the database.
+
+6.1. Unzip the file `dublinbus/main/migrations/sqldump.sql.zip` into the same folder. This has a sql file that contains the instructions to insert the data in the database.
+- note: the file had to be compressed due to Github storage limits (100MB).
+
+6.2. Run the following command to create the tables in the database:
+
+```bash
+cd dublinbus
+python manage.py migrate
+```
+
+6.3. Run the following command to insert the data in the database:
+
+```bash
+docker exec -i mysql mysql -u${DEVELOPMENT_DATABASE_USER} -p${DEVELOPMENT_DATABASE_PASSWORD} < ./main/migrations/sqldump.sql
+```
+- note: this is quicker to insert the data than using Django data migrations and also allows our CI to easily create a test database without having to do the data migrations which would be very slow due to the amount of data. 
+
+
+7. To run the app locally execute the following commands, be aware the local docker MySQL instance must be running before:
 
 ```bash
 cd dublinbus

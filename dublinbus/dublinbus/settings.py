@@ -124,6 +124,7 @@ DATABASES = {
         "PASSWORD": database_password,
         "HOST": database_host,
         "PORT": database_port,
+        "OPTIONS": {"init_command": "SET sql_mode='STRICT_ALL_TABLES'"},
     }
 }
 
