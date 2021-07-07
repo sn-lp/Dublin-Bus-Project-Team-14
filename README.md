@@ -86,6 +86,7 @@ docker run -p ${DEVELOPMENT_DATABASE_PORT}:3306  --name mysql -e MYSQL_ROOT_PASS
 ```
 - here`mysql` is the name we are giving to the container.
 - we will need to create these environment variables for our production database too.
+- note: if you are using Windows, the way to retrieve the env variable value in this and following commands should be %DEVELOPMENT_DATABASE_PORT%, %DEVELOPMENT_DATABASE_PASSWORD% and %DEVELOPMENT_DATABASE_USER%
 
 4. After the above command, and only the first time as well, run the following command to create a database/schema named "dublin_bus" (we will need to create a schema with the same name in the production DB too):
 ```bash
