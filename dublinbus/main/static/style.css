@@ -1,7 +1,7 @@
 /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
 #map {
-  height: calc(100vh - 30px);
+  height: calc(100vh);
   width: 100%;
 }
 
@@ -27,4 +27,77 @@ a:hover {
 .mdc-top-app-bar--fixed,
 a:visited {
   color: black;
+}
+
+h3 {
+  float: right;
+  color: black;
+  margin-top: 7px;
+  margin-left: 10px;
+}
+
+/* JOURNEY PLANNER INTERFACE */
+button.btn,
+button.btn:active,
+button.btn:target,
+button.btn:hover {
+  background-color: #ffcc00;
+  border: none;
+}
+
+#over_map {
+  position: absolute;
+  top: 10vh;
+  left: 3vw;
+  z-index: 0;
+  min-width: 370px;
+  max-width: 370px;
+}
+
+#over_map div,
+p,
+input {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 0.7vh;
+  width: 100%;
+}
+
+/* CHANGE WIDTH FOR MOBILE DEVICES */
+@media only screen and (max-width: 992px) {
+  #over_map {
+    min-width: 94vw;
+  }
+}
+
+.btn-primary {
+  background: #ffcc00;
+  color: black;
+}
+
+#wrapper {
+  position: relative;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active,
+.open.dropdown-toggle.btn-primary {
+  color: black;
+  background-color: #ffcc00;
+}
+
+/* HIDE GOOGLE MAPS WARNINGS */
+.warnbox-content,
+.adp-warnbox,
+.adp-agencies {
+  visibility: hidden;
+  height: 0;
+  width: 0;
+}
+
+#resultsUI div {
+  padding: 0px;
 }
