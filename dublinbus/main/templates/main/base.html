@@ -39,6 +39,7 @@
     </aside>
   
     <div class="mdc-drawer-scrim d-lg-none"></div>
+
     <div class="mdc-drawer-app-content">
       <header class="mdc-top-app-bar mdc-top-app-bar--fixed">
         <div class="mdc-top-app-bar__row">
@@ -47,8 +48,11 @@
 
             <div class="mx-auto d-lg-none">
               <img src="{% static 'img/db_icon.png' %}" height="45px" /></img>
+              <h3>{% block nav_title %}{{ nav_title }}{% endblock %}</h3>
             </div>
-        
+
+            <button class="mdc-icon-button material-icons" id="map_toggle" style="color: black;">map</button>
+
             <img class="d-none d-lg-block" src="{% static 'img/db_logo.png' %}" height="45px" /></img>
             <div class="d-none d-lg-block">
               <a class="mdc-top-app-bar--fixed" href="/">Journey Planner</a>
@@ -62,12 +66,11 @@
     </div>
 
     <main id="container-fluid">{% block content %}{% endblock %}</main>
-
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLEMAPS_APIKEY }}&callback=initMap&libraries=&v=weekly" async></script>
+    
     <script src="{% static 'app.js' %}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLEMAPS_APIKEY }}&callback=initMap&libraries=places&v=weekly" async></script>
     <script src="{% static 'main/js/bootstrap.js' %}"></script>
     <script src="{% static 'main/MDB/js/mdb.min.js' %}"></script>
   </body>
 
-  <footer class="text-center">UCD Computer Science 2021 - Team 14</footer>
 </html>
