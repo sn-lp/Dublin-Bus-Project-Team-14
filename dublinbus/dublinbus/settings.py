@@ -174,3 +174,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # We can have all other environment variables (e.g. API keys) here
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLEMAPS_APIKEY", "")
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": os.path.join(BASE_DIR, "django_cache"),
+    }
+}
