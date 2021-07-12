@@ -40,6 +40,7 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer) {
       transitOptions: {
         modes: ["BUS"],
       },
+      provideRouteAlternatives: true,
     })
     .then((response) => {
       directionsRenderer.setDirections(response);
