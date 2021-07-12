@@ -62,6 +62,13 @@ def get_weather(input_timestamp):
         print("No Value in Cache")
         update_weather_cache()
 
+    if (
+        cache.get("hourly_weather_dic") is None
+        or cache.get("daily_weather_dic") is None
+    ):
+        print("Error: cannot load weather api data")
+        return None
+
     # if the input is within 48 hour (169200 sec), then retrieve the hourly data
     if truncated_input_timestamp - truncated_current_timestamp <= 169200:
         hour_index = int(

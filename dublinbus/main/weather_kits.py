@@ -1,6 +1,7 @@
 import requests
 import datetime
 import os
+from django.conf import settings
 
 
 class Weather:
@@ -98,9 +99,12 @@ def parse(object, is_daily):
 
 
 def scrape():
+    if settings.WEATHER_APIKEY is None:
+        print("ERROR: no WEATHER_APIKEY set!")
+        return None, None
     url = (
         "http://api.openweathermap.org/data/2.5/onecall?lat=53.349805&lon=-6.26031&units=metric&appid="
-        + os.getenv("WEATHER_APIKEY")
+        + settings.WEATHER_APIKEY
     )
 
     response = requests.get(url)
