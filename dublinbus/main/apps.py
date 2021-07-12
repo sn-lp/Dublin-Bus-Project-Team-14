@@ -8,4 +8,4 @@ class MainConfig(AppConfig):
     def ready(self):
         from main import cache_manipulator
 
-        cache_manipulator.update_weather_cache_hourly()
+        cache_manipulator.update_weather_data_hourly()

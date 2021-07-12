@@ -19,7 +19,7 @@ def main():
         ) from exc
     # run the weather scraper and put the data in cache right after the server started
     cache.clear()
-    cache_manipulator.update_weather_cache()
+    cache_manipulator.update_weather_data()
     execute_from_command_line(sys.argv)
     cache.clear()
 

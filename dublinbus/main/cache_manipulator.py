@@ -5,7 +5,7 @@ from datetime import datetime
 import pytz
 
 
-def update_weather_cache():
+def update_weather_data():
     hourly_weather_dic, daily_weather_dic = weather_kits.scrape()
     # hourly_weather_dic is a list (index: hours from now, value: weather object)
     # daily_weather_dic is a list (index: days from now,  value: weather object)
@@ -15,10 +15,10 @@ def update_weather_cache():
     print("RUN WEATHER UPDATE")  # this could be changed, when we have a logging module
 
 
-def update_weather_cache_hourly():
+def update_weather_data_hourly():
     scheduler = BackgroundScheduler()
     # use cron to run hourly
-    scheduler.add_job(update_weather_cache, "cron", minute=0)
+    scheduler.add_job(update_weather_data, "cron", minute=0)
     scheduler.start()
 
 
@@ -59,15 +59,16 @@ def get_weather(input_timestamp):
         cache.get("hourly_weather_dic") is None
         or cache.get("daily_weather_dic") is None
     ):
-        print(
-            "Error: No value in Cache"
-        )  # this could be changed, when we have a logging module
-        update_weather_cache()
+        # this could be changed, when we have a logging module
+        print("Error: No value in Cache")
+        update_weather_data()
 
+    # after trying one time, still has no data, then return None
     if (
         cache.get("hourly_weather_dic") is None
         or cache.get("daily_weather_dic") is None
     ):
+        # this could be changed, when we have a logging module
         print("Error: cannot load weather api data")
         return None
 
