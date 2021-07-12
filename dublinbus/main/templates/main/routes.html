@@ -10,16 +10,16 @@
   <div id="over_map" class="container w-25 p-3 bg-white">
 
     <div id="searchRouteUI">
-    <p class="font-weight-bold text-center">Search by Route</p>
+      <p class="font-weight-bold text-center">Search by Route</p>
 
       <div class="form-group">
+        <p class="text-center" id="user-error-message"></p>
         <input type="text" class="form-control" id="bus-route-input" placeholder="Bus Route">
       </div>
 
-    <div class="d-grid gap-2">
-        <button id="submit" class="btn btn-primary" type="submit" onclick="getBusStopsFromBackend()">Submit</button>
-    </div>
-
+      <div class="d-grid gap-2">
+          <button id="submit" class="btn btn-primary" type="submit" onclick="getBusStopsFromBackend()">Submit</button>
+      </div>
     </div>
 
     <div id="directions-buttons" style="display: none;">
@@ -47,14 +47,10 @@
           ></button>
         </li>
     </div>
-
-  </div>
-
     
-  </div>
-
-
-
+    <button id="back-to-routes" class="btn btn-primary" type="submit" onclick="goToRoutesPage()">Back to Routes</button>
+  </div>    
+</div>
 
 <script src="{% static 'routeviewer.js' %}"></script>
 {% endblock %}
