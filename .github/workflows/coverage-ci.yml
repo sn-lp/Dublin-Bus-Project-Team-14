@@ -43,6 +43,7 @@ jobs:
       - name: Run coverage
         run: cd dublinbus && coverage run --source='.' manage.py test main
         env:
+          WEATHER_APIKEY: ${{ secrets.WEATHER_APIKEY }}
           GOOGLEMAPS_APIKEY: ${{ secrets.GOOGLEMAPS_APIKEY }}
           DEVELOPMENT_DATABASE_USER: ${{ secrets.DEVELOPMENT_DATABASE_USER }}
           DEVELOPMENT_DATABASE_PASSWORD: ${{ secrets.DEVELOPMENT_DATABASE_PASSWORD }}
