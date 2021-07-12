@@ -99,12 +99,9 @@ def parse(object, is_daily):
 
 
 def scrape():
-    if settings.WEATHER_APIKEY is None:
-        print("ERROR: no WEATHER_APIKEY set!")
-        return None, None
     url = (
         "http://api.openweathermap.org/data/2.5/onecall?lat=53.349805&lon=-6.26031&units=metric&appid="
-        + "27ca9208d8aa854c6556a76e6521c4dc"
+        + settings.WEATHER_APIKEY
     )
 
     response = requests.get(url)

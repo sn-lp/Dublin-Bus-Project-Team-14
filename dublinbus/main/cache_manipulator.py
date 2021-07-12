@@ -12,7 +12,7 @@ def update_weather_cache():
     # expire time: 65 minutes
     cache.set("hourly_weather_dic", hourly_weather_dic, 65 * 60)
     cache.set("daily_weather_dic", daily_weather_dic, 65 * 60)
-    print("RUN WEATHER UPDATE")
+    print("RUN WEATHER UPDATE") # this could be changed, when we have a logging module
 
 
 def update_weather_cache_hourly():
@@ -59,7 +59,7 @@ def get_weather(input_timestamp):
         cache.get("hourly_weather_dic") is None
         or cache.get("daily_weather_dic") is None
     ):
-        print("No Value in Cache")
+        print("Error: No value in Cache") # this could be changed, when we have a logging module
         update_weather_cache()
 
     if (
