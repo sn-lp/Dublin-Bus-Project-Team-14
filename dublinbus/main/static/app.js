@@ -8,3 +8,15 @@ const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(
 topAppBar.listen("MDCTopAppBar:nav", () => {
   drawer.open = !drawer.open;
 });
+
+//Button to hide UI to just show map
+const targetDiv = document.getElementById("over_map");
+const toggleBtn = document.getElementById("map_toggle");
+
+toggleBtn.onclick = function () {
+  if (targetDiv.style.display !== "none") {
+    targetDiv.style.display = "none";
+  } else {
+    targetDiv.style.display = "block";
+  }
+};

@@ -1,7 +1,60 @@
 {% extends "main/base.html" %}
+{% load static %}
 
 {% block title %}Dublin Bus - Routes{% endblock %}
 
 {% block content %}
+<div id="wrapper">
   <div id="map"></div>
+  
+  <div id="over_map" class="container w-25 p-3 bg-white">
+
+    <div id="searchRouteUI">
+      <p class="font-weight-bold text-center">Search by Route</p>
+
+      <div class="form-group">
+        <p class="text-center" id="user-error-message"></p>
+        <input type="text" class="form-control" id="bus-route-input" placeholder="Bus Route">
+      </div>
+
+      <div class="d-grid gap-2">
+          <button id="submit" class="btn btn-primary" type="submit" onclick="getBusStopsFromBackend()">Submit</button>
+      </div>
+    </div>
+
+    <div id="directions-buttons" style="display: none;">
+      <ul class="nav nav-tabs mb-3" id="directions-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link active"
+            id="direction-button-0"
+            type="button"
+            role="tab"
+            aria-controls="direction-0"
+            aria-selected="true"
+            onclick="changeDirection(0)"
+          ></button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="direction-button-1"
+            type="button"
+            role="tab"
+            aria-controls="direction-1"
+            aria-selected="false"
+            onclick="changeDirection(1)"
+          ></button>
+        </li>
+    </div>
+
+    <div class="d-grid gap-2">
+      <button id="back-to-routes" class="btn btn-primary" type="submit" onclick="goToRoutesPage()">Back to Routes</button>
+    </div>
+
+  </div>    
+
+</div>
+
+<script src="{% static 'routeviewer.js' %}"></script>
 {% endblock %}

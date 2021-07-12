@@ -101,3 +101,11 @@ input {
 #resultsUI div {
   padding: 0px;
 }
+/* ROUTES INTERFACE */
+#directions-buttons {
+  display: none;
+}
+
+#back-to-routes {
+  display: none;
+}
