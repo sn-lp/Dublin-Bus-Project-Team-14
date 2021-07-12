@@ -55,7 +55,7 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer) {
       const resultsUI = document.getElementById("resultsUI");
       resultsUI.style.display = "block";
     })
-    .catch((e) => window.alert("Directions request failed due to " + status));
+    .catch((e) => window.alert("No bus directions could be found"));
 }
 
 //Clear the map
