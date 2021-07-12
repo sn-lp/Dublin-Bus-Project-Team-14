@@ -4,6 +4,7 @@ from main.cache_manipulator import get_weather
 from datetime import datetime
 import pytz
 
+
 class ViewTests(TestCase):
     def test_index_view(self):
         response = self.client.get(reverse("home"))
@@ -16,6 +17,7 @@ class ViewTests(TestCase):
     def test_routes_view(self):
         response = self.client.get(reverse("busroutes"))
         self.assertEqual(response.status_code, 200)
+
 
 class CacheTests(TestCase):
     def test_get_weather(self):
@@ -72,4 +74,4 @@ class CacheTests(TestCase):
             truncate_daily_time(get_weather(in_7day_timestamp).get_timestamp()),
             truncate_daily_time(in_7day_timestamp),
         )
-        self.assertEqual(get_weather(in_8day_timestamp), None) 
+        self.assertEqual(get_weather(in_8day_timestamp), None)

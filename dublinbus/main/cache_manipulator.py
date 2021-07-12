@@ -45,8 +45,12 @@ def get_weather(input_timestamp):
 
     # if input is 7 days after
 
-    input_day = truncated_input_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
-    current_day = truncated_current_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+    input_day = truncated_input_datetime.replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+    current_day = truncated_current_datetime.replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
     if (input_day - current_day).days > 7:
         return None
 

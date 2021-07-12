@@ -5,6 +5,7 @@ import sys
 from main import cache_manipulator
 from django.core.cache import cache
 
+
 def main():
     """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dublinbus.settings")
