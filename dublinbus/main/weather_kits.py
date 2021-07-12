@@ -104,7 +104,7 @@ def scrape():
         return None, None
     url = (
         "http://api.openweathermap.org/data/2.5/onecall?lat=53.349805&lon=-6.26031&units=metric&appid="
-        + settings.WEATHER_APIKEY
+        + "27ca9208d8aa854c6556a76e6521c4dc"
     )
 
     response = requests.get(url)
