@@ -16,7 +16,7 @@ function initMap() {
 }
 
 function hideSubmitForm() {
-  document.getElementById("over_map").style.display = "none";
+  document.getElementById("searchRouteUI").style.display = "none";
 }
 
 function displayDirectionsButtons() {
