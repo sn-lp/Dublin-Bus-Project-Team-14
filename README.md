@@ -79,6 +79,7 @@ To install Docker:
 - DEVELOPMENT_DATABASE_PASSWORD
 - DEVELOPMENT_DATABASE_HOST
 - DEVELOPMENT_DATABASE_PORT (note: choose a port number different from 3306 so it does not conflict with a MySQL database you may already have running at port 3306);
+- WEATHER_APIKEY
 
 3. For the first time only, run the following command in the terminal to create and run a MySQL instance locally with the same version as the MySQL database on Heroku:
 ```bash
