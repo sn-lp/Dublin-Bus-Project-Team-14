@@ -79,7 +79,6 @@ To install Docker:
 - DEVELOPMENT_DATABASE_PASSWORD
 - DEVELOPMENT_DATABASE_HOST
 - DEVELOPMENT_DATABASE_PORT (note: choose a port number different from 3306 so it does not conflict with a MySQL database you may already have running at port 3306);
-- WEATHER_APIKEY
 
 3. For the first time only, run the following command in the terminal to create and run a MySQL instance locally with the same version as the MySQL database on Heroku:
 ```bash
@@ -124,8 +123,11 @@ docker exec -i mysql mysql -u${DEVELOPMENT_DATABASE_USER} -p${DEVELOPMENT_DATABA
 ```
 - note: this is quicker to insert the data than using Django data migrations and also allows our CI to easily create a test database without having to do the data migrations which would be very slow due to the amount of data. 
 
+7. Create env variables for API keys
+- GOOGLEMAPS_APIKEY
+- WEATHER_APIKEY 
 
-7. To run the app locally execute the following commands, be aware the local docker MySQL instance must be running before:
+8. To run the app locally execute the following commands, be aware the local docker MySQL instance must be running before:
 
 ```bash
 cd dublinbus
