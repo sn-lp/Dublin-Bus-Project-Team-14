@@ -123,8 +123,11 @@ docker exec -i mysql mysql -u${DEVELOPMENT_DATABASE_USER} -p${DEVELOPMENT_DATABA
 ```
 - note: this is quicker to insert the data than using Django data migrations and also allows our CI to easily create a test database without having to do the data migrations which would be very slow due to the amount of data. 
 
+7. Create env variables for API keys
+- GOOGLEMAPS_APIKEY
+- WEATHER_APIKEY 
 
-7. To run the app locally execute the following commands, be aware the local docker MySQL instance must be running before:
+8. To run the app locally execute the following commands, be aware the local docker MySQL instance must be running before:
 
 ```bash
 cd dublinbus
