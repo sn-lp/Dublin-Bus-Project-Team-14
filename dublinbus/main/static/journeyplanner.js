@@ -48,6 +48,8 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer) {
         document.getElementById("directions_results")
       );
 
+      console.log(response);
+
       //Switching UI
       const searchUI = document.getElementById("searchUI");
       searchUI.style.display = "none";
