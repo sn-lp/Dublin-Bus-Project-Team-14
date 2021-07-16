@@ -40,12 +40,15 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer) {
       transitOptions: {
         modes: ["BUS"],
       },
+      provideRouteAlternatives: true,
     })
     .then((response) => {
       directionsRenderer.setDirections(response);
       directionsRenderer.setPanel(
         document.getElementById("directions_results")
       );
+
+      console.log(response);
 
       //Switching UI
       const searchUI = document.getElementById("searchUI");
@@ -54,7 +57,7 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer) {
       const resultsUI = document.getElementById("resultsUI");
       resultsUI.style.display = "block";
     })
-    .catch((e) => window.alert("Directions request failed due to " + status));
+    .catch((e) => window.alert("No bus directions could be found"));
 }
 
 //Clear the map
