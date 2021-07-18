@@ -13,43 +13,41 @@ let map;
 
 window.onload = function afterWindowLoaded() {
   displayFavourites();
-}
+};
 
 function displayFavourites() {
   // run this function, only if the browser supports localstorage
-  if (typeof(Storage) !== "undefined") {
-
+  if (typeof Storage !== "undefined") {
     if (localStorage.getItem("favourite_routes") !== null) {
       // display title
       var para = document.createElement("P");
-      para.classList.add('font-weight-bold');
-      para.classList.add('text-center');
+      para.classList.add("font-weight-bold");
+      para.classList.add("text-center");
       para.innerHTML = "Favourites";
       document.getElementById("favourites").appendChild(para);
       // display buttons
-      let favourites_array = JSON.parse(localStorage.getItem("favourite_routes"));
-      favourites_array.forEach(function(item, index, array) {
+      let favourites_array = JSON.parse(
+        localStorage.getItem("favourite_routes")
+      );
+      favourites_array.forEach(function (item, index, array) {
         // create div
         var route_div = document.createElement("DIV");
-        route_div.classList.add('d-grid');
-        route_div.classList.add('gap-2');
+        route_div.classList.add("d-grid");
+        route_div.classList.add("gap-2");
         // create button
         var btn = document.createElement("BUTTON");
-        btn.setAttribute('class', 'btn btn-primary');
-        btn.setAttribute('type', 'submit');
-        btn.addEventListener('click', function(){
+        btn.setAttribute("class", "btn btn-primary");
+        btn.setAttribute("type", "submit");
+        btn.addEventListener("click", function () {
           getBusStopsByBusNum(item);
         });
         btn.textContent = item;
         // append the button to the div, and append the div to the favourite section
         route_div.appendChild(btn);
         document.getElementById("favourites").appendChild(route_div);
-      })
+      });
     }
   }
-
-
-
 }
 
 function initMap() {
@@ -97,9 +95,8 @@ function goToRoutesPage() {
 }
 
 function addToFavourites() {
-// run this function, only if the browser supports localstorage
-  if (typeof(Storage) !== "undefined") {
-
+  // run this function, only if the browser supports localstorage
+  if (typeof Storage !== "undefined") {
     let route_num = document.getElementById("bus-route-input").value;
 
     // favourite_routes is empty, then initialise it
@@ -107,15 +104,17 @@ function addToFavourites() {
       let favourites_array = [route_num];
       let favourites_str = JSON.stringify(favourites_array);
       localStorage.setItem("favourite_routes", favourites_str);
-    
-    // favourite_routes is not empty, then append new route to it
+
+      // favourite_routes is not empty, then append new route to it
     } else {
-      let favourites_array = JSON.parse(localStorage.getItem("favourite_routes"));
+      let favourites_array = JSON.parse(
+        localStorage.getItem("favourite_routes")
+      );
       // store if not duplicated
       if (!favourites_array.includes(route_num)) {
         favourites_array.push(route_num);
         let favourites_str = JSON.stringify(favourites_array);
-        localStorage.setItem("favourite_routes", favourites_str);    	
+        localStorage.setItem("favourite_routes", favourites_str);
       }
     }
   }
