@@ -29,13 +29,16 @@ function displayFavourites() {
       // display buttons
       let favourites_array = JSON.parse(localStorage.getItem("favourite_routes"));
       favourites_array.forEach(function(item, index, array) {
+        // create div
         var route_div = document.createElement("DIV");
         route_div.classList.add('d-grid');
         route_div.classList.add('gap-2');
+        // create button
         var btn = document.createElement("BUTTON");
         btn.setAttribute('class', 'btn btn-primary');
         btn.setAttribute('type', 'submit');
         btn.textContent = item;
+        // append the button to the div, and append the div to the favourite section
         route_div.appendChild(btn);
         document.getElementById("favourites").appendChild(route_div);
       })
