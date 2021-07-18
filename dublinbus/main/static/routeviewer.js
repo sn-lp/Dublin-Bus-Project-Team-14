@@ -11,9 +11,40 @@ const defaultMapPositionLong = -6.2603;
 //Google Maps
 let map;
 
-  window.onload = function loadFavourites() {
-    console.log('load favourites now.');
+window.onload = function afterWindowLoaded() {
+  displayFavourites();
+}
+
+function displayFavourites() {
+  // run this function, only if the browser supports localstorage
+  if (typeof(Storage) !== "undefined") {
+
+    if (localStorage.getItem("favourite_routes") !== null) {
+      // display title
+      var para = document.createElement("P");
+      para.classList.add('font-weight-bold');
+      para.classList.add('text-center');
+      para.innerHTML = "Favourites";
+      document.getElementById("favourites").appendChild(para);
+      // display buttons
+      let favourites_array = JSON.parse(localStorage.getItem("favourite_routes"));
+      favourites_array.forEach(function(item, index, array) {
+        var route_div = document.createElement("DIV");
+        route_div.classList.add('d-grid');
+        route_div.classList.add('gap-2');
+        var btn = document.createElement("BUTTON");
+        btn.setAttribute('class', 'btn btn-primary');
+        btn.setAttribute('type', 'submit');
+        btn.textContent = item;
+        route_div.appendChild(btn);
+        document.getElementById("favourites").appendChild(route_div);
+      })
+    }
   }
+
+
+
+}
 
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
@@ -32,6 +63,10 @@ function initMap() {
 
 function hideSubmitForm() {
   document.getElementById("searchRouteUI").style.display = "none";
+}
+
+function hideFavourites() {
+  document.getElementById("favourites").style.display = "none";
 }
 
 function displayDirectionsButtons() {
@@ -171,6 +206,7 @@ function getBusStopsFromBackend() {
         index += 1;
       }
       hideSubmitForm();
+      hideFavourites();
       displayBackToRoutesButton();
       displayAddToFavouritesButton();
       displayDirectionsButtons();
