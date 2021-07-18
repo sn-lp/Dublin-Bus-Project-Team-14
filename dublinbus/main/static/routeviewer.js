@@ -98,7 +98,7 @@ function addToFavourites() {
   // run this function, only if the browser supports localstorage
   if (typeof Storage !== "undefined") {
     let route_num = document.getElementById("bus-route-input").value;
-    if (route_num == '') {
+    if (route_num == "") {
       return;
     }
     // favourite_routes is empty, then initialise it
