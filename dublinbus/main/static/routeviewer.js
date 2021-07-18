@@ -110,7 +110,7 @@ function addToFavourites() {
       let favourites_array = JSON.parse(
         localStorage.getItem("favourite_routes")
       );
-      // store if not duplicated
+      // append the new favourite routes, if not duplicated
       if (!favourites_array.includes(route_num)) {
         favourites_array.push(route_num);
         let favourites_str = JSON.stringify(favourites_array);
