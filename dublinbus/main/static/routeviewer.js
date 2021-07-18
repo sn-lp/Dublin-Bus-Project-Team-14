@@ -37,6 +37,9 @@ function displayFavourites() {
         var btn = document.createElement("BUTTON");
         btn.setAttribute('class', 'btn btn-primary');
         btn.setAttribute('type', 'submit');
+        btn.addEventListener('click', function(){
+          getBusStopsByBusNum(item);
+        });
         btn.textContent = item;
         // append the button to the div, and append the div to the favourite section
         route_div.appendChild(btn);
@@ -175,6 +178,10 @@ function drawMarkers(stops) {
 
 function getBusStopsFromBackend() {
   routeNumber = document.getElementById("bus-route-input").value;
+  getBusStopsByBusNum(routeNumber);
+}
+
+function getBusStopsByBusNum(routeNumber) {
   busRoutesEndpoint = "/api/get_bus_stops/?route_number=" + routeNumber;
   fetch(busRoutesEndpoint)
     .then((response) => {
