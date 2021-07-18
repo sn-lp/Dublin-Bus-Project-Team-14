@@ -11,6 +11,10 @@ const defaultMapPositionLong = -6.2603;
 //Google Maps
 let map;
 
+  window.onload = function loadFavourites() {
+    console.log('load favourites now.');
+  }
+
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: defaultMapPositionLat, lng: defaultMapPositionLong },
@@ -52,7 +56,28 @@ function goToRoutesPage() {
 }
 
 function addToFavourites() {
-  console.log("ADD FFF");
+// run this function, only if the browser supports localstorage
+  if (typeof(Storage) !== "undefined") {
+
+    let route_num = document.getElementById("bus-route-input").value;
+
+    // favourite_routes is empty, then initialise it
+    if (localStorage.getItem("favourite_routes") == null) {
+      let favourites_array = [route_num];
+      let favourites_str = JSON.stringify(favourites_array);
+      localStorage.setItem("favourite_routes", favourites_str);
+    
+    // favourite_routes is not empty, then append new route to it
+    } else {
+      let favourites_array = JSON.parse(localStorage.getItem("favourite_routes"));
+      // store if not duplicated
+      if (!favourites_array.includes(route_num)) {
+        favourites_array.push(route_num);
+        let favourites_str = JSON.stringify(favourites_array);
+        localStorage.setItem("favourite_routes", favourites_str);    	
+      }
+    }
+  }
 }
 
 function resetMapPositionAndZoom() {
