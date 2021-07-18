@@ -43,8 +43,16 @@ function displayBackToRoutesButton() {
   document.getElementById("back-to-routes").style.display = "block";
 }
 
+function displayAddToFavouritesButton() {
+  document.getElementById("add-to-favourites").style.display = "block";
+}
+
 function goToRoutesPage() {
   window.location.reload();
+}
+
+function addToFavourites() {
+  console.log("ADD FFF");
 }
 
 function resetMapPositionAndZoom() {
@@ -139,6 +147,7 @@ function getBusStopsFromBackend() {
       }
       hideSubmitForm();
       displayBackToRoutesButton();
+      displayAddToFavouritesButton();
       displayDirectionsButtons();
       injectDirectionNameInButtons();
       selectedDirection = directions[0];
