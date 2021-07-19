@@ -127,7 +127,7 @@ function goToRoutesPage() {
   window.location.reload();
 }
 
-function ddToLocalstorage() {
+function addToLocalstorage() {
   let route_num = document.getElementById("bus-route-input").value;
   if (route_num != "") {
     addToLocalstorageByRouteNum(route_num);
