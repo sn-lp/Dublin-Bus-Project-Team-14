@@ -23,8 +23,7 @@ function displayFavourites() {
     }
     // display title
     var para = document.createElement("P");
-    para.classList.add("font-weight-bold");
-    para.classList.add("text-center");
+    para.setAttribute("class", "font-weight-bold text-center");
     para.innerHTML = "Favourites";
     document.getElementById("favourites").appendChild(para);
     // display buttons
@@ -32,8 +31,7 @@ function displayFavourites() {
     favourites_array.forEach(function (item, index, array) {
       // create div
       var route_div = document.createElement("DIV");
-      route_div.classList.add("d-grid");
-      route_div.classList.add("gap-2");
+      para.setAttribute("class", "d-grid gap-2");
       // create button
       var btn = document.createElement("BUTTON");
       btn.setAttribute("class", "btn btn-primary");
