@@ -109,7 +109,7 @@ function displayAddOrRemoveFavouritesButton(routeNumber) {
       document.getElementById("remove-from-favourites").style.display = "block";
       let btn = document.getElementById("remove-from-favourites");
       btn.addEventListener("click", function () {
-        removeFromFavourites(routeNumber);
+        removeFromLocalstorage(routeNumber);
       });
 
       // else display "add to favourite" button
@@ -159,7 +159,7 @@ function addToLocalstorageByRouteNum(route_num) {
   }
 }
 
-function removeFromFavourites(routeNumber) {
+function removeFromLocalstorage(routeNumber) {
   // run this function, only if the browser supports localstorage
   if (typeof Storage !== "undefined") {
     // localstorage is null, then return
