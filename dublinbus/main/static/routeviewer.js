@@ -87,7 +87,10 @@ function displayBackToRoutesButton() {
 }
 
 function displayAddToFavouritesButton() {
-  document.getElementById("add-to-favourites").style.display = "block";
+  // run this function, only if the browser supports localstorage
+  if (typeof Storage !== "undefined") {
+    document.getElementById("add-to-favourites").style.display = "block";
+  }
 }
 
 function goToRoutesPage() {
