@@ -11,6 +11,45 @@ const defaultMapPositionLong = -6.2603;
 //Google Maps
 let map;
 
+window.onload = function afterWindowLoaded() {
+  displayFavourites();
+};
+
+function displayFavourites() {
+  // run this function, only if the browser supports localstorage
+  if (typeof Storage !== "undefined") {
+    if (localStorage.getItem("favourite_routes") !== null) {
+      // display title
+      var para = document.createElement("P");
+      para.classList.add("font-weight-bold");
+      para.classList.add("text-center");
+      para.innerHTML = "Favourites";
+      document.getElementById("favourites").appendChild(para);
+      // display buttons
+      let favourites_array = JSON.parse(
+        localStorage.getItem("favourite_routes")
+      );
+      favourites_array.forEach(function (item, index, array) {
+        // create div
+        var route_div = document.createElement("DIV");
+        route_div.classList.add("d-grid");
+        route_div.classList.add("gap-2");
+        // create button
+        var btn = document.createElement("BUTTON");
+        btn.setAttribute("class", "btn btn-primary");
+        btn.setAttribute("type", "submit");
+        btn.addEventListener("click", function () {
+          getBusStopsByBusNum(item);
+        });
+        btn.textContent = item;
+        // append the button to the div, and append the div to the favourite section
+        route_div.appendChild(btn);
+        document.getElementById("favourites").appendChild(route_div);
+      });
+    }
+  }
+}
+
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: defaultMapPositionLat, lng: defaultMapPositionLong },
@@ -30,6 +69,10 @@ function hideSubmitForm() {
   document.getElementById("searchRouteUI").style.display = "none";
 }
 
+function hideFavourites() {
+  document.getElementById("favourites").style.display = "none";
+}
+
 function displayDirectionsButtons() {
   document.getElementById("directions-buttons").style.display = "block";
 }
@@ -43,8 +86,43 @@ function displayBackToRoutesButton() {
   document.getElementById("back-to-routes").style.display = "block";
 }
 
+function displayAddToFavouritesButton() {
+  // run this function, only if the browser supports localstorage
+  if (typeof Storage !== "undefined") {
+    document.getElementById("add-to-favourites").style.display = "block";
+  }
+}
+
 function goToRoutesPage() {
   window.location.reload();
+}
+
+function addToFavourites() {
+  // run this function, only if the browser supports localstorage
+  if (typeof Storage !== "undefined") {
+    let route_num = document.getElementById("bus-route-input").value;
+    if (route_num == "") {
+      return;
+    }
+    // favourite_routes is empty, then initialise it
+    if (localStorage.getItem("favourite_routes") == null) {
+      let favourites_array = [route_num];
+      let favourites_str = JSON.stringify(favourites_array);
+      localStorage.setItem("favourite_routes", favourites_str);
+
+      // favourite_routes is not empty, then append new route to it
+    } else {
+      let favourites_array = JSON.parse(
+        localStorage.getItem("favourite_routes")
+      );
+      // append the new favourite routes, if not duplicated
+      if (!favourites_array.includes(route_num)) {
+        favourites_array.push(route_num);
+        let favourites_str = JSON.stringify(favourites_array);
+        localStorage.setItem("favourite_routes", favourites_str);
+      }
+    }
+  }
 }
 
 function resetMapPositionAndZoom() {
@@ -104,6 +182,10 @@ function drawMarkers(stops) {
 
 function getBusStopsFromBackend() {
   routeNumber = document.getElementById("bus-route-input").value;
+  getBusStopsByBusNum(routeNumber);
+}
+
+function getBusStopsByBusNum(routeNumber) {
   busRoutesEndpoint = "/api/get_bus_stops/?route_number=" + routeNumber;
   fetch(busRoutesEndpoint)
     .then((response) => {
@@ -138,7 +220,9 @@ function getBusStopsFromBackend() {
         index += 1;
       }
       hideSubmitForm();
+      hideFavourites();
       displayBackToRoutesButton();
+      displayAddToFavouritesButton();
       displayDirectionsButtons();
       injectDirectionNameInButtons();
       selectedDirection = directions[0];
