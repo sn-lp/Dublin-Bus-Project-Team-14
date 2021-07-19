@@ -97,7 +97,7 @@ function displayAddOrRemoveFavouritesButton(routeNumber) {
       let btn = document.getElementById("add-to-favourites");
       btn.style.display = "block";
       btn.addEventListener("click", function () {
-        addToFavouritesByRouteNum(routeNumber);
+        addToLocalstorageByRouteNum(routeNumber);
       });
       return;
     }
@@ -117,7 +117,7 @@ function displayAddOrRemoveFavouritesButton(routeNumber) {
       let btn = document.getElementById("add-to-favourites");
       btn.style.display = "block";
       btn.addEventListener("click", function () {
-        addToFavouritesByRouteNum(routeNumber);
+        addToLocalstorageByRouteNum(routeNumber);
       });
     }
   }
@@ -127,14 +127,14 @@ function goToRoutesPage() {
   window.location.reload();
 }
 
-function addToFavourites() {
+function ddToLocalstorage() {
   let route_num = document.getElementById("bus-route-input").value;
   if (route_num != "") {
-    addToFavouritesByRouteNum(route_num);
+    addToLocalstorageByRouteNum(route_num);
   }
 }
 
-function addToFavouritesByRouteNum(route_num) {
+function addToLocalstorageByRouteNum(route_num) {
   // run this function, only if the browser supports localstorage
   if (typeof Storage !== "undefined") {
     // localstorage is empty, then initialise it
