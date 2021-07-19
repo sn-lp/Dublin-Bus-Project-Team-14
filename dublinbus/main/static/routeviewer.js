@@ -23,7 +23,8 @@ function displayFavourites() {
     }
     // display title
     var para = document.createElement("P");
-    para.setAttribute("class", "font-weight-bold text-center");
+    para.classList.add("font-weight-bold");
+    para.classList.add("text-center");
     para.innerHTML = "Favourites";
     document.getElementById("favourites").appendChild(para);
     // display buttons
@@ -31,7 +32,8 @@ function displayFavourites() {
     favourites_array.forEach(function (item, index, array) {
       // create div
       var route_div = document.createElement("DIV");
-      para.setAttribute("class", "d-grid gap-2");
+      route_div.classList.add("d-grid");
+      route_div.classList.add("gap-2");
       // create button
       var btn = document.createElement("BUTTON");
       btn.setAttribute("class", "btn btn-primary");
@@ -112,7 +114,11 @@ function displayAddOrRemoveFavouritesButton(routeNumber) {
 
       // else display "add to favourite" button
     } else {
-      document.getElementById("add-to-favourites").style.display = "block";
+      let btn = document.getElementById("add-to-favourites");
+      btn.style.display = "block";
+      btn.addEventListener("click", function () {
+        addToFavouritesByRouteNum(routeNumber);
+      });
     }
   }
 }
