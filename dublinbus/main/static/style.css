@@ -113,3 +113,8 @@ input {
 #add-to-favourites {
   display: none;
 }
+
+#remove-from-favourites {
+  display: none;
+  background-color: #25b5f1;
+}
