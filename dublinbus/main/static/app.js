@@ -21,20 +21,21 @@ toggleBtn.onclick = function () {
   }
 };
 
-
 //Weather Widget
 function getWeatherFromBackend() {
   weatherEndpoint = "/api/weather_widget";
   fetch(weatherEndpoint)
     .then((response) => {
       if (response.ok) {
-        console.log(response);
         return response.json();
       }
+    })
+    .then((weatherDict) => {
+      console.log(weatherDict);
     })
     .catch((error) => {
       console.log(error);
     });
 }
 
-getWeatherFromBackend()
+getWeatherFromBackend();
