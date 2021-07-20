@@ -94,12 +94,12 @@ function displayAddOrRemoveFavouritesButton(routeNumber) {
 
     let favourites_array = [];
 
-    // if localstorage is null, then display "add to favourites" button
+    // to avoid NullPointerException
     if (localStorage.getItem("favourite_routes")) {
       favourites_array = JSON.parse(localStorage.getItem("favourite_routes"));
     }
 
-    // if localstorage contains the route number, then display "remove from favourite" button
+    // if localstorage doesn't contain the route number, then display "add to favourite" button
     if (
       favourites_array.length == 0 ||
       !favourites_array.includes(routeNumber)
@@ -109,7 +109,7 @@ function displayAddOrRemoveFavouritesButton(routeNumber) {
       btn.addEventListener("click", function () {
         addToLocalstorageByRouteNum(routeNumber);
       });
-      // else display "add to favourite" button
+      // else display "remove from favourite" button
     } else {
       document.getElementById("remove-from-favourites").style.display = "block";
       let btn = document.getElementById("remove-from-favourites");
