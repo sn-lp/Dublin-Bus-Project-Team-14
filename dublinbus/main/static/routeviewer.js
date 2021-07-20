@@ -100,7 +100,10 @@ function displayAddOrRemoveFavouritesButton(routeNumber) {
     }
 
     // if localstorage contains the route number, then display "remove from favourite" button
-    if (favourites_array.length == 0 || !favourites_array.includes(routeNumber)) {
+    if (
+      favourites_array.length == 0 ||
+      !favourites_array.includes(routeNumber)
+    ) {
       let btn = document.getElementById("add-to-favourites");
       btn.style.display = "block";
       btn.addEventListener("click", function () {
