@@ -25,4 +25,5 @@ urlpatterns = [
     path("busroutes/", main_views.bus_routes, name="busroutes"),
     path("api/get_bus_stops/", main_api.get_bus_stops, name="getbusstops"),
     path("admin/", admin.site.urls),
+    path("api/weather_widget", main_api.weather_widget, name="weather_widget"),
 ]

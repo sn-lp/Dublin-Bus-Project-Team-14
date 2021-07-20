@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from main.models import Route, Trip, Trips_Stops, Stop
+from main.cache_manipulator import *
 
 # returns all bus stops for each direction of each bus route
 def get_bus_stops(request):
@@ -41,3 +42,11 @@ def get_bus_stops(request):
                 "longitude": stop.longitude,
             }
     return JsonResponse(json_result)
+
+
+# Display current weather for widget
+def weather_widget(request):
+    current_timestamp = datetime.now().timestamp()
+    weather = get_weather(current_timestamp)
+    print(weather.__dict__)
+    return weather.__dict__
