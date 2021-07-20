@@ -92,32 +92,26 @@ function displayAddOrRemoveFavouritesButton(routeNumber) {
     document.getElementById("add-to-favourites").style.display = "none";
     document.getElementById("remove-from-favourites").style.display = "none";
 
+    let favourites_array = [];
+
     // if localstorage is null, then display "add to favourites" button
-    if (localStorage.getItem("favourite_routes") == null) {
+    if (localStorage.getItem("favourite_routes")) {
+      favourites_array = JSON.parse(localStorage.getItem("favourite_routes"));
+    }
+
+    // if localstorage contains the route number, then display "remove from favourite" button
+    if (favourites_array.length == 0 || !favourites_array.includes(routeNumber)) {
       let btn = document.getElementById("add-to-favourites");
       btn.style.display = "block";
       btn.addEventListener("click", function () {
         addToLocalstorageByRouteNum(routeNumber);
       });
-      return;
-    }
-
-    let favourites_array = JSON.parse(localStorage.getItem("favourite_routes"));
-
-    // if localstorage contains the route number, then display "remove from favourite" button
-    if (favourites_array.includes(routeNumber)) {
+      // else display "add to favourite" button
+    } else {
       document.getElementById("remove-from-favourites").style.display = "block";
       let btn = document.getElementById("remove-from-favourites");
       btn.addEventListener("click", function () {
         removeFromLocalstorage(routeNumber);
-      });
-
-      // else display "add to favourite" button
-    } else {
-      let btn = document.getElementById("add-to-favourites");
-      btn.style.display = "block";
-      btn.addEventListener("click", function () {
-        addToLocalstorageByRouteNum(routeNumber);
       });
     }
   }
