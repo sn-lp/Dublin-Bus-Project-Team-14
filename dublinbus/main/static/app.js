@@ -31,7 +31,16 @@ function getWeatherFromBackend() {
       }
     })
     .then((weatherDict) => {
-      console.log(weatherDict);
+      const weather_icon_id = weatherDict['_Weather__weather_icon'];
+      const weather_temperature = weatherDict['_Weather__temp'] + "° C";
+
+      var weather_widget_image = document.createElement("img");
+      weather_widget_image.setAttribute("src", 'http://openweathermap.org/img/wn/' + weather_icon_id + '@2x.png');
+      document.getElementById("weather_widget_top").appendChild(weather_widget_image);
+
+      var weather_widget_temperature = document.createElement("h5");
+      weather_widget_temperature.innerText = weather_temperature;
+      document.getElementById("weather_widget_top").appendChild(weather_widget_temperature);
     })
     .catch((error) => {
       console.log(error);
