@@ -3,6 +3,7 @@ from django.core.cache import cache
 from main import weather_kits
 from datetime import datetime
 import pytz
+from django.http import JsonResponse
 
 
 def update_weather_data():
@@ -85,3 +86,5 @@ def get_weather(input_timestamp):
             (truncated_input_timestamp - truncated_current_timestamp) / (24 * 3600)
         )
         return cache.get("daily_weather_dic")[daily_index]
+
+
