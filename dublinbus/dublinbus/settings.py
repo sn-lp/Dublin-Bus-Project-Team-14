@@ -102,7 +102,11 @@ def get_database_env_variables(production_variable, development_variable):
         )
 
 
-database_name = "dublin_bus"
+if os.getenv("PRODUCTION_DATABASE_NAME"):
+    database_name = os.getenv("PRODUCTION_DATABASE_NAME")
+else:
+    database_name = "dublin_bus"
+
 database_user = get_database_env_variables(
     "PRODUCTION_DATABASE_USER", "DEVELOPMENT_DATABASE_USER"
 )
