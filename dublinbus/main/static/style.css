@@ -120,4 +120,12 @@ input {
   float: left;
   margin-top: 50px;
   font-size: large;
+
+#add-to-favourites {
+  display: none;
+}
+
+#remove-from-favourites {
+  display: none;
+  background-color: #25b5f1;
 }
