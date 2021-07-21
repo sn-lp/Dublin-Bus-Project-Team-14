@@ -47,6 +47,20 @@ def get_bus_stops(request):
     return JsonResponse(json_result)
 
 
+def get_all_bus_stops(request):
+
+    stops = Stop.objects.all()
+    json_result = {}
+
+    for stop in stops:
+            json_result[stop.name] = {
+                "latitude": stop.latitude,
+                "longitude": stop.longitude,
+            }
+    return JsonResponse(json_result)
+
+
+
 # Returns current weather data dictionary for building weather widget
 def weather_widget(request):
     input_timestamp = datetime.now().timestamp()
