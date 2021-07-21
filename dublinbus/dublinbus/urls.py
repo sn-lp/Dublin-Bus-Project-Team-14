@@ -24,6 +24,11 @@ urlpatterns = [
     path("realtime/", main_views.real_time, name="realtime"),
     path("busroutes/", main_views.bus_routes, name="busroutes"),
     path("api/get_bus_stops/", main_api.get_bus_stops, name="getbusstops"),
+    path(
+        "api/get_journey_travel_time_estimation/",
+        main_api.get_journey_travel_time_estimation,
+        name="gettraveltimes",
+    ),
     path("admin/", admin.site.urls),
     path("api/weather_widget", main_api.weather_widget, name="weather_widget"),
     path("api/autocomple_route", main_api.autocomple_route, name="autocomple_route"),
