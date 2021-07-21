@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from main.models import Route, Trip, Trips_Stops, Stop
+from main.cache_manipulator import *
 
 # returns all bus stops for each direction of each bus route
 def get_bus_stops(request):
@@ -41,3 +42,14 @@ def get_bus_stops(request):
                 "longitude": stop.longitude,
             }
     return JsonResponse(json_result)
+
+
+# Returns current weather data dictionary for building weather widget
+def weather_widget(request):
+    input_timestamp = datetime.now().timestamp()
+    # need to add a few seconds to the input time so that it works with get_weather() function where it is comparing
+    # "input_timestamp" with "current_timestamp" and if current is bigger than input it would return None
+    # if we don't add the seconds, input will always be smaller since this is calculated before calling get_weather()
+    input_timestamp += 5
+    weather = get_weather(input_timestamp)
+    return JsonResponse(weather.__dict__)

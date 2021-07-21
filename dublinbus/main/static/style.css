@@ -110,6 +110,17 @@ input {
   display: none;
 }
 
+#weather_widget_top {
+  margin-left: auto;
+  margin-right: 0px;
+  float: left;
+}
+
+#weather_widget_top h5 {
+  float: left;
+  margin-top: 50px;
+  font-size: large;
+
 #add-to-favourites {
   display: none;
 }
