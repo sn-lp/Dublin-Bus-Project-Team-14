@@ -57,7 +57,7 @@ def weather_widget(request):
 
 def autocomple_route(request):
     insert = request.GET.get("insert")
-    payload = []
+    routes = []
     if insert:
         route_objs = (
             Route.objects.filter(short_name__icontains=insert)
@@ -66,6 +66,6 @@ def autocomple_route(request):
         )
 
         for route_obj in route_objs:
-            payload.append(route_obj["short_name"])
+            routes.append(route_obj["short_name"])
 
-    return JsonResponse({"status": 200, "data": payload})
+    return JsonResponse({"status": 200, "data": routes})
