@@ -53,12 +53,11 @@ def get_all_bus_stops(request):
     json_result = {}
 
     for stop in stops:
-            json_result[stop.name] = {
-                "latitude": stop.latitude,
-                "longitude": stop.longitude,
-            }
+        json_result[stop.name] = {
+            "latitude": stop.latitude,
+            "longitude": stop.longitude,
+        }
     return JsonResponse(json_result)
-
 
 
 # Returns current weather data dictionary for building weather widget

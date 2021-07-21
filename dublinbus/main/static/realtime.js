@@ -7,6 +7,10 @@ function initMap() {
     zoom: 15,
     disableDefaultUI: true,
   });
+  infowindow = new google.maps.InfoWindow();
+  if (infowindow) {
+    infowindow.close();
+  }
 }
 
 function getAllBusStops() {
@@ -15,7 +19,6 @@ function getAllBusStops() {
   fetch(busStopsEndpoint)
     .then((response) => {
       if (response.ok) {
-        console.log(typeof (response.json));
         return response.json();
       }
     })
@@ -45,17 +48,10 @@ function getAllBusStops() {
           map.panTo(newMarker.getPosition());
         });
       }
-
-
-
     })
     .catch((error) => {
       console.log(error);
     });
-
 }
-
-
-
 
 getAllBusStops();
