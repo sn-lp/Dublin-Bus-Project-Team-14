@@ -86,5 +86,3 @@ def get_weather(input_timestamp):
             (truncated_input_timestamp - truncated_current_timestamp) / (24 * 3600)
         )
         return cache.get("daily_weather_dic")[daily_index]
-
-

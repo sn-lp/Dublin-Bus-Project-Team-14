@@ -120,6 +120,8 @@ input {
   float: left;
   margin-top: 50px;
   font-size: large;
+  color: black;
+}
 
 #add-to-favourites {
   display: none;
