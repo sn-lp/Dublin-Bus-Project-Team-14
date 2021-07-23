@@ -74,10 +74,7 @@ def autocomple_route(request):
     return JsonResponse({"status": 200, "data": routes})
 
 
-# https://docs.djangoproject.com/en/3.2/ref/csrf/#django.views.decorators.csrf.csrf_exempt
-# this decorator is added to exempt this function from CSRF protection, this should be removed later and the problem addressed in another ticket
-# to address the issue later the following should be followed https://docs.djangoproject.com/en/3.2/ref/csrf/#ajax
-@csrf_exempt
+# returns travel time estimations for all suggested routes
 def get_journey_travel_time_estimation(request):
     # this endpoint receives a dictionary with departure date/time and route's data
     if request.method == "POST":

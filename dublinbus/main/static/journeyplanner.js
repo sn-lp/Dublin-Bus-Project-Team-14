@@ -178,6 +178,24 @@ function setAutocomplete(object, id) {
   return object;
 }
 
+// acquire CSRF token, following Django documentation here https://docs.djangoproject.com/en/3.2/ref/csrf/
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === name + "=") {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+const csrftoken = getCookie("csrftoken");
+
 // returns travel time estimation for all suggested routes that come in the google directions API
 function getRoutesTravelEstimationsFromModels(directionsResponseObject) {
   suggestedRoutesData.routesData = getRoutesDataFromDirectionsAPIResponse(
@@ -189,12 +207,17 @@ function getRoutesTravelEstimationsFromModels(directionsResponseObject) {
 
   let travelTimeEstimationsEndpoint =
     "/api/get_journey_travel_time_estimation/";
-  fetch(travelTimeEstimationsEndpoint, {
-    method: "POST",
+
+  const request = new Request(travelTimeEstimationsEndpoint, {
     headers: {
+      "X-CSRFToken": csrftoken,
       Accept: "application/json",
       "Content-Type": "application/json",
     },
+  });
+  fetch(request, {
+    method: "POST",
+    mode: "same-origin",
     body: JSON.stringify(suggestedRoutesData),
   })
     .then((response) => {
