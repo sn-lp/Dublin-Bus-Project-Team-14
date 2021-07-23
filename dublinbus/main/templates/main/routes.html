@@ -6,6 +6,12 @@
 {% block nav_title %}Routes{% endblock %}
 
 {% block content %}
+<script src="https://unpkg.com/@trevoreyre/autocomplete-js"></script>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/@trevoreyre/autocomplete-js/dist/style.css"
+/>
+
 <div id="wrapper">
   <div id="map"></div>
   
@@ -16,7 +22,10 @@
 
       <div class="form-group">
         <p class="text-center" id="user-error-message"></p>
-        <input type="text" class="form-control" id="bus-route-input" placeholder="Bus Route">
+        <div id="autocomplete" class="autocomplete">
+          <input class="autocomplete-input form-control" type="text" id="bus-route-input" placeholder="Bus Route"/>
+          <ul class="autocomplete-result-list"></ul>
+        </div>
       </div>
 
       <div class="d-grid gap-2">

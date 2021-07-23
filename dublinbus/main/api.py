@@ -53,3 +53,19 @@ def weather_widget(request):
     input_timestamp += 5
     weather = get_weather(input_timestamp)
     return JsonResponse(weather.__dict__)
+
+
+def autocomple_route(request):
+    insert = request.GET.get("insert")
+    routes = []
+    if insert:
+        route_objs = (
+            Route.objects.filter(short_name__icontains=insert)
+            .values("short_name")
+            .distinct()
+        )
+
+        for route_obj in route_objs:
+            routes.append(route_obj["short_name"])
+
+    return JsonResponse({"status": 200, "data": routes})
