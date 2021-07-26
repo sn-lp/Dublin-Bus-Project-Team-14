@@ -308,7 +308,7 @@ function displayRouteDetails() {
 
 // changes window to display suggested routes again
 function displaySuggestedRoutes() {
-  // change display style of divs injected in "directions_results" when 
+  // change display style of divs injected in "directions_results" when
   // directionsRenderer.setPanel(document.getElementById("directions_results")) is called
   document.getElementById("directions_results").children[0].style.display =
     "block";
