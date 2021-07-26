@@ -189,12 +189,17 @@ function getRoutesTravelEstimationsFromModels(directionsResponseObject) {
 
   let travelTimeEstimationsEndpoint =
     "/api/get_journey_travel_time_estimation/";
-  fetch(travelTimeEstimationsEndpoint, {
-    method: "POST",
+
+  const request = new Request(travelTimeEstimationsEndpoint, {
     headers: {
+      "X-CSRFToken": csrftoken,
       Accept: "application/json",
       "Content-Type": "application/json",
     },
+  });
+  fetch(request, {
+    method: "POST",
+    mode: "same-origin",
     body: JSON.stringify(suggestedRoutesData),
   })
     .then((response) => {
