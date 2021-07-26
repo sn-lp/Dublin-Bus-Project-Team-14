@@ -1,6 +1,9 @@
 from django.http import JsonResponse
+from django.http.response import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from main.models import Route, Trip, Trips_Stops, Stop
 from main.cache_manipulator import *
+import json
 
 # returns all bus stops for each direction of each bus route
 def get_bus_stops(request):
@@ -69,3 +72,18 @@ def autocomple_route(request):
             routes.append(route_obj["short_name"])
 
     return JsonResponse({"status": 200, "data": routes})
+
+
+# https://docs.djangoproject.com/en/3.2/ref/csrf/#django.views.decorators.csrf.csrf_exempt
+# this decorator is added to exempt this function from CSRF protection, this should be removed later and the problem addressed in another ticket
+# to address the issue later the following should be followed https://docs.djangoproject.com/en/3.2/ref/csrf/#ajax
+@csrf_exempt
+def get_journey_travel_time_estimation(request):
+    # this endpoint receives a dictionary with departure date/time and route's data
+    if request.method == "POST":
+        routesData = json.loads(request.body)
+        # TODO access routes' data and format any data if necessary according to the data format the models were trained on
+        # TODO feed data to models and get estimated travel time
+        # TODO calculate total time, if needed by combining our Dublin Bus predictions with other times from other steps that are not operated by Dublin Bus
+        # TODO send total times for all suggested routes to frontend that will render them by replacing the times injected from the google directions api response
+        return JsonResponse({})

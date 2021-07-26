@@ -15,14 +15,14 @@
 
     <div id="searchUI">
 
-    <p class="font-weight-bold text-center">Travelling From</p>
-    <div class="d-grid gap-2">
-      <button id="btn-primary" class="btn btn-primary" type="button">My Location</button>
-    </div>
+      <p class="font-weight-bold text-center">Travelling From</p>
+      <div class="d-grid gap-2">
+        <button id="btn-primary" class="btn btn-primary" type="button">My Location</button>
+      </div>
 
-    <div class="d-grid gap-2">
-      <p class="text-center">OR</p>
-    </div> 
+      <div class="d-grid gap-2">
+        <p class="text-center">OR</p>
+      </div> 
     
       <div class="form-group">
         <input type="text" class="form-control" id="origin" placeholder="Enter Location">
@@ -39,26 +39,26 @@
         <input type="datetime-local" id="departure-time" name="departure-time">
       </div>
 
-    <div class="d-grid gap-2">
-        <button id="submit" class="btn btn-primary" type="submit" onclick="calculateAndDisplayRoute(directionsService1, directionsRenderer1)">Submit</button>
-    </div>
+      <div class="d-grid gap-2">
+          <button id="submit" class="btn btn-primary" type="submit" onclick="calculateAndDisplayRoute(directionsService1, directionsRenderer1)">Submit</button>
+      </div>
 
-  </div>
+    </div>
 
     <div id="resultsUI" style="display: none">
 
-    <div id="directions_results"></div>
+      <div id="directions_results"></div>
+      <p class="text-center" id="user-error-message"></p>
 
-    <div class="d-grid gap-2">
-      <button id="clear" class="btn btn-primary" type="submit" onclick="clearDirections(directionsRenderer1)">Back to search</button>
-    </div>
+      <div class="d-grid gap-2">
+        <button id="submit_selected_route" class="btn btn-primary" type="submit" onclick="displayRouteDetails()">Route details</button>
+        <button id="clear" class="btn btn-primary" type="submit" onclick="clearDirections(directionsRenderer1)">Back to search</button>
+      </div>
 
     </div>
 
   </div>
-    
-
-  </div>
+ 
 </div>
 
 <script src="{% static 'journeyplanner.js' %}"></script>
