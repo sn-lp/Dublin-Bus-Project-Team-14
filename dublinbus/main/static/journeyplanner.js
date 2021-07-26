@@ -74,6 +74,19 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer) {
 
       const resultsUI = document.getElementById("resultsUI");
       resultsUI.style.display = "block";
+
+      if (
+        document.getElementById("user-error-message").style.display == "block"
+      ) {
+        document.getElementById("user-error-message").style.display = "none";
+      }
+
+      if (
+        document.getElementById("submit-selected-route").style.display == "none"
+      ) {
+        document.getElementById("submit-selected-route").style.display =
+          "block";
+      }
     })
     .catch((e) => {
       console.log(e);
@@ -96,6 +109,13 @@ function directionsResultDivChanged() {
 
 //Clear the map
 function clearDirections(directionsRenderer) {
+  if (
+    document.getElementById("directions_results").children[0].style.display ==
+    "none"
+  ) {
+    document.getElementById("directions_results").children[0].style.display =
+      "block";
+  }
   directionsRenderer.set("directions", null);
   directionsRenderer.setPanel(document.getElementById("directions_results"));
 
@@ -181,6 +201,7 @@ function getRoutesTravelEstimationsFromModels(directionsResponseObject) {
       if (response.ok) {
         return response.json();
       } else {
+        document.getElementById("user-error-message").style.display = "block";
         document.getElementById("user-error-message").innerText =
           "Something went wrong, please try again.";
         // status and statusText doesn't work for all browsers but works in Chrome and Safari
@@ -274,8 +295,26 @@ function getRouteData(route) {
   return routeData;
 }
 
+// displays detailed steps, for the selected route when the user clicks the "route details" button
 function displayRouteDetails() {
-  // this function will be implemented in another ticket/PR to display the details, including detailed steps, for the route
-  // when the user clicks the "route details" button
-  return;
+  document.getElementById("directions_results").children[0].style.display =
+    "none";
+  document.getElementById("directions_results").children[1].style.display =
+    "block";
+  document.getElementById("submit-selected-route").style.display = "none";
+  document.getElementById("clear").style.display = "none";
+  document.getElementById("back-to-routes").style.display = "block";
+}
+
+// changes window to display suggested routes again
+function displaySuggestedRoutes() {
+  // change display style of divs injected in "directions_results" when
+  // directionsRenderer.setPanel(document.getElementById("directions_results")) is called
+  document.getElementById("directions_results").children[0].style.display =
+    "block";
+  document.getElementById("directions_results").children[1].style.display =
+    "none";
+  document.getElementById("submit-selected-route").style.display = "block";
+  document.getElementById("clear").style.display = "block";
+  document.getElementById("back-to-routes").style.display = "none";
 }
