@@ -93,7 +93,9 @@ def get_journey_travel_time_estimation(request):
     if request.method == "POST":
         routesData = json.loads(request.body)
         # TODO access routes' data and format any data if necessary according to the data format the models were trained on
-        datetime_object = datetime.strptime(routesData["departure_time"], '%Y-%m-%dT%H:%M')
+        datetime_object = datetime.strptime(
+            routesData["departure_time"], "%Y-%m-%dT%H:%M"
+        )
         day_of_the_week = datetime_object.weekday()
         month_of_the_year = datetime_object.month
         hour_of_the_day = datetime_object.hour
