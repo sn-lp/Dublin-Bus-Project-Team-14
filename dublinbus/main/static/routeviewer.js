@@ -288,3 +288,17 @@ function getBusStopsByBusNum(routeNumber) {
       console.log(error);
     });
 }
+
+// Autocomplete
+new Autocomplete("#autocomplete", {
+  search: (input) => {
+    const url = `/api/autocomple_route?insert=${input}`;
+    return new Promise((resolve) => {
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          resolve(data.data);
+        });
+    });
+  },
+});

@@ -131,3 +131,7 @@ input {
   display: none;
   background-color: #25b5f1;
 }
+
+#user-error-message {
+  display: none;
+}
