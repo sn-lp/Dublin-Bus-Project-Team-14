@@ -93,6 +93,17 @@ def get_journey_travel_time_estimation(request):
     if request.method == "POST":
         routesData = json.loads(request.body)
         # TODO access routes' data and format any data if necessary according to the data format the models were trained on
+        datetime_object = datetime.strptime(
+            routesData["departure_time"], "%Y-%m-%dT%H:%M"
+        )
+        day_of_the_week = datetime_object.weekday()
+        month_of_the_year = datetime_object.month
+        hour_of_the_day = datetime_object.hour
+
+        weather = get_weather(datetime_object.timestamp() + 5)
+        temp = weather.get_temp()
+        w_main = weather.get_weather_main()
+
         # TODO feed data to models and get estimated travel time
         # TODO calculate total time, if needed by combining our Dublin Bus predictions with other times from other steps that are not operated by Dublin Bus
         # TODO send total times for all suggested routes to frontend that will render them by replacing the times injected from the google directions api response
