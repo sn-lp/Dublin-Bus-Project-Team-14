@@ -93,7 +93,7 @@ def get_journey_travel_time_estimation(request):
     if request.method == "POST":
         routesData = json.loads(request.body)
 
-        # format data according to the data format the models were trained on
+        # convert the data to a list which has the same format as the prediction models
 
         # index     0     1       2    3      4     5       6        7    8     9     10     11    12    13       14       15
         # feature  prog, direct, day, month, temp, clouds, drizzle, fog, mist, rain, smoke, snow, hour, hour**2, hour**3, hour**4
