@@ -94,10 +94,10 @@ def get_journey_travel_time_estimation(request):
         routesData = json.loads(request.body)
 
         # format data according to the data format the models were trained on
-        
+
         # index     0     1       2    3      4     5       6        7    8     9     10     11    12    13       14       15
         # feature  prog, direct, day, month, temp, clouds, drizzle, fog, mist, rain, smoke, snow, hour, hour**2, hour**3, hour**4
-        model_args=[0] * 16
+        model_args = [0] * 16
 
         ## TODO insert prog and direct
 
@@ -110,26 +110,31 @@ def get_journey_travel_time_estimation(request):
         weather = get_weather(datetime_object.timestamp() + 5)
         model_args[4] = weather.get_temp()
         w_main = weather.get_weather_main()
-        if w_main == 'Clouds':
+        if w_main == "Clouds":
             model_args[5] = 1
-        if w_main == 'Drizzle':
+        if w_main == "Drizzle":
             model_args[6] = 1
-        elif w_main == 'Fog':
+        elif w_main == "Fog":
             model_args[7] = 1
-        elif w_main == 'Mist':
+        elif w_main == "Mist":
             model_args[8] = 1
-        elif w_main == 'Rain' or w_main == 'Thunderstorm':
+        elif w_main == "Rain" or w_main == "Thunderstorm":
             model_args[9] = 1
-        elif w_main == 'Smoke' or w_main == 'Haze' or w_main == 'Dust' or w_main == 'Sand' or w_main == 'Ash':
+        elif (
+            w_main == "Smoke"
+            or w_main == "Haze"
+            or w_main == "Dust"
+            or w_main == "Sand"
+            or w_main == "Ash"
+        ):
             model_args[10] = 1
-        elif w_main == 'Snow':
+        elif w_main == "Snow":
             model_args[11] = 1
-        
-        model_args[12] = datetime_object.hour
-        model_args[13] = model_args[12]**2
-        model_args[14] = model_args[12]**3
-        model_args[15] = model_args[12]**4
 
+        model_args[12] = datetime_object.hour
+        model_args[13] = model_args[12] ** 2
+        model_args[14] = model_args[12] ** 3
+        model_args[15] = model_args[12] ** 4
 
         # TODO feed data to models and get estimated travel time
         # TODO calculate total time, if needed by combining our Dublin Bus predictions with other times from other steps that are not operated by Dublin Bus
