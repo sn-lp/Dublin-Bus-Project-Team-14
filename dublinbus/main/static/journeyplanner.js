@@ -273,6 +273,7 @@ function getRouteData(route) {
             provider: provider,
           };
         } else {
+          const step_duration = routeSteps[i].duration.text;
           const travel_mode = "TRANSIT";
           const provider = routeSteps[i].transit.line.agencies[j].name;
           const bus_line_long_name = routeSteps[i].transit.line.name;
@@ -283,6 +284,7 @@ function getRouteData(route) {
           // getting the number of stops should be useful to display cost of Dublin Bus journey
           const number_of_stops = routeSteps[i].transit.num_stops;
           routeStepsData.step = {
+            step_duration: step_duration,
             travel_mode: travel_mode,
             provider: provider,
             bus_line_long_name: bus_line_long_name,
