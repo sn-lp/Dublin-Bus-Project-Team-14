@@ -112,7 +112,7 @@ def get_journey_travel_time_estimation(request):
         w_main = weather.get_weather_main()
         if w_main == "Clouds":
             model_args[5] = 1
-        if w_main == "Drizzle":
+        elif w_main == "Drizzle":
             model_args[6] = 1
         elif w_main == "Fog":
             model_args[7] = 1
