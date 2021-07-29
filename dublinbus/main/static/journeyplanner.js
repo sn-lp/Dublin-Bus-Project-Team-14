@@ -178,6 +178,31 @@ function setAutocomplete(object, id) {
   return object;
 }
 
+//Geolocation
+locationButton = document.getElementById("location_button");
+originField = document.getElementById("origin");
+
+locationButton.addEventListener("click", () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        console.log(pos.lat + " , " + pos.lng);
+        originField.value = pos.lat + " , " + pos.lng;
+      },
+      () => {
+        alert("Error: Location services were rejected.");
+      }
+    );
+  } else {
+    // Browser doesn't support Geolocation
+    alert("Error: Browser does nto support Location services.");
+  }
+});
+
 // returns travel time estimation for all suggested routes that come in the google directions API
 function getRoutesTravelEstimationsFromModels(directionsResponseObject) {
   suggestedRoutesData.routesData = getRoutesDataFromDirectionsAPIResponse(
