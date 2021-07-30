@@ -262,6 +262,7 @@ function getBusStopsByBusNum(routeNumber) {
         busRoutes.constructor === Object
       ) {
         // display error message if the object is empty
+        document.getElementById("user-error-message").style.display = "block";
         document.getElementById("user-error-message").innerText =
           "Please enter a valid route number";
         return;
