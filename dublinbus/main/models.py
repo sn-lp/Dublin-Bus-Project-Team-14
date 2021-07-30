@@ -39,10 +39,13 @@ class Trips_Stops(models.Model):
     class Meta:
         db_table = "trips_stops"
 
+
 class Stop_Times(models.Model):
+    # id = models.CharField(primary_key=True, max_length=30)
     trip_id = models.CharField(max_length=50)
     arrival_time = models.TimeField()
     stop_id = models.CharField(max_length=50)
+    id = models.IntegerField(primary_key=True)
 
     class Meta:
         db_table = "stop_times"
