@@ -36,7 +36,7 @@ function getAllBusStops() {
           },
           icon: {
             url: "http://maps.google.com/mapfiles/kml/paddle/ylw-circle.png",
-            scaledSize: new google.maps.Size(50, 50),
+            scaledSize: new google.maps.Size(40, 40),
           },
           map,
         });
@@ -51,6 +51,10 @@ function getAllBusStops() {
           stop_name_heading.innerText = contentString;
         });
       }
+      new MarkerClusterer(map, markers, {
+        imagePath:
+          "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+      });
     })
     .catch((error) => {
       console.log(error);
