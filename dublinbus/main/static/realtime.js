@@ -13,6 +13,8 @@ function initMap() {
   }
 }
 
+const stop_name_heading = document.getElementById("stop_name_box");
+
 function getAllBusStops() {
   busStopsEndpoint = "/api/get_all_bus_stops";
 
@@ -46,6 +48,7 @@ function getAllBusStops() {
           infowindow.open(map, newMarker);
           // Pan map to the selected marker
           map.panTo(newMarker.getPosition());
+          stop_name_heading.innerText = contentString;
         });
       }
       new MarkerClusterer(map, markers, {

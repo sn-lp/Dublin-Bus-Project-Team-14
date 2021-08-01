@@ -9,7 +9,28 @@
 {% block content %}
   <div id="map"></div>
 
+
+  <div id="over_map" class="container w-25 p-3 bg-white">
+    <p class="font-weight-bold text-center">Select a Bus Stop or Search</p>
+
+    <div class="form-group">
+      <p class="text-center" id="user-error-message"></p>
+      <div id="autocomplete" class="autocomplete">
+        <input class="autocomplete-input form-control" type="text" id="bus-route-input" placeholder="Bus Stop"/>
+        <ul class="autocomplete-result-list"></ul>
+      </div>
+    </div>
+
+    <p class="font-weight-bold text-center" id="stop_name_box"></p>
+
+
+    
+  </div>
+
+
+
   <script src="https://unpkg.com/@googlemaps/markerclustererplus/dist/index.min.js"></script>
+
   <script src="{% static 'realtime.js' %}"></script>
 {% endblock %}
 
