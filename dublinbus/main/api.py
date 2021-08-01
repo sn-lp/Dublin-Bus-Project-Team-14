@@ -57,6 +57,7 @@ def get_all_bus_stops(request):
         json_result[stop.name] = {
             "latitude": stop.latitude,
             "longitude": stop.longitude,
+            "id": stop.id,
         }
     return JsonResponse(json_result)
 

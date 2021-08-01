@@ -26,13 +26,13 @@ function getAllBusStops() {
     })
     .then((busStopsResponse) => {
       markers = [];
-      for (const [stopName, coordinates] of Object.entries(busStopsResponse)) {
+      for (const [stopName, stop] of Object.entries(busStopsResponse)) {
         // set the infoWindow content to contain the name of the bus stop
-        let contentString = stopName;
+        let contentString = stopName + "|" + stop.id;
         const newMarker = new google.maps.Marker({
           position: {
-            lat: coordinates.latitude,
-            lng: coordinates.longitude,
+            lat: stop.latitude,
+            lng: stop.longitude,
           },
           icon: {
             url: "http://maps.google.com/mapfiles/kml/paddle/ylw-circle.png",
@@ -49,6 +49,7 @@ function getAllBusStops() {
           // Pan map to the selected marker
           map.panTo(newMarker.getPosition());
           stop_name_heading.innerText = contentString;
+          console.log(contentString);
         });
       }
       new MarkerClusterer(map, markers, {
@@ -63,20 +64,19 @@ function getAllBusStops() {
 
 getAllBusStops();
 
-$.ajax({
-  type: "GET",
-  url: "https://arcane-woodland-84034.herokuapp.com/https://gtfsr.transportforireland.ie/v1/?format=json",
 
-  // Request headers
-  beforeSend: function(xhrObj) {
-      xhrObj.setRequestHeader("x-api-key", "GTFSR_API_KEY");
-      xhrObj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-      },
-  })
-.done(function (data) {
-  console.log(data);
-})
-.fail(function () {
-  alert("Error: No Realtime Info could be retrieved.");
-});
+var parsedGTFSR;
+var xmlhttp1 = new XMLHttpRequest();
+
+xmlhttp1.onreadystatechange = function() {
+    if (xmlhttp1.readyState == 4 && xmlhttp1.status == 200) { 
+        parsedGTFSR = JSON.parse(xmlhttp1.responseText);
+        console.log(parsedGTFSR['entity']);
+    }
+}
+
+xmlhttp1.open("GET", "https://arcane-woodland-84034.herokuapp.com/https://gtfsr.transportforireland.ie/v1/?format=json", true);
+xmlhttp1.setRequestHeader('Cache-Control', 'no-cache');
+xmlhttp1.setRequestHeader('x-api-key', 'APIKEY');
+xmlhttp1.send();
 
