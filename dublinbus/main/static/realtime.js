@@ -62,3 +62,21 @@ function getAllBusStops() {
 }
 
 getAllBusStops();
+
+$.ajax({
+  type: "GET",
+  url: "https://arcane-woodland-84034.herokuapp.com/https://gtfsr.transportforireland.ie/v1/?format=json",
+
+  // Request headers
+  beforeSend: function(xhrObj) {
+      xhrObj.setRequestHeader("x-api-key", "GTFSR_API_KEY");
+      xhrObj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      },
+  })
+.done(function (data) {
+  console.log(data);
+})
+.fail(function () {
+  alert("Error: No Realtime Info could be retrieved.");
+});
+
