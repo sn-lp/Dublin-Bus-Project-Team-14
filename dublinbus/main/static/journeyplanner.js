@@ -178,10 +178,26 @@ function setAutocomplete(object, id) {
   return object;
 }
 
-//Geolocation
+//Reverse geocoding
 locationButton = document.getElementById("location_button");
 originField = document.getElementById("origin");
 
+function reverse_geocoder(latitude, longitude) {
+
+  var xmlhttp1 = new XMLHttpRequest();
+  var parsedResponse;
+
+  xmlhttp1.onreadystatechange = function() {
+      if (xmlhttp1.readyState == 4 && xmlhttp1.status == 200) { 
+          parsedResponse = JSON.parse(xmlhttp1.responseText);
+          originField.value = parsedResponse['results'][0].formatted_address;
+      }
+  }
+  xmlhttp1.open("GET", "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "APIKEY", true);
+  xmlhttp1.send();
+}
+
+//Geolocation
 locationButton.addEventListener("click", () => {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
@@ -190,18 +206,21 @@ locationButton.addEventListener("click", () => {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         };
-        console.log(pos.lat + " , " + pos.lng);
-        originField.value = pos.lat + " , " + pos.lng;
+        reverse_geocoder(pos.lat, pos.lng);
       },
       () => {
         alert("Error: Location services were rejected.");
+        locationButton.style.display = "none";
       }
     );
   } else {
     // Browser doesn't support Geolocation
-    alert("Error: Browser does nto support Location services.");
+    alert("Error: Browser does not support Location services.");
+    locationButton.style.display = "none";
   }
 });
+
+
 
 // returns travel time estimation for all suggested routes that come in the google directions API
 function getRoutesTravelEstimationsFromModels(directionsResponseObject) {
