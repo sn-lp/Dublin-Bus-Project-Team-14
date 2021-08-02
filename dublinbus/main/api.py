@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.http.response import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from main.models import Route, Trip, Trips_Stops, Stop
+from main.models import Route, Trip, Trips_Stops, Stop, Stop_Times
 from main.cache_manipulator import *
 import json
 from django.db import connection
@@ -45,6 +45,27 @@ def get_bus_stops(request):
                 "latitude": stop.latitude,
                 "longitude": stop.longitude,
             }
+    return JsonResponse(json_result)
+
+def get_bus_stop_times(request):
+    if "stop_id" not in request.GET:
+        return JsonResponse({"error": '"route_number" query parameter not found'})
+        
+    request_stop_id = request.GET["stop_id"]
+
+    query_result = Stop_Times.objects.filter(stop_id=request_stop_id)
+
+    if not query_result:
+        return JsonResponse({})
+    
+    json_result = {}
+    for i in query_result:
+        json_result[i] = {
+            "stop_id": i.stop_id,
+            "arrival_time": i.arrival_time,
+            "trip_id": i.trip_id,
+        }
+
     return JsonResponse(json_result)
 
 

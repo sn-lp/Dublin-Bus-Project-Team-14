@@ -16,4 +16,5 @@ urlpatterns = [
         api.get_journey_travel_time_estimation,
         name="gettraveltimes",
     ),
+    path("api/get_bus_stop_times", api.get_bus_stop_times, name="getbusstoptimes"),
 ]

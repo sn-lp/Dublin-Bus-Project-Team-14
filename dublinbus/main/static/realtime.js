@@ -67,6 +67,20 @@ getAllBusStops();
 const bus_results_div = document.getElementById("realtime_buses");
 
 function get_realtime(stop_id) {
+  stopTimesEndpoint = "/api/get_bus_stop_times/?stop_id=" + stop_id;
+
+  console.log(stopTimesEndpoint);
+
+  fetch(stopTimesEndpoint)
+    .then((response) => {
+      if (response.ok) {
+        console.log(response.json());
+      }
+    })
+    .then((stopTimesEndpoint) => {
+    });
+    
+
   var parsedGTFSR;
   var xmlhttp1 = new XMLHttpRequest();
 
