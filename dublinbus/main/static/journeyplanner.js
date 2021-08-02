@@ -193,7 +193,7 @@ function reverse_geocoder(latitude, longitude) {
           originField.value = parsedResponse['results'][0].formatted_address;
       }
   }
-  xmlhttp1.open("GET", "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "APIKEY", true);
+  xmlhttp1.open("GET", "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&key=APIKEY", true);
   xmlhttp1.send();
 }
 
@@ -211,16 +211,36 @@ locationButton.addEventListener("click", () => {
       () => {
         alert("Error: Location services were rejected.");
         locationButton.style.display = "none";
+        setLocationPrefs(1);
       }
     );
   } else {
     // Browser doesn't support Geolocation
     alert("Error: Browser does not support Location services.");
     locationButton.style.display = "none";
+    setLocationPrefs(1);
   }
 });
 
+//Local Storage for locations preference
+function setLocationPrefs(num) {
+  // run this function, only if the browser supports localstorage
+  if (typeof Storage !== "undefined") {
+    if (localStorage.getItem("locations_pref") == null) {
+      localStorage.setItem("locations_pref", num);
+    }
+  }
+}
 
+function readLocationPrefs() {
+  if (typeof Storage !== "undefined") {
+    if (localStorage.getItem("locations_pref") == 1) {
+      locationButton.style.display = "none";
+    }
+  }
+}
+
+readLocationPrefs();
 
 // returns travel time estimation for all suggested routes that come in the google directions API
 function getRoutesTravelEstimationsFromModels(directionsResponseObject) {
