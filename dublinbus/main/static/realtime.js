@@ -28,7 +28,7 @@ function getAllBusStops() {
       markers = [];
       for (const [stopName, stop] of Object.entries(busStopsResponse)) {
         // set the infoWindow content to contain the name of the bus stop
-        let contentString = stopName + "|" + stop.id;
+        let contentString = stopName + stop.id;
         const newMarker = new google.maps.Marker({
           position: {
             lat: stop.latitude,
@@ -49,7 +49,7 @@ function getAllBusStops() {
           // Pan map to the selected marker
           map.panTo(newMarker.getPosition());
           stop_name_heading.innerText = contentString;
-          console.log(contentString);
+          get_realtime(stop.id);
         });
       }
       new MarkerClusterer(map, markers, {
@@ -64,19 +64,46 @@ function getAllBusStops() {
 
 getAllBusStops();
 
+const bus_results_div = document.getElementById("realtime_buses");
 
-var parsedGTFSR;
-var xmlhttp1 = new XMLHttpRequest();
+function get_realtime(stop_id) {
+  var parsedGTFSR;
+  var xmlhttp1 = new XMLHttpRequest();
 
-xmlhttp1.onreadystatechange = function() {
-    if (xmlhttp1.readyState == 4 && xmlhttp1.status == 200) { 
-        parsedGTFSR = JSON.parse(xmlhttp1.responseText);
-        console.log(parsedGTFSR['entity']);
+  xmlhttp1.onreadystatechange = function () {
+    if (xmlhttp1.readyState == 4 && xmlhttp1.status == 200) {
+      parsedGTFSR = JSON.parse(xmlhttp1.responseText);
+
+      for (var i = 0; i < parsedGTFSR["entity"].length; i++) {
+        try {
+          var stop_time_update_object =
+          parsedGTFSR["entity"][i]["trip_update"]["stop_time_update"];
+          var trip_id = parsedGTFSR["entity"][i]["trip_update"]["trip"].trip_id;
+          var bus_route = trip_id.split('-')[1];
+
+          for (var x = 0; x < stop_time_update_object.length; x++) {
+            var stop_id_response = stop_time_update_object[x].stop_id;
+            var delay = stop_time_update_object[x].departure["delay"];
+            if (stop_id_response == stop_id) {
+              console.log("STOP ID | " + stop_id_response);
+              console.log("DELAY | " + delay);
+              console.log("TRIP | " + trip_id);
+              console.log("ROUTE | " + bus_route);
+            }
+          }
+        } catch (e) {
+          //All error are caught. Must be mroe careful with this - come back to.
+        }
+      }
     }
+  };
+
+  xmlhttp1.open(
+    "GET",
+    "https://arcane-woodland-84034.herokuapp.com/https://gtfsr.transportforireland.ie/v1/?format=json",
+    true
+  );
+  xmlhttp1.setRequestHeader("Cache-Control", "no-cache");
+  xmlhttp1.setRequestHeader("x-api-key", "APIKEY");
+  xmlhttp1.send();
 }
-
-xmlhttp1.open("GET", "https://arcane-woodland-84034.herokuapp.com/https://gtfsr.transportforireland.ie/v1/?format=json", true);
-xmlhttp1.setRequestHeader('Cache-Control', 'no-cache');
-xmlhttp1.setRequestHeader('x-api-key', 'APIKEY');
-xmlhttp1.send();
-
