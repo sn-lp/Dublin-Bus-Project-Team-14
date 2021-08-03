@@ -34,6 +34,10 @@ function initDirectionsRenderer() {
 function calculateAndDisplayRoute(directionsService, directionsRenderer) {
   directionsRenderer.setMap(map);
 
+  departureTime = document.getElementById("departure-time").value;
+  var unix_date = new Date();
+  unix_date.setTime(Date.parse(departureTime));
+
   directionsService
     .route({
       origin: {
@@ -45,6 +49,7 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer) {
       travelMode: google.maps.TravelMode.TRANSIT,
       transitOptions: {
         modes: ["BUS"],
+        departureTime: unix_date,
       },
       provideRouteAlternatives: true,
     })
@@ -123,7 +128,7 @@ function clearDirections(directionsRenderer) {
   searchUI.style.display = "block";
 }
 
-//Setting datetime
+//Setting datetime in format YYYY-MM-DDTHH:MM
 var today = new Date();
 var year = today.getFullYear();
 var month = today.getMonth() + 1;
@@ -152,6 +157,7 @@ var datetime_string =
   ":" +
   date_vars[4];
 
+//Setting the datetime selector so that you can't select a time prior to the current time (on page load)
 document.getElementById("departure-time").value = datetime_string;
 document.getElementById("departure-time").min = datetime_string;
 
