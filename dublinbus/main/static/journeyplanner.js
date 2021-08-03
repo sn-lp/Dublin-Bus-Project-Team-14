@@ -34,9 +34,9 @@ function initDirectionsRenderer() {
 function calculateAndDisplayRoute(directionsService, directionsRenderer) {
   directionsRenderer.setMap(map);
 
-  var user_departure_time = document.getElementById("departure-time").value;
+  departureTime = document.getElementById("departure-time").value;
   var unix_date = new Date();
-  unix_date.setTime(Date.parse(user_departure_time));
+  unix_date.setTime(Date.parse(departureTime));
 
   directionsService
     .route({
