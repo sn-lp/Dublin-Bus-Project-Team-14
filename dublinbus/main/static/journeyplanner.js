@@ -183,17 +183,25 @@ locationButton = document.getElementById("location_button");
 originField = document.getElementById("origin");
 
 function reverse_geocoder(latitude, longitude) {
-
   var xmlhttp1 = new XMLHttpRequest();
   var parsedResponse;
 
-  xmlhttp1.onreadystatechange = function() {
-      if (xmlhttp1.readyState == 4 && xmlhttp1.status == 200) { 
-          parsedResponse = JSON.parse(xmlhttp1.responseText);
-          originField.value = parsedResponse['results'][0].formatted_address;
-      }
-  }
-  xmlhttp1.open("GET", "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&key=APIKEY", true);
+  xmlhttp1.onreadystatechange = function () {
+    if (xmlhttp1.readyState == 4 && xmlhttp1.status == 200) {
+      parsedResponse = JSON.parse(xmlhttp1.responseText);
+      originField.value = parsedResponse["results"][0].formatted_address;
+    }
+  };
+  xmlhttp1.open(
+    "GET",
+    "https://maps.googleapis.com/maps/api/geocode/json?latlng=" +
+      latitude +
+      "," +
+      longitude +
+      "&key=" +
+      google_api_key,
+    true
+  );
   xmlhttp1.send();
 }
 
