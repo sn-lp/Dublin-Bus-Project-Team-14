@@ -76,15 +76,15 @@ def autocomple_route(request):
     insert = request.GET.get("insert")
     routes = []
 
-    cursor = connection.cursor()
-    cursor.execute(
-        "SELECT * FROM (SELECT concat(a.short_name, ' - ', b.headsign) AS new_name FROM routes as a RIGHT JOIN trips AS b ON a.id = b.route_id Group By short_name) c WHERE c.new_name like '%"
-        + str(insert)
-        + "%';"
-    )
-    rows = cursor.fetchall()
-    for row in rows:
-        routes.append(row)
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT * FROM (SELECT concat(a.short_name, ' - ', b.headsign) AS new_name FROM routes as a RIGHT JOIN trips AS b ON a.id = b.route_id Group By short_name) c WHERE c.new_name like '%"
+            + str(insert)
+            + "%';"
+        )
+        rows = cursor.fetchall()
+        for row in rows:
+            routes.append(row)
 
     return JsonResponse({"status": 200, "data": routes})
 
