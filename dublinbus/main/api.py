@@ -86,8 +86,6 @@ def autocomple_route(request):
     for row in rows:
         routes.append(row)
 
-    print(routes)
-
     return JsonResponse({"status": 200, "data": routes})
 
 
