@@ -77,13 +77,16 @@ def autocomple_route(request):
     routes = []
 
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM (SELECT concat(a.short_name, ' - ', b.headsign) AS new_name FROM dublin_bus.routes as a RIGHT JOIN dublin_bus.trips AS b ON a.id = b.route_id Group By short_name) c WHERE c.new_name like '%"+ str(insert) +"%';")
+    cursor.execute(
+        "SELECT * FROM (SELECT concat(a.short_name, ' - ', b.headsign) AS new_name FROM dublin_bus.routes as a RIGHT JOIN dublin_bus.trips AS b ON a.id = b.route_id Group By short_name) c WHERE c.new_name like '%"
+        + str(insert)
+        + "%';"
+    )
     rows = cursor.fetchall()
     for row in rows:
         routes.append(row)
 
     print(routes)
-    
 
     return JsonResponse({"status": 200, "data": routes})
 
