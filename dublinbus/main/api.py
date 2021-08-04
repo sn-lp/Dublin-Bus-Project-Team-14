@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from main.models import Route, Trip, Trips_Stops, Stop
 from main.cache_manipulator import *
 import json
+from django.db import connection
 
 # returns all bus stops for each direction of each bus route
 def get_bus_stops(request):
@@ -74,15 +75,16 @@ def weather_widget(request):
 def autocomple_route(request):
     insert = request.GET.get("insert")
     routes = []
-    if insert:
-        route_objs = (
-            Route.objects.filter(short_name__icontains=insert)
-            .values("short_name")
-            .distinct()
-        )
 
-        for route_obj in route_objs:
-            routes.append(route_obj["short_name"])
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT * FROM (SELECT concat(a.short_name, ' - ', b.headsign) AS new_name FROM routes as a RIGHT JOIN trips AS b ON a.id = b.route_id Group By short_name) c "
+            + "WHERE c.new_name like %s;",
+            ["%" + str(insert) + "%"],
+        )
+        rows = cursor.fetchall()
+        for row in rows:
+            routes.append(row)
 
     return JsonResponse({"status": 200, "data": routes})
 

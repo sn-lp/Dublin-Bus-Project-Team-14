@@ -184,6 +184,12 @@ class ApiTests(TestCase):
         for data in db_response_for_route44b:
             self.assertTrue(data.headsign in api_response_for_route44b)
 
+        # insert a route that does not exist (route 88)
+        api_response_for_route88 = json.loads(
+            self.client.get("/api/get_bus_stops/", {"route_number": "88"}).content
+        )
+        self.assertEqual(len(api_response_for_route88), 0)
+
     def test_weather_widget(self):
         # compare the response from api and cache
         api_response_timestamp = json.loads(
@@ -221,4 +227,17 @@ class ApiTests(TestCase):
         )
         self.assertEqual(
             len(api_response_when_insert_4b), len(db_response_when_insert_4b)
+        )
+
+        # insert a route that does not exist (route 88)
+        api_response_when_insert_88 = json.loads(
+            self.client.get("/api/autocomple_route", {"insert": "88"}).content
+        )["data"]
+        db_response_when_insert_88 = (
+            Route.objects.filter(short_name__icontains="88")
+            .values("short_name")
+            .distinct()
+        )
+        self.assertEqual(
+            len(db_response_when_insert_88), len(api_response_when_insert_88)
         )

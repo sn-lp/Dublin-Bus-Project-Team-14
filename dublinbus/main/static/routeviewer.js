@@ -238,7 +238,9 @@ function drawMarkers(stops) {
 }
 
 function getBusStopsFromBackend() {
-  routeNumber = document.getElementById("bus-route-input").value;
+  routeName = document.getElementById("bus-route-input").value;
+  routeNumber = routeName.split(" ")[0];
+  document.getElementById("bus-route-input").value = routeNumber;
   getBusStopsByBusNum(routeNumber);
 }
 
