@@ -48,22 +48,21 @@ def get_bus_stops(request):
     return JsonResponse(json_result)
 
 def get_bus_stop_times(request):
+
     if "stop_id" not in request.GET:
-        return JsonResponse({"error": '"route_number" query parameter not found'})
-        
-    request_stop_id = request.GET["stop_id"]
+        return JsonResponse({"error": '"stop_id" query parameter not found'})
+    requested_stop_id = request.GET["stop_id"]
 
-    query_result = Stop_Times.objects.filter(stop_id=request_stop_id)
+    print(type(requested_stop_id))
 
-    if not query_result:
-        return JsonResponse({})
-    
+    stop_times = Stop_Times.objects.filter(stop_id=requested_stop_id)
     json_result = {}
-    for i in query_result:
-        json_result[i] = {
-            "stop_id": i.stop_id,
-            "arrival_time": i.arrival_time,
-            "trip_id": i.trip_id,
+
+    for stop_time in stop_times:
+        json_result[stop_time.id] = {
+            "arrival_time": stop_time.arrival_time,
+            "trip_id": stop_time.trip_id,
+            "stop_id": stop_time.stop_id,
         }
 
     return JsonResponse(json_result)
