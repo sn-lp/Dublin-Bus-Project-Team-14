@@ -15,6 +15,7 @@ class Trip(models.Model):
     id = models.CharField(primary_key=True, max_length=50)
     route = models.ForeignKey(Route, on_delete=models.CASCADE)
     headsign = models.CharField(max_length=200)
+    direction = models.PositiveIntegerField(default=0)
 
     class Meta:
         db_table = "trips"
@@ -35,6 +36,7 @@ class Stop(models.Model):
 class Trips_Stops(models.Model):
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE)
     stop = models.ForeignKey(Stop, on_delete=models.CASCADE)
+    progress_number = models.PositiveIntegerField(default=0)
 
     class Meta:
         db_table = "trips_stops"
