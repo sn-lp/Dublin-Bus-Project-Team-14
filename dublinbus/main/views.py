@@ -19,7 +19,7 @@ def real_time(request):
     if not settings.GOOGLE_MAPS_API_KEY:
         # if key is empty because it couldn't find the env variable, return an "Internal Server Error" 500 response code
         return HttpResponse(status=500)
-    context = {"GOOGLEMAPS_APIKEY": settings.GOOGLE_MAPS_API_KEY}
+    context = {"GOOGLEMAPS_APIKEY": settings.GOOGLE_MAPS_API_KEY, "GTFSR_API_KEY": settings.GTFSR_API_KEY}
     return HttpResponse(template.render(context, request))
 
 

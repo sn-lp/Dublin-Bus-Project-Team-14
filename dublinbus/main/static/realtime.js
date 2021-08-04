@@ -117,7 +117,8 @@ function get_realtime(stop_id) {
     "https://arcane-woodland-84034.herokuapp.com/https://gtfsr.transportforireland.ie/v1/?format=json",
     true
   );
+  console.log(GTFSR_API_KEY);
   xmlhttp1.setRequestHeader("Cache-Control", "no-cache");
-  xmlhttp1.setRequestHeader("x-api-key", "APIKEY");
+  xmlhttp1.setRequestHeader("x-api-key", GTFSR_API_KEY);
   xmlhttp1.send();
 }
