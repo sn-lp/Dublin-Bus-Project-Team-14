@@ -5,6 +5,7 @@ from main.models import Route, Trip, Trips_Stops, Stop, Stop_Times
 from main.cache_manipulator import *
 import json
 from django.db import connection
+from datetime import datetime, timedelta
 
 # returns all bus stops for each direction of each bus route
 def get_bus_stops(request):
@@ -47,15 +48,24 @@ def get_bus_stops(request):
             }
     return JsonResponse(json_result)
 
+
 def get_bus_stop_times(request):
+    # Will only return values which are within the next 1 hour.
 
     if "stop_id" not in request.GET:
         return JsonResponse({"error": '"stop_id" query parameter not found'})
     requested_stop_id = request.GET["stop_id"]
 
-    print(type(requested_stop_id))
+    now = datetime.now()
+    hour_ahead = now + timedelta(hours=1)
 
-    stop_times = Stop_Times.objects.filter(stop_id=requested_stop_id)
+    current_time = now.strftime("%H:%M:%S")
+    current_time_1hr = hour_ahead.strftime("%H:%M:%S")
+
+    print("Current Time =", current_time)
+    print("1hr Ahead =", current_time_1hr)
+
+    stop_times = Stop_Times.objects.filter(stop_id=requested_stop_id, arrival_time__gte=current_time, arrival_time__lte=current_time_1hr)
     json_result = {}
 
     for stop_time in stop_times:
