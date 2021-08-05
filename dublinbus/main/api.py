@@ -66,6 +66,7 @@ def get_bus_stop_times(request):
     print("1hr Ahead =", current_time_1hr)
 
     stop_times = Stop_Times.objects.filter(stop_id=requested_stop_id, arrival_time__gte=current_time, arrival_time__lte=current_time_1hr)
+    # stop_times = Stop_Times.objects.filter(stop_id=requested_stop_id)
     json_result = {}
 
     for stop_time in stop_times:

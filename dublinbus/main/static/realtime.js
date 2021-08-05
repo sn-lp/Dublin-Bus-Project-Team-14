@@ -97,7 +97,7 @@ function get_realtime(stop_id) {
   fetch(stopTimesEndpoint)
     .then((response) => response.json())
     .then((data) => {
-      GTFSR_matching(stop_id, data);
+      GTFSR_matching(data);
     })
     .catch((error) => {
       console.log(error);
@@ -105,11 +105,8 @@ function get_realtime(stop_id) {
 }
 
 
-function GTFSR_matching(stop_id, backend_data) {
+function GTFSR_matching(backend_data) {
   var backend_dict = {};
-  var gtfsr_dict = {};
-  var parsedGTFSR;
-  var xmlhttp1 = new XMLHttpRequest();
 
   //Populate the Backend Dictionary.
   for (var i = 0; i < Object.keys(backend_data).length; i++) {
@@ -122,49 +119,8 @@ function GTFSR_matching(stop_id, backend_data) {
     }
   }
 
-  //Populate the GTFSR dictionary.
-  xmlhttp1.onreadystatechange = function () {
-    if (xmlhttp1.readyState == 4 && xmlhttp1.status == 200) {
-      parsedGTFSR = JSON.parse(xmlhttp1.responseText);
-      for (var i = 0; i < parsedGTFSR["entity"].length; i++) {
-        try {
-          var stop_time_update_object =
-            parsedGTFSR["entity"][i]["trip_update"]["stop_time_update"];
-          var trip_id = parsedGTFSR["entity"][i]["trip_update"]["trip"].trip_id;
-          var bus_route = trip_id.split("-")[1];
-
-          //For each stop_time_update from GTFSR.
-          for (var x = 0; x < stop_time_update_object.length; x++) {
-            var stop_id_response = stop_time_update_object[x].stop_id;
-            var delay = stop_time_update_object[x].departure["delay"];
-
-            if (stop_id_response == stop_id) {
-              gtfsr_dict[trip_id] = {
-                "delay": delay,
-                "bus_route": bus_route,
-              }
-            }
-          }
-        } catch (e) {
-          //All errors are caught.
-        }
-      }
-    }
-  };
-
-  xmlhttp1.open(
-    "GET",
-    "https://arcane-woodland-84034.herokuapp.com/https://gtfsr.transportforireland.ie/v1/?format=json",
-    true
-  );
-  xmlhttp1.setRequestHeader("Cache-Control", "no-cache");
-  xmlhttp1.setRequestHeader("x-api-key", GTFSR_API_KEY);
-  xmlhttp1.send();
-
   console.log("BACKEND DICTIONARY");
   console.log(backend_dict);
-  console.log("GTFSR DICTIONARY");
-  console.log(gtfsr_dict);
 
 }
 
