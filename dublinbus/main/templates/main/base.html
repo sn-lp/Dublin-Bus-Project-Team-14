@@ -24,7 +24,7 @@
     <aside class="mdc-drawer mdc-drawer--modal d-lg-none">
       <div class="mdc-drawer__content">
         <nav class="mdc-list">
-          <img class="mdc-list-item" src="{% static 'img/db_logo.png' %}" height="45px" /></img>
+          <img class="mdc-list-item" src="{% static 'img/db_logo.png' %}" alt="dublin_bus_logo" height="45px" /></img>
           <a class="mdc-list-item mdc-list-item--activated" href="/" tabindex="0" aria-current="page">
             Journey Planner
           </a>
@@ -47,13 +47,13 @@
             <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button d-lg-none" style="color: black;">menu</button>
 
             <div class="mx-auto d-lg-none">
-              <img src="{% static 'img/db_icon.png' %}" height="45px" /></img>
+              <img src="{% static 'img/db_icon.png' %}" alt="dublin_bus_icon" height="45px" /></img>
               <h3>{% block nav_title %}{{ nav_title }}{% endblock %}</h3>
             </div>
 
             <button class="mdc-icon-button material-icons" id="map_toggle" style="color: black;">map</button>
 
-            <img class="d-none d-lg-block" src="{% static 'img/db_logo.png' %}" height="45px" /></img>
+            <img class="d-none d-lg-block" src="{% static 'img/db_logo.png' %}" alt="dublin_bus_logo" height="45px" /></img>
             <div class="d-none d-lg-block">
               <a class="mdc-top-app-bar--fixed" href="/">Journey Planner</a>
               <a class="mdc-top-app-bar--fixed" href="/realtime/">Real Time Info</a>
