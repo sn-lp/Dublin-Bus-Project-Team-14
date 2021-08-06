@@ -99,7 +99,6 @@ def model_prediction(
     route_model_file = f"main/ml_models/KNN_models/knn_{route}.joblib"
     with open(route_model_file, "rb") as f:
         route_model = joblib.load(f)
-        print(type(route_model))
     # convert the data to a list of parameters for the predictive KNN model
 
     # index     0     1       2    3      4     5       6        7    8     9     10     11    12
