@@ -62,28 +62,23 @@ def get_bus_stop_times(request):
     current_time = now.strftime("%H:%M:%S")
     current_time_1hr = hour_ahead.strftime("%H:%M:%S")
 
-    stop_times = Stop_Times.objects.filter(
-        stop_id=requested_stop_id,
-        arrival_time__gte=current_time,
-        arrival_time__lte=current_time_1hr,
-    )
+    stop_times = Stop_Times.objects.filter(stop_id=requested_stop_id, arrival_time__gte=current_time, arrival_time__lte=current_time_1hr)
     json_result = {}
 
     day_of_week = datetime.today().weekday()
     print(day_of_week)
     service_id_dict = {
-        "y1003": [0, 1, 2, 3, 4],
-        "y1004": [6],
-        "y1005": [5],
-        "y1007": [0, 1, 2, 3, 4],
-        "y1008": [6],
-        "y1009": [5],
+        'y1003': [0, 1, 2, 3, 4],
+        'y1004': [6],
+        'y1005': [5],
+        'y1007': [0, 1, 2, 3, 4],
+        'y1008': [6],
+        'y1009': [5],
     }
 
     for stop_time in stop_times:
         service_id = stop_time.trip_id.split(".")[1]
         if day_of_week in service_id_dict[service_id]:
-            print(service_id_dict[service_id])
 
             json_result[stop_time.id] = {
                 "arrival_time": stop_time.arrival_time,

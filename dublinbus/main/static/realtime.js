@@ -28,7 +28,7 @@ function getAllBusStops() {
       markers = [];
       for (const [stopName, stop] of Object.entries(busStopsResponse)) {
         // set the infoWindow content to contain the name of the bus stop
-        let contentString = stopName + stop.id;
+        let contentString = stopName;
         const newMarker = new google.maps.Marker({
           position: {
             lat: stop.latitude,
@@ -104,7 +104,6 @@ function get_realtime(stop_id) {
 }
 
 function GTFSR_matching(backend_data) {
-
   //Set results table as empty.
   document.getElementById("realtime_buses").innerHTML = `
   <table class="table" id="results_table">
@@ -118,17 +117,14 @@ function GTFSR_matching(backend_data) {
 
   // Loop through backend data.
   for (const [key, values] of Object.entries(backend_data)) {
-
     backend_arrival_time = values.arrival_time;
     backend_trip_id = values.trip_id;
     bus_route = backend_trip_id.split("-")[1];
 
     push_realtime_update(backend_arrival_time, bus_route);
-
-  };
+  }
   sortTable();
   make_table_data_readable();
-  
 }
 
 function push_realtime_update(estimated_arrival, bus_route) {
@@ -159,9 +155,7 @@ function push_realtime_update(estimated_arrival, bus_route) {
     time_remaining = "0" + time_remaining;
   }
 
-
   eta_td.innerHTML = time_remaining;
-
 
   row.appendChild(bus_route_td);
   row.appendChild(eta_td);
@@ -182,7 +176,7 @@ function sortTable() {
     rows = table.rows;
     /* Loop through all table rows (except the
     first, which contains table headers): */
-    for (i = 1; i < (rows.length - 1); i++) {
+    for (i = 1; i < rows.length - 1; i++) {
       // Start by saying there should be no switching:
       shouldSwitch = false;
       /* Get the two elements you want to compare,
@@ -209,17 +203,16 @@ function make_table_data_readable() {
   table = document.getElementById("results_table");
   rows = table.rows;
 
-  for (i = 1; i < (rows.length ); i++) {
+  for (i = 1; i < rows.length; i++) {
     this_row = rows[i].getElementsByTagName("TD")[1];
 
     if (this_row.innerHTML < 10 && this_row.innerHTML > 0) {
-      this_row.innerHTML = this_row.innerHTML.substring(1,2);
+      this_row.innerHTML = this_row.innerHTML.substring(1, 2);
       this_row.innerHTML += " mins";
     } else if (this_row.innerHTML == 0) {
       this_row.innerHTML = "NOW";
     } else {
       this_row.innerHTML += " mins";
     }
-    
   }
 }
