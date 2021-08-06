@@ -49,7 +49,6 @@ class CacheTests(TestCase):
             return dt.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
 
         # assertion:  (timestamp stored by the scraper in the cache) VS. (truncated orinignal timestamp)
-        self.assertEqual(get_weather(before_1min_timestamp), None)
 
         self.assertEqual(
             get_weather(in_30min_timestamp).get_timestamp(),
