@@ -53,7 +53,6 @@ def get_weather(input_timestamp):
         hour=0, minute=0, second=0, microsecond=0
     )
     if (input_day - current_day).days > 7:
-        print("here2")
         return None
 
     # if cache has no data, then scrape the data and put it in cache
