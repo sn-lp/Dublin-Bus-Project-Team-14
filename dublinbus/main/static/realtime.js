@@ -90,7 +90,6 @@ function get_time() {
 const bus_results_div = document.getElementById("realtime_buses");
 
 function get_realtime(stop_id) {
-
   stopTimesEndpoint = "/api/get_bus_stop_times/?stop_id=" + stop_id;
 
   //Fetch request to backend
@@ -104,41 +103,123 @@ function get_realtime(stop_id) {
     });
 }
 
-
 function GTFSR_matching(backend_data) {
-  var backend_dict = {};
 
-  //Populate the Backend Dictionary.
-  for (var i = 0; i < Object.keys(backend_data).length; i++) {
-    key = Object.keys(backend_data)[i];
-    backend_trip_id = backend_data[key]['trip_id'];
-    backend_arrival_time = backend_data[key]['arrival_time'];
+  //Set results table as empty.
+  document.getElementById("realtime_buses").innerHTML = `
+  <table class="table" id="results_table">
+    <thead>
+      <tr>
+        <th scope="col">Route</th>
+        <th scope="col">ETA (mins)</th>
+      </tr>
+    </thead>
+  <tbody id='results_rows'>`;
 
-    backend_dict[backend_trip_id] = {
-      "arrival_time": backend_arrival_time,
-    }
-  }
+  // Loop through backend data.
+  for (const [key, values] of Object.entries(backend_data)) {
 
-  console.log("BACKEND DICTIONARY");
-  console.log(backend_dict);
+    backend_arrival_time = values.arrival_time;
+    backend_trip_id = values.trip_id;
+    bus_route = backend_trip_id.split("-")[1];
 
+    push_realtime_update(backend_arrival_time, bus_route);
+
+  };
+  sortTable();
+  make_table_data_readable();
+  
 }
 
-
 function push_realtime_update(estimated_arrival, bus_route) {
-  var card = document.createElement("div");
-  card.setAttribute("class", "card-body");
+  var row = document.createElement("tr");
+  var bus_route_td = document.createElement("td");
+  var eta_td = document.createElement("td");
 
-  var bus_route_text = document.createElement("p");
-  bus_route_text.setAttribute("class", "card-text");
-  bus_route_text.innerText = bus_route;
+  bus_route_td.innerHTML = bus_route;
 
-  var eta_text = document.createElement("p");
-  eta_text.setAttribute("class", "card-text");
-  eta_text.innerText = estimated_arrival;
+  //Time
+  var current_time = new Date();
+  var eta = new Date(
+    current_time.getFullYear(),
+    current_time.getMonth(),
+    current_time.getDate(),
+    estimated_arrival.substring(0, 2),
+    estimated_arrival.substring(3, 5),
+    estimated_arrival.substring(6, 8)
+  );
 
-  card.appendChild(bus_route_text);
-  card.appendChild(eta_text);
+  var time_remaining = Math.floor(
+    (Math.round(eta.getTime() / 1000) -
+      Math.round(current_time.getTime() / 1000)) /
+      60
+  );
 
-  document.getElementById("realtime_buses").appendChild(card);
+  if (time_remaining < 10) {
+    time_remaining = "0" + time_remaining;
+  }
+
+
+  eta_td.innerHTML = time_remaining;
+
+
+  row.appendChild(bus_route_td);
+  row.appendChild(eta_td);
+
+  document.getElementById("results_rows").appendChild(row);
+}
+
+//Helped by W3 schools 'How TO - Sort a Table' https://www.w3schools.com/howto/howto_js_sort_table.asp.
+function sortTable() {
+  var table, rows, switching, i, x, y, shouldSwitch;
+  table = document.getElementById("results_table");
+  switching = true;
+  /* Make a loop that will continue until
+  no switching has been done: */
+  while (switching) {
+    // Start by saying: no switching is done:
+    switching = false;
+    rows = table.rows;
+    /* Loop through all table rows (except the
+    first, which contains table headers): */
+    for (i = 1; i < (rows.length - 1); i++) {
+      // Start by saying there should be no switching:
+      shouldSwitch = false;
+      /* Get the two elements you want to compare,
+      one from current row and one from the next: */
+      x = rows[i].getElementsByTagName("TD")[1];
+      y = rows[i + 1].getElementsByTagName("TD")[1];
+      // Check if the two rows should switch place:
+      if (x.innerHTML > y.innerHTML) {
+        // If so, mark as a switch and break the loop:
+        shouldSwitch = true;
+        break;
+      }
+    }
+    if (shouldSwitch) {
+      /* If a switch has been marked, make the switch
+      and mark that a switch has been done: */
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+    }
+  }
+}
+
+function make_table_data_readable() {
+  table = document.getElementById("results_table");
+  rows = table.rows;
+
+  for (i = 1; i < (rows.length ); i++) {
+    this_row = rows[i].getElementsByTagName("TD")[1];
+
+    if (this_row.innerHTML < 10 && this_row.innerHTML > 0) {
+      this_row.innerHTML = this_row.innerHTML.substring(1,2);
+      this_row.innerHTML += " mins";
+    } else if (this_row.innerHTML == 0) {
+      this_row.innerHTML = "NOW";
+    } else {
+      this_row.innerHTML += " mins";
+    }
+    
+  }
 }
