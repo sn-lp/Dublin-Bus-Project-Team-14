@@ -20,7 +20,7 @@ let directionsRenderer1;
 let departureTime;
 
 // dict that will have info about departure time and every suggested route by the directions api to send to backend
-let suggestedRoutesData = { departure_time: "", routesData: [] };
+let suggestedRoutesData = { departureTime: "", routesData: [] };
 
 function initDirectionsService() {
   directionsService1 = new google.maps.DirectionsService();
@@ -263,7 +263,7 @@ function getRoutesTravelEstimationsFromModels(directionsResponseObject) {
   );
   // get departure date and time selected by the user
   departureTime = document.getElementById("departure-time").value;
-  suggestedRoutesData.departure_time = departureTime;
+  suggestedRoutesData.departureTime = departureTime;
 
   let travelTimeEstimationsEndpoint =
     "/api/get_journey_travel_time_estimation/";
@@ -284,6 +284,10 @@ function getRoutesTravelEstimationsFromModels(directionsResponseObject) {
       if (response.ok) {
         return response.json();
       } else {
+        // hide suggested routes div if server error occurs
+        document.getElementById(
+          "directions_results"
+        ).children[0].style.display = "none";
         document.getElementById("user-error-message").style.display = "block";
         document.getElementById("user-error-message").innerText =
           "Something went wrong, please try again.";
@@ -328,11 +332,14 @@ function getRouteData(route) {
     return {};
   }
   let routeData = [];
+  let journey_start_time = routeLegs.departure_time.value.toString();
+  let start_time = { start_time: journey_start_time };
+  routeData.push(start_time);
   routeSteps = routeLegs.steps;
   for (let i = 0; i < routeSteps.length; i++) {
     let routeStepsData = { step: {} };
     if (routeSteps[i].travel_mode == "WALKING") {
-      const step_duration = routeSteps[i].duration.text;
+      const step_duration = routeSteps[i].duration.value;
       const travel_mode = "WALKING";
       routeStepsData.step = {
         step_duration: step_duration,
@@ -342,16 +349,20 @@ function getRouteData(route) {
     if (routeSteps[i].travel_mode == "TRANSIT") {
       for (let j = 0; j < routeSteps[i].transit.line.agencies.length; j++) {
         if (routeSteps[i].transit.line.agencies[j].name != "Dublin Bus") {
-          const step_duration = routeSteps[i].duration.text;
+          const step_duration = routeSteps[i].duration.value;
           const travel_mode = "TRANSIT";
           const provider = routeSteps[i].transit.line.agencies[j].name;
+          const departure_time = routeSteps[
+            i
+          ].transit.departure_time.value.toString();
           routeStepsData.step = {
             step_duration: step_duration,
             travel_mode: travel_mode,
             provider: provider,
+            departure_time: departure_time,
           };
         } else {
-          const step_duration = routeSteps[i].duration.text;
+          const step_duration = routeSteps[i].duration.value;
           const travel_mode = "TRANSIT";
           const provider = routeSteps[i].transit.line.agencies[j].name;
           const bus_line_long_name = routeSteps[i].transit.line.name;
@@ -359,6 +370,9 @@ function getRouteData(route) {
           const headsign = routeSteps[i].transit.headsign;
           const departure_stop = routeSteps[i].transit.departure_stop.name;
           const arrival_stop = routeSteps[i].transit.arrival_stop.name;
+          const departure_time = routeSteps[
+            i
+          ].transit.departure_time.value.toString();
           // getting the number of stops should be useful to display cost of Dublin Bus journey
           const number_of_stops = routeSteps[i].transit.num_stops;
           routeStepsData.step = {
@@ -370,6 +384,7 @@ function getRouteData(route) {
             headsign: headsign,
             departure_stop: departure_stop,
             arrival_stop: arrival_stop,
+            departure_time: departure_time,
             number_of_stops: number_of_stops,
           };
         }

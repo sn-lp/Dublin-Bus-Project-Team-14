@@ -1,10 +1,14 @@
 from django.http import JsonResponse
 from django.http.response import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
 from main.models import Route, Trip, Trips_Stops, Stop
 from main.cache_manipulator import *
 import json
 from django.db import connection
+import os.path
+from django.db.models import Q
+import pandas as pd
+import joblib
+from datetime import timedelta
 
 # returns all bus stops for each direction of each bus route
 def get_bus_stops(request):
@@ -89,56 +93,262 @@ def autocomple_route(request):
     return JsonResponse({"status": 200, "data": routes})
 
 
+def model_prediction(
+    route, progress_number, direction, day, month, temp, weather, hour
+):
+    route_model_file = f"main/ml_models/KNN_models/knn_{route}.joblib"
+    with open(route_model_file, "rb") as f:
+        route_model = joblib.load(f)
+        print(type(route_model))
+    # convert the data to a list of parameters for the predictive KNN model
+
+    # index     0     1       2    3      4     5       6        7    8     9     10     11    12
+    # feature  prog, direct, day, month, temp, clouds, drizzle, fog, mist, rain, smoke, snow, hour
+    model_args = [0] * 13
+    model_args[0] = progress_number
+    model_args[1] = direction
+    model_args[2] = day
+    model_args[3] = month
+    model_args[4] = temp
+
+    if weather == "Clouds":
+        model_args[5] = 1
+    elif weather == "Drizzle":
+        model_args[6] = 1
+    elif weather == "Fog":
+        model_args[7] = 1
+    elif weather == "Mist":
+        model_args[8] = 1
+    elif weather == "Rain" or weather == "Thunderstorm":
+        model_args[9] = 1
+    elif (
+        weather == "Smoke"
+        or weather == "Haze"
+        or weather == "Dust"
+        or weather == "Sand"
+        or weather == "Ash"
+    ):
+        model_args[10] = 1
+    elif weather == "Snow":
+        model_args[11] = 1
+
+    model_args[12] = hour
+
+    return float(
+        route_model.predict(
+            pd.DataFrame(
+                [model_args],
+                columns=[
+                    "PROGRNUMBER",
+                    "DIRECTION",
+                    "DAYOFWEEK",
+                    "MONTHOFYEAR",
+                    "temp",
+                    "w_main_Clouds",
+                    "w_main_Drizzle",
+                    "w_main_Fog",
+                    "w_main_Mist",
+                    "w_main_Rain",
+                    "w_main_Smoke",
+                    "w_main_Snow",
+                    "HOUROFDAY",
+                ],
+            )
+        )
+    )
+
+
 # returns travel time estimations for all suggested routes
 def get_journey_travel_time_estimation(request):
-    # this endpoint receives a dictionary with departure date/time and route's data
-    if request.method == "POST":
+    if not request.method == "POST":
+        return JsonResponse({"error": "endpoint only accepts POST requests"})
+
+    try:
+        # this endpoint receives a dictionary with departure date/time and route's data
         routesData = json.loads(request.body)
+    except:
+        return JsonResponse({"error": "request.body cannot be parsed as a JSON object"})
 
-        # convert the data to a list for the prediction model
-
-        # index     0     1       2    3      4     5       6        7    8     9     10     11    12    13       14       15
-        # feature  prog, direct, day, month, temp, clouds, drizzle, fog, mist, rain, smoke, snow, hour, hour**2, hour**3, hour**4
-        model_args = [0] * 16
-
-        ## TODO insert prog and direct
-
-        datetime_object = datetime.strptime(
-            routesData["departure_time"], "%Y-%m-%dT%H:%M"
+    if not "routesData" in routesData and not "departureTime" in routesData:
+        return JsonResponse(
+            {"error": "JSON object must have 'routesData' and 'departureTime'"}
         )
-        model_args[2] = datetime_object.weekday()
-        model_args[3] = datetime_object.month
 
-        weather = get_weather(datetime_object.timestamp() + 5)
-        model_args[4] = weather.get_temp()
-        w_main = weather.get_weather_main()
-        if w_main == "Clouds":
-            model_args[5] = 1
-        elif w_main == "Drizzle":
-            model_args[6] = 1
-        elif w_main == "Fog":
-            model_args[7] = 1
-        elif w_main == "Mist":
-            model_args[8] = 1
-        elif w_main == "Rain" or w_main == "Thunderstorm":
-            model_args[9] = 1
-        elif (
-            w_main == "Smoke"
-            or w_main == "Haze"
-            or w_main == "Dust"
-            or w_main == "Sand"
-            or w_main == "Ash"
+    # the time selected by the user in the calendar form
+    user_datetime_object = datetime.strptime(
+        routesData["departureTime"], "%Y-%m-%dT%H:%M"
+    )
+
+    # initialise empty dict that will have the predictions for all routes to send to frontend
+    routes_predictions = {}
+    for i in range(0, len(routesData["routesData"])):
+        routes_predictions[f"route_{i}"] = _get_travel_time_for_route(
+            routesData["routesData"][i], user_datetime_object
+        )
+
+    return JsonResponse(routes_predictions)
+
+
+# receives a route and returns route travel time estimation
+def _get_travel_time_for_route(route, user_datetime_object):
+    route_travel_prediction = {}
+
+    route_start_time = route[0]["start_time"]
+    # convert start time to datetime object
+    # this line will remove from the string the timezone description within parenthesis, e.g. 'Fri Aug 06 2021 11:39:36 GMT+0100 (Irish Standard Time)'
+    start_time_without_description = route_start_time.split(" (", 1)[0]
+    # after the description of timezone is removed we can convert to a datetime object
+    start_time_datetime_object = datetime.strptime(
+        start_time_without_description, f"%a %b %d %Y %H:%M:%S %Z%z"
+    )
+    route_travel_prediction["journey_starts"] = _datetime_to_hour_minutes_string(
+        start_time_datetime_object
+    )
+
+    # route_total_time is in seconds and holds total amount of seconds the route takes
+    route_total_time = 0
+    # iterate through the steps and skip the start time dict which is the first element of each route's list
+    for route_step_dict in route[1:]:
+        route_total_time += _get_step_time_estimation(
+            route_step_dict, user_datetime_object
+        )
+
+    total_seconds = timedelta(seconds=route_total_time)
+    end_time_datetime_object = start_time_datetime_object + total_seconds
+
+    # add total time in seconds we estimate the route will take to the routes predictions dict
+    route_travel_prediction["total_time_seconds"] = route_total_time
+
+    # add final clock time of the journey to the routes_predictions dict
+    route_travel_prediction["journey_ends"] = _datetime_to_hour_minutes_string(
+        end_time_datetime_object
+    )
+
+    return route_travel_prediction
+
+
+def _get_step_time_estimation(route_step_dict, user_datetime_object):
+    step_time_estimation = 0
+    if not "step" in route_step_dict or not "step_duration" in route_step_dict["step"]:
+        return step_time_estimation
+
+    google_travel_time_prediction = route_step_dict["step"]["step_duration"]
+
+    if "departure_time" in route_step_dict["step"]:
+        # use google's step's departure time to feed the date, time and weather to the models
+        departure_time = route_step_dict["step"]["departure_time"]
+        departure_time_without_description = departure_time.split(" (", 1)[0]
+        departure_time_datetime_object = datetime.strptime(
+            departure_time_without_description, f"%a %b %d %Y %H:%M:%S %Z%z"
+        )
+        day = departure_time_datetime_object.weekday()
+        month = departure_time_datetime_object.month
+        hour = departure_time_datetime_object.hour
+        weather = get_weather(departure_time_datetime_object.timestamp())
+    else:
+        # use user selected date and time
+        day = user_datetime_object.weekday()
+        month = user_datetime_object.month
+        hour = user_datetime_object.hour
+        weather = get_weather(user_datetime_object.timestamp())
+
+    weather_main = weather.get_weather_main()
+    temp = weather.get_temp()
+
+    if (
+        route_step_dict["step"]["travel_mode"] == "WALKING"
+        or route_step_dict["step"]["provider"] != "Dublin Bus"
+    ):
+        step_time_estimation += google_travel_time_prediction
+        return step_time_estimation
+    else:
+        route_shortname = route_step_dict["step"]["bus_line_short_name"]
+        matching_route_in_db = Route.objects.filter(short_name=route_shortname.lower())
+        if not matching_route_in_db or not os.path.isfile(
+            f"main/ml_models/KNN_models/knn_{route_shortname}.joblib"
         ):
-            model_args[10] = 1
-        elif w_main == "Snow":
-            model_args[11] = 1
+            step_time_estimation += google_travel_time_prediction
+            return step_time_estimation
 
-        model_args[12] = datetime_object.hour
-        model_args[13] = model_args[12] ** 2
-        model_args[14] = model_args[12] ** 3
-        model_args[15] = model_args[12] ** 4
+        trip_headsign = route_step_dict["step"]["bus_line_long_name"]
+        departure_stop = route_step_dict["step"]["departure_stop"]
+        arrival_stop = route_step_dict["step"]["arrival_stop"]
+        # we will get these variable's values from database if we find route matching data
+        bus_direction = 0
+        departure_stop_progress_number = 0
+        arrival_stop_progress_number = 0
 
-        # TODO feed data to models and get estimated travel time
-        # TODO calculate total time, if needed by combining our Dublin Bus predictions with other times from other steps that are not operated by Dublin Bus
-        # TODO send total times for all suggested routes to frontend that will render them by replacing the times injected from the google directions api response
-        return JsonResponse({})
+        # check if there's matching trip an bus stops in the DB to get progress numbers and trip direction
+        for route in matching_route_in_db:
+            matching_trip = Trip.objects.filter(
+                Q(headsign=trip_headsign) & Q(route_id=route.id)
+            ).first()
+            if matching_trip:
+                bus_direction = matching_trip.direction
+                break
+        # bus direction must be 1 or 2 in case we have a matching trip in the database
+        if bus_direction == 0:
+            step_time_estimation += google_travel_time_prediction
+            return step_time_estimation
+
+        trip_id = matching_trip.id
+        matching_departure_stop = Stop.objects.filter(Q(name=departure_stop)).first()
+        if matching_departure_stop:
+            departure_trip_stop = Trips_Stops.objects.filter(
+                Q(trip_id=trip_id) & Q(stop_id=matching_departure_stop.id)
+            ).first()
+            if departure_trip_stop:
+                departure_stop_progress_number = departure_trip_stop.progress_number
+
+        # progress numbers must be bigger than 0 in case we have a matching stop in the database
+        if departure_stop_progress_number == 0:
+            step_time_estimation += google_travel_time_prediction
+            return step_time_estimation
+
+        matching_arrival_stop = Stop.objects.filter(Q(name=arrival_stop)).first()
+        if matching_arrival_stop:
+            arrival_trip_stop = Trips_Stops.objects.filter(
+                Q(trip_id=trip_id) & Q(stop_id=matching_arrival_stop.id)
+            ).first()
+            if arrival_trip_stop:
+                arrival_stop_progress_number = arrival_trip_stop.progress_number
+
+        if arrival_stop_progress_number == 0:
+            step_time_estimation += google_travel_time_prediction
+            return step_time_estimation
+
+        # make predictions if all necessary values are available
+        departure_stop_prediction = model_prediction(
+            route_shortname,
+            departure_stop_progress_number,
+            bus_direction,
+            day,
+            month,
+            temp,
+            weather_main,
+            hour,
+        )
+        arrival_stop_prediction = model_prediction(
+            route_shortname,
+            arrival_stop_progress_number,
+            bus_direction,
+            day,
+            month,
+            temp,
+            weather_main,
+            hour,
+        )
+        step_travel_time_prediction = (
+            arrival_stop_prediction - departure_stop_prediction
+        )
+        step_time_estimation += step_travel_time_prediction
+        return step_time_estimation
+
+
+# returns a string from a datetime in a format 'hh:mm'
+# datetime.minute gives an int in range(60), if minute < than 10 we need to add one zero to the string before the int returned
+def _datetime_to_hour_minutes_string(datetime):
+    if datetime.minute < 10:
+        return f"{datetime.hour}:0{datetime.minute}"
+    else:
+        return f"{datetime.hour}:{datetime.minute}"

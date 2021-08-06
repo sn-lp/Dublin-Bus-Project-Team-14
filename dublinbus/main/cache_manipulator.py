@@ -27,7 +27,7 @@ def get_weather(input_timestamp):
     current_timestamp = datetime.now().timestamp()
     # if input is before current time
     if input_timestamp < current_timestamp:
-        return None
+        input_timestamp = current_timestamp
 
     # set timezone
     current_datetime = datetime.fromtimestamp(
@@ -53,6 +53,7 @@ def get_weather(input_timestamp):
         hour=0, minute=0, second=0, microsecond=0
     )
     if (input_day - current_day).days > 7:
+        print("here2")
         return None
 
     # if cache has no data, then scrape the data and put it in cache
