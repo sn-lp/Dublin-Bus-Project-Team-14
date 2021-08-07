@@ -126,7 +126,9 @@ function realtime(backend_data) {
   hideFirstMenu();
   sortTable();
   make_table_data_readable();
-  displayAddOrRemoveFavouritesButton(document.getElementById("stop_name_box").innerHTML);
+  displayAddOrRemoveFavouritesButton(
+    document.getElementById("stop_name_box").innerHTML
+  );
 }
 
 function push_realtime_update(estimated_arrival, bus_route) {
@@ -259,7 +261,6 @@ function displayFavourites() {
 }
 
 function call_realtime_by_stop_name(stop_name) {
-
   stop_name_heading.innerText = stop_name;
 
   busStopsEndpoint = "/api/get_all_bus_stops/?stop_name=" + stop_name;
@@ -269,11 +270,11 @@ function call_realtime_by_stop_name(stop_name) {
     .then((response) => response.json())
     .then((data) => {
       console.log(Object.entries(data)[0]);
-      realtime_fetch(Object.entries(data)[0][1]['id']);
+      realtime_fetch(Object.entries(data)[0][1]["id"]);
       LatLng = {
-        "lat": Object.entries(data)[0][1]['latitude'],
-        "lng": Object.entries(data)[0][1]['longitude']
-      }
+        lat: Object.entries(data)[0][1]["latitude"],
+        lng: Object.entries(data)[0][1]["longitude"],
+      };
       map.panTo(LatLng);
       map.setZoom(20);
     })
@@ -377,11 +378,24 @@ function displayAddOrRemoveFavouritesButton(stopNumber) {
 
 function hideFirstMenu() {
   document.getElementById("favourites").style.display = "none";
-  document.getElementById("autocomplete_div").style.display = "none";
-  document.getElementById("first_menu_header").style.display = "none";
+  document.getElementById("searchStopUI").style.display = "none";
   document.getElementById("back-to-stops").style.display = "block";
 }
 
 function goToStopsPage() {
   window.location.reload();
 }
+
+// Autocomplete NOT FUNCTIONAL
+// new Autocomplete("#autocomplete", {
+//   search: (input) => {
+//     const url = `/api/autocomple_route?insert=${input}`;
+//     return new Promise((resolve) => {
+//       fetch(url)
+//         .then((response) => response.json())
+//         .then((data) => {
+//           resolve(data.data);
+//         });
+//     });
+//   },
+// });
