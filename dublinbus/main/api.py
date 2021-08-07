@@ -147,14 +147,13 @@ def autocomple_route(request):
 
     return JsonResponse({"status": 200, "data": routes})
 
+
 def autocomple_stop(request):
     insert = request.GET.get("insert")
     stops = []
     if insert:
         stop_objs = (
-            Stop.objects.filter(name__icontains=insert)
-            .values("name")
-            .distinct()
+            Stop.objects.filter(name__icontains=insert).values("name").distinct()
         )
 
         for route_obj in stop_objs:

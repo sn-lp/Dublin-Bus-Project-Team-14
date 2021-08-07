@@ -224,6 +224,10 @@ function drawMarkers(stops) {
         lat: coordinates.latitude,
         lng: coordinates.longitude,
       },
+      icon: {
+        url: "http://maps.google.com/mapfiles/kml/paddle/ylw-circle.png",
+        scaledSize: new google.maps.Size(40, 40),
+      },
       map,
     });
     markers.push(newMarker);

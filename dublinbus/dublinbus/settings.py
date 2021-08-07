@@ -179,7 +179,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # We can have all other environment variables (e.g. API keys) here
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLEMAPS_APIKEY", "")
 WEATHER_APIKEY = os.getenv("WEATHER_APIKEY", "")
-GTFSR_API_KEY = os.getenv("GTFSR_API_KEY", "")
 
 CACHES = {
     "default": {

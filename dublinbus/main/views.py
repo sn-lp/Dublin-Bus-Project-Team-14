@@ -21,7 +21,6 @@ def real_time(request):
         return HttpResponse(status=500)
     context = {
         "GOOGLEMAPS_APIKEY": settings.GOOGLE_MAPS_API_KEY,
-        "GTFSR_API_KEY": settings.GTFSR_API_KEY,
     }
     return HttpResponse(template.render(context, request))
 
