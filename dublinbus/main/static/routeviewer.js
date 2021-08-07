@@ -182,15 +182,16 @@ function removeFromLocalstorage(routeNumber) {
   }
 }
 
-function resetMapPositionAndZoom() {
-  map.setZoom(defaultMapZoomLevel);
-  map.setCenter(
-    new google.maps.LatLng(defaultMapPositionLat, defaultMapPositionLong)
-  );
-}
+// KYLE COMMENTED OUT FOR NOW - I THINK THIS MAKES THE UI LESS USABLE
+// function resetMapPositionAndZoom() {
+//   map.setZoom(defaultMapZoomLevel);
+//   map.setCenter(
+//     new google.maps.LatLng(defaultMapPositionLat, defaultMapPositionLong)
+//   );
+// }
 
 function changeDirection(directionNumber) {
-  resetMapPositionAndZoom();
+  // resetMapPositionAndZoom();
   // Get the container element
   const btnContainer = document.getElementById("directions-buttons");
 

@@ -91,8 +91,22 @@ def get_bus_stop_times(request):
 
 def get_all_bus_stops(request):
 
-    stops = Stop.objects.all()
     json_result = {}
+
+    if "stop_name" in request.GET:
+        stop_name = request.GET["stop_name"]
+        stops = Stop.objects.filter(name=stop_name)
+
+        for stop in stops:
+            json_result[stop.name] = {
+                "latitude": stop.latitude,
+                "longitude": stop.longitude,
+                "id": stop.id,
+            }
+
+        return JsonResponse(json_result)
+
+    stops = Stop.objects.all()
 
     for stop in stops:
         json_result[stop.name] = {

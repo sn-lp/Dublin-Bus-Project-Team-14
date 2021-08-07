@@ -49,7 +49,7 @@ function getAllBusStops() {
           // Pan map to the selected marker
           map.panTo(newMarker.getPosition());
           stop_name_heading.innerText = contentString;
-          get_realtime(stop.id);
+          realtime_fetch(stop.id);
         });
       }
       new MarkerClusterer(map, markers, {
@@ -89,28 +89,28 @@ function get_time() {
 //Realtime with GTFSR API and Backend
 const bus_results_div = document.getElementById("realtime_buses");
 
-function get_realtime(stop_id) {
+function realtime_fetch(stop_id) {
   stopTimesEndpoint = "/api/get_bus_stop_times/?stop_id=" + stop_id;
 
   //Fetch request to backend
   fetch(stopTimesEndpoint)
     .then((response) => response.json())
     .then((data) => {
-      GTFSR_matching(data);
+      realtime(data);
     })
     .catch((error) => {
       console.log(error);
     });
 }
 
-function GTFSR_matching(backend_data) {
+function realtime(backend_data) {
   //Set results table as empty.
   document.getElementById("realtime_buses").innerHTML = `
   <table class="table" id="results_table">
     <thead>
       <tr>
         <th scope="col">Route</th>
-        <th scope="col">ETA (mins)</th>
+        <th scope="col">ETA</th>
       </tr>
     </thead>
   <tbody id='results_rows'>`;
@@ -123,8 +123,10 @@ function GTFSR_matching(backend_data) {
 
     push_realtime_update(backend_arrival_time, bus_route);
   }
+  hideFirstMenu();
   sortTable();
   make_table_data_readable();
+  displayAddOrRemoveFavouritesButton(document.getElementById("stop_name_box").innerHTML);
 }
 
 function push_realtime_update(estimated_arrival, bus_route) {
@@ -215,4 +217,171 @@ function make_table_data_readable() {
       this_row.innerHTML += " mins";
     }
   }
+}
+
+window.onload = function afterWindowLoaded() {
+  displayFavourites();
+};
+
+//AnYi's favourites function from routeviewer.js, modified for stops.
+function displayFavourites() {
+  // run this function, only if the browser supports localstorage
+  if (typeof Storage !== "undefined") {
+    if (localStorage.getItem("favourite_stops") == null) {
+      return;
+    }
+    // display title
+    var para = document.createElement("P");
+    para.classList.add("font-weight-bold");
+    para.classList.add("text-center");
+    para.innerHTML = "Favourites";
+    document.getElementById("favourites").appendChild(para);
+    // display buttons
+    let favourites_array = JSON.parse(localStorage.getItem("favourite_stops"));
+    favourites_array.forEach(function (item, index, array) {
+      // create div
+      var favourites_div = document.createElement("DIV");
+      favourites_div.classList.add("d-grid");
+      favourites_div.classList.add("gap-2");
+      // create button
+      var btn = document.createElement("BUTTON");
+      btn.setAttribute("class", "btn btn-primary");
+      btn.setAttribute("type", "submit");
+      btn.addEventListener("click", function () {
+        call_realtime_by_stop_name(item);
+      });
+      btn.textContent = item;
+      // append the button to the div, and append the div to the favourite section
+      favourites_div.appendChild(btn);
+      document.getElementById("favourites").appendChild(favourites_div);
+    });
+  }
+}
+
+function call_realtime_by_stop_name(stop_name) {
+
+  stop_name_heading.innerText = stop_name;
+
+  busStopsEndpoint = "/api/get_all_bus_stops/?stop_name=" + stop_name;
+
+  //Fetch request to backend
+  fetch(busStopsEndpoint)
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(Object.entries(data)[0]);
+      realtime_fetch(Object.entries(data)[0][1]['id']);
+      LatLng = {
+        "lat": Object.entries(data)[0][1]['latitude'],
+        "lng": Object.entries(data)[0][1]['longitude']
+      }
+      map.panTo(LatLng);
+      map.setZoom(20);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+function addToLocalstorageByStopNum(stop_num) {
+  // run this function, only if the browser supports localstorage
+  if (typeof Storage !== "undefined") {
+    // localstorage is empty, then initialise it
+    if (localStorage.getItem("favourite_stops") == null) {
+      let favourites_array = [stop_num];
+      let favourites_str = JSON.stringify(favourites_array);
+      localStorage.setItem("favourite_stops", favourites_str);
+
+      // localstorage is not empty, then append new route to it
+    } else {
+      let favourites_array = JSON.parse(
+        localStorage.getItem("favourite_stops")
+      );
+      // only append the new favourite routes, if it's not duplicated
+      if (!favourites_array.includes(stop_num)) {
+        favourites_array.push(stop_num);
+        let favourites_str = JSON.stringify(favourites_array);
+        localStorage.setItem("favourite_stops", favourites_str);
+      }
+    }
+    displayAddOrRemoveFavouritesButton(stop_num);
+  }
+}
+
+function removeFromLocalstorage(stopNumber) {
+  // run this function, only if the browser supports localstorage
+  if (typeof Storage !== "undefined") {
+    // localstorage is null, then return
+    if (localStorage.getItem("favourite_stops") == null) {
+      return;
+    }
+
+    let favourites_array = JSON.parse(localStorage.getItem("favourite_stops"));
+    // remove the stop from localstorage, if the stop exists in localstorage
+    if (favourites_array.includes(stopNumber)) {
+      favourites_array = favourites_array.filter(function (item) {
+        return item !== stopNumber;
+      });
+      if (favourites_array.length == 0) {
+        localStorage.removeItem("favourite_stops");
+      } else {
+        let favourites_str = JSON.stringify(favourites_array);
+        localStorage.setItem("favourite_stops", favourites_str);
+      }
+    }
+    // reload buttons
+    displayAddOrRemoveFavouritesButton(stopNumber);
+  }
+}
+
+function addToLocalstorage() {
+  let stop_num = document.getElementById("stop_name_box").innerHTML;
+  if (stop_num != "") {
+    addToLocalstorageByStopNum(stop_num);
+  }
+}
+
+function displayAddOrRemoveFavouritesButton(stopNumber) {
+  // run this function, only if the browser supports localstorage
+  if (typeof Storage !== "undefined") {
+    // clear all
+    document.getElementById("add-to-favourites").style.display = "none";
+    document.getElementById("remove-from-favourites").style.display = "none";
+
+    let favourites_array = [];
+
+    // to avoid NullPointerException
+    if (localStorage.getItem("favourite_stops")) {
+      favourites_array = JSON.parse(localStorage.getItem("favourite_stops"));
+    }
+
+    // if localstorage doesn't contain the stop number, then display "add to favourite" button
+    if (
+      favourites_array.length == 0 ||
+      !favourites_array.includes(stopNumber)
+    ) {
+      let btn = document.getElementById("add-to-favourites");
+      btn.style.display = "block";
+      btn.addEventListener("click", function () {
+        addToLocalstorageByStopNum(stopNumber);
+      });
+      // else display "remove from favourite" button
+    } else {
+      document.getElementById("remove-from-favourites").style.display = "block";
+      let btn = document.getElementById("remove-from-favourites");
+      btn.addEventListener("click", function () {
+        removeFromLocalstorage(stopNumber);
+      });
+    }
+  }
+}
+
+function hideFirstMenu() {
+  document.getElementById("favourites").style.display = "none";
+  document.getElementById("autocomplete_div").style.display = "none";
+  document.getElementById("first_menu_header").style.display = "none";
+  document.getElementById("back-to-stops").style.display = "block";
+}
+
+function goToStopsPage() {
+  window.location.reload();
 }
