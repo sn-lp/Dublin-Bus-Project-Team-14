@@ -283,6 +283,11 @@ function call_realtime_by_stop_name(stop_name) {
     });
 }
 
+function call_realtime_from_search() {
+  var stop_name = document.getElementById("bus-stop-input").value;
+  call_realtime_by_stop_name(stop_name);
+}
+
 function addToLocalstorageByStopNum(stop_num) {
   // run this function, only if the browser supports localstorage
   if (typeof Storage !== "undefined") {
@@ -386,16 +391,16 @@ function goToStopsPage() {
   window.location.reload();
 }
 
-// Autocomplete NOT FUNCTIONAL
-// new Autocomplete("#autocomplete", {
-//   search: (input) => {
-//     const url = `/api/autocomple_route?insert=${input}`;
-//     return new Promise((resolve) => {
-//       fetch(url)
-//         .then((response) => response.json())
-//         .then((data) => {
-//           resolve(data.data);
-//         });
-//     });
-//   },
-// });
+// Autocomplete
+new Autocomplete("#autocomplete", {
+  search: (input) => {
+    const url = `/api/autocomple_stop?insert=${input}`;
+    return new Promise((resolve) => {
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          resolve(data.data);
+        });
+    });
+  },
+});

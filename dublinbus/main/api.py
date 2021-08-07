@@ -147,6 +147,21 @@ def autocomple_route(request):
 
     return JsonResponse({"status": 200, "data": routes})
 
+def autocomple_stop(request):
+    insert = request.GET.get("insert")
+    stops = []
+    if insert:
+        stop_objs = (
+            Stop.objects.filter(name__icontains=insert)
+            .values("name")
+            .distinct()
+        )
+
+        for route_obj in stop_objs:
+            stops.append(route_obj["name"])
+
+    return JsonResponse({"status": 200, "data": stops})
+
 
 # returns travel time estimations for all suggested routes
 def get_journey_travel_time_estimation(request):
