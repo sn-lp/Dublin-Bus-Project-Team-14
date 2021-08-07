@@ -71,9 +71,6 @@ def get_bus_stop_times(request):
 
     day_of_week = datetime.today().weekday()
     service_id_dict = {
-        "y1003": [0, 1, 2, 3, 4],
-        "y1004": [6],
-        "y1005": [5],
         "y1007": [0, 1, 2, 3, 4],
         "y1008": [6],
         "y1009": [5],
