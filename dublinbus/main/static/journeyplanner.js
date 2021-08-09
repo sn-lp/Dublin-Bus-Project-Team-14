@@ -22,6 +22,11 @@ let departureTime;
 // dict that will have info about departure time and every suggested route by the directions api to send to backend
 let suggestedRoutesData = { departureTime: "", routesData: [] };
 
+// global variables that need to be accessed by independent functions
+let travelTimeEstimations;
+let suggestedRoutesElements;
+let timeEstimationReplaced = false;
+
 function initDirectionsService() {
   directionsService1 = new google.maps.DirectionsService();
 }
@@ -32,7 +37,8 @@ function initDirectionsRenderer() {
 
 //Directions
 function calculateAndDisplayRoute(directionsService, directionsRenderer) {
-  directionsRenderer.setMap(map);
+  // hide over_map until we replaced the times in the suggested routes div
+  document.getElementById("over_map").style.display = "none";
 
   departureTime = document.getElementById("departure-time").value;
   var unix_date = new Date();
@@ -68,11 +74,10 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer) {
           directionsResultDivChanged,
           false
         );
-      getRoutesTravelEstimationsFromModels(response);
+      getRoutesTravelEstimationsFromModels(response, directionsRenderer);
       directionsRenderer.setPanel(
         document.getElementById("directions_results")
       );
-
       //Switching UI
       const searchUI = document.getElementById("searchUI");
       searchUI.style.display = "none";
@@ -107,6 +112,12 @@ function directionsResultDivChanged() {
     document.getElementById("directions_results").childNodes.length != 2
   ) {
     return;
+  }
+  // hide the suggested routes only until the time estimations have been replaced
+  // otherwise because this is asynchronous the user could potentially see the times changing on the page
+  if (!timeEstimationReplaced) {
+    document.getElementById("directions_results").children[0].style.display =
+      "none";
   }
   document.getElementById("directions_results").children[1].style.display =
     "none";
@@ -257,7 +268,10 @@ function readLocationPrefs() {
 readLocationPrefs();
 
 // returns travel time estimation for all suggested routes that come in the google directions API
-function getRoutesTravelEstimationsFromModels(directionsResponseObject) {
+function getRoutesTravelEstimationsFromModels(
+  directionsResponseObject,
+  directionsRenderer
+) {
   suggestedRoutesData.routesData = getRoutesDataFromDirectionsAPIResponse(
     directionsResponseObject
   );
@@ -289,14 +303,20 @@ function getRoutesTravelEstimationsFromModels(directionsResponseObject) {
           "directions_results"
         ).children[0].style.display = "none";
         document.getElementById("user-error-message").style.display = "block";
-        document.getElementById("user-error-message").innerText =
-          "Something went wrong, please try again.";
+        displayErrorMessageToUser();
         // status and statusText doesn't work for all browsers but works in Chrome and Safari
         throw new Error(response.status + ", " + response.statusText);
       }
     })
-    .then((travelTimeEstimations) => {
-      //travelTimeEstimations will be the response sent by the backend with the travel time estimations for all suggested routes
+    .then((estimationsResponse) => {
+      travelTimeEstimations = estimationsResponse;
+      replaceTravelTimeEstimations(travelTimeEstimations);
+      timeEstimationReplaced = true;
+      document.getElementById("directions_results").children[0].style.display =
+        "block";
+      document.getElementById("over_map").style.display = "block";
+      // only draw the journey line on the map after we rendered the suggested routes div, otherwise this will be displayed before the user sees any suggested routes
+      directionsRenderer.setMap(map);
     })
     .catch((error) => {
       console.log(error);
@@ -397,10 +417,17 @@ function getRouteData(route) {
 
 // displays detailed steps, for the selected route when the user clicks the "route details" button
 function displayRouteDetails() {
+  // replace or hide steps' details of a selected route when user clicks on the "Route Details" button
+  replaceOrHideStepTimes();
   document.getElementById("directions_results").children[0].style.display =
     "none";
-  document.getElementById("directions_results").children[1].style.display =
-    "block";
+  if (
+    document.getElementById("directions_results").children[1].style.display ==
+    "none"
+  ) {
+    document.getElementById("directions_results").children[1].style.display =
+      "block";
+  }
   document.getElementById("submit-selected-route").style.display = "none";
   document.getElementById("clear").style.display = "none";
   document.getElementById("back-to-routes").style.display = "block";
@@ -408,6 +435,10 @@ function displayRouteDetails() {
 
 // changes window to display suggested routes again
 function displaySuggestedRoutes() {
+  // if a route's details triggered an error message, remove it when going back to suggested routes
+  if (document.getElementById("user-error-message").style.display == "block") {
+    document.getElementById("user-error-message").style.display = "none";
+  }
   // change display style of divs injected in "directions_results" when
   // directionsRenderer.setPanel(document.getElementById("directions_results")) is called
   document.getElementById("directions_results").children[0].style.display =
@@ -417,4 +448,203 @@ function displaySuggestedRoutes() {
   document.getElementById("submit-selected-route").style.display = "block";
   document.getElementById("clear").style.display = "block";
   document.getElementById("back-to-routes").style.display = "none";
+}
+
+function replaceTravelTimeEstimations(travelTimeEstimations) {
+  // try access all (nested) elements until we reach individual route elements that we can use to replace google's time estimations with ours
+  // if the expected html elements don't exist, display an error message to the user
+  try {
+    if (!document.getElementById("directions_results")) {
+      throw new Error(
+        "Could not find 'directions_results' html child elements."
+      );
+    }
+    const directionsResultsDiv = document.getElementById("directions_results");
+    if (
+      !directionsResultsDiv.hasChildNodes() ||
+      directionsResultsDiv.children[0] == null
+    ) {
+      displayErrorMessageToUser();
+      return;
+    }
+    const multipleRoutesDiv = directionsResultsDiv.children[0];
+    if (
+      !multipleRoutesDiv.hasChildNodes() ||
+      multipleRoutesDiv.children[0] == null
+    ) {
+      displayErrorMessageToUser();
+      return;
+    }
+    const routesSelectionDiv = multipleRoutesDiv.children[0];
+    if (
+      !routesSelectionDiv.childNodes.length > 1 ||
+      routesSelectionDiv.children[1] == null
+    ) {
+      displayErrorMessageToUser();
+      return;
+    }
+    const routeOptions = routesSelectionDiv.children[1];
+    if (!routeOptions.hasChildNodes() || routeOptions.children[0] == null) {
+      displayErrorMessageToUser();
+      return;
+    }
+    if (!routeOptions.children[0].hasChildNodes()) {
+      displayErrorMessageToUser();
+      return;
+    }
+    // routesElements is a list of <li> elements injected in the "directions_results" div by calling "directionsRenderer.setPanel",
+    // each <li> element corresponds to an individual suggested route
+    const routesElements = routeOptions.children[0].children;
+    suggestedRoutesElements = routesElements;
+    // we can map the routes in the backend response object to the corresponding route that the directions api returns since they are in the same index order
+    for (let i = 0; i < suggestedRoutesElements.length; i++) {
+      routeEstimations = travelTimeEstimations[`route_${i}`];
+      replaceRouteTravelTime(suggestedRoutesElements[i], routeEstimations);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+// receives a route i.e. <li> element and replaces the travel times for that route
+function replaceRouteTravelTime(route, routeEstimations) {
+  if (
+    !route.hasChildNodes() ||
+    !route.children[0].classList.contains("adp-summary-duration")
+  ) {
+    displayErrorMessageToUser();
+    return;
+  }
+  const routeDurationDiv = route.children[0];
+  routeDurationDiv.innerText = routeEstimations.route_duration;
+  const routeInitalTime = route.children[2].children[0];
+  routeInitalTime.innerText = routeEstimations.journey_starts;
+  const routeEndTime = route.children[2].children[1];
+  routeEndTime.innerText = routeEstimations.journey_ends;
+}
+
+function replaceOrHideStepTimes() {
+  try {
+    if (!document.getElementById("directions_results")) {
+      throw new Error(
+        "Could not find 'directions_results' html child elements."
+      );
+    }
+    const directionsResultsDiv = document.getElementById("directions_results");
+    if (
+      !directionsResultsDiv.hasChildNodes() ||
+      directionsResultsDiv.children[1] == null
+    ) {
+      displayErrorMessageToUser();
+      return;
+    }
+    const detailsDiv = directionsResultsDiv.children[1];
+    if (
+      !detailsDiv.hasChildNodes() ||
+      detailsDiv.children[0] == null ||
+      !detailsDiv.children[0].hasChildNodes() ||
+      detailsDiv.children[0].childNodes.length < 3
+    ) {
+      displayErrorMessageToUser();
+      return;
+    }
+    const stepsDiv = detailsDiv.children[0].children[2];
+    if (
+      !stepsDiv.hasChildNodes() ||
+      stepsDiv.childNodes.length < 3 ||
+      stepsDiv.children[0] == null
+    ) {
+      displayErrorMessageToUser();
+      return;
+    }
+    const routeSummaryDiv = stepsDiv.children[0];
+    const stepDetailsDiv = stepsDiv.children[1];
+    if (
+      !routeSummaryDiv.hasChildNodes() ||
+      routeSummaryDiv.childNodes.length < 3 ||
+      !stepDetailsDiv.hasChildNodes() ||
+      stepDetailsDiv.children[0] == null
+    ) {
+      displayErrorMessageToUser();
+      return;
+    }
+    const journeyTimeDiv = routeSummaryDiv.children[2];
+    const tableDetailsDiv = stepDetailsDiv.children[0];
+    if (
+      !journeyTimeDiv.hasChildNodes() ||
+      !tableDetailsDiv.hasChildNodes() ||
+      tableDetailsDiv.children[0] == null
+    ) {
+      displayErrorMessageToUser();
+      return;
+    }
+    const timeDiv = journeyTimeDiv.children[0];
+    const tableDetailsBodyDiv = tableDetailsDiv.children[0];
+    selectedRouteIndex = getSelectedRouteIndex();
+    timeDiv.innerText =
+      travelTimeEstimations[`route_${selectedRouteIndex}`]["route_duration"];
+
+    for (let i = 0; i < tableDetailsBodyDiv.children.length; i++) {
+      tableRow = tableDetailsBodyDiv.children[i];
+
+      // for now disable google infowindow display when clicking a step since the window will show google step times estimations that don't correspond to ours
+      tableRow.setAttribute("jsaction", " ");
+
+      if (!tableRow.hasChildNodes() || tableRow.children[0] == null) {
+        displayErrorMessageToUser();
+        return;
+      }
+      const subStep = tableRow.children[0];
+      if (!subStep.hasChildNodes()) {
+        displayErrorMessageToUser();
+        return;
+      }
+      const stepEstimations = subStep.children[2];
+      // when step is walk we don't want to change anything because google walk time estimation is the one we are using for when a step is walking mode
+      // google's stepEstimations html element has style display "none" when it is a walking step
+      // so we only do this when display style is "block" --> which means it is not a walking step
+      if (stepEstimations.style.display != "none") {
+        if (
+          !stepEstimations.hasChildNodes() ||
+          stepEstimations.children.length < 3
+        ) {
+          displayErrorMessageToUser();
+          return;
+        }
+        const clockTimes = stepEstimations.children[0];
+        const durationAndNumberOfStops = stepEstimations.children[1];
+        // for now hide this information --> there's a TODO needed in the backend so it also calculates each route's steps duration for the frontend to show here
+        clockTimes.style.display = "none";
+        durationAndNumberOfStops.style.display = "none";
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+function getSelectedRouteIndex() {
+  index = 0;
+  suggestedRoutesElements.forEach((route) => {
+    // the selected <li> element i.e. route, gets the class "adp-listsel" when selected
+    if (route.classList.contains("adp-listsel")) {
+      route_index = index;
+    }
+    index += 1;
+  });
+  return route_index;
+}
+
+function displayErrorMessageToUser() {
+  // display error message to the user if the injected html elements expected from calling "directionsRenderer.setPanel" are not available
+  console.log(document.getElementById("directions_results").children[1]);
+  if (
+    document.getElementById("directions_results").children[1].style.display ==
+    "block"
+  ) {
+    document.getElementById("directions_results").children[1].style.display =
+      "none";
+  }
+  document.getElementById("user-error-message").style.display = "block";
+  document.getElementById("user-error-message").innerText =
+    "Sorry, something went wrong, please try again";
 }

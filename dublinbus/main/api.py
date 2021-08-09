@@ -9,6 +9,7 @@ from django.db.models import Q
 import pandas as pd
 import joblib
 from datetime import timedelta
+import time
 
 # returns all bus stops for each direction of each bus route
 def get_bus_stops(request):
@@ -214,9 +215,21 @@ def _get_travel_time_for_route(route, user_datetime_object):
 
     total_seconds = timedelta(seconds=route_total_time)
     end_time_datetime_object = start_time_datetime_object + total_seconds
+    # convert route total time in seconds to string with hours and mins to send to frontend already formatted
+    if route_total_time > 3600:
+        if route_total_time < 7200:
+            route_duration = time.strftime(
+                "%-H hour %-M mins", time.gmtime(route_total_time)
+            )
+        else:
+            route_duration = time.strftime(
+                "%-H hours %-M mins", time.gmtime(route_total_time)
+            )
+    else:
+        route_duration = time.strftime("%-M mins", time.gmtime(route_total_time))
 
     # add total time in seconds we estimate the route will take to the routes predictions dict
-    route_travel_prediction["total_time_seconds"] = route_total_time
+    route_travel_prediction["route_duration"] = route_duration
 
     # add final clock time of the journey to the routes_predictions dict
     route_travel_prediction["journey_ends"] = _datetime_to_hour_minutes_string(
