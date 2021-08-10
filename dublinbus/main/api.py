@@ -279,10 +279,29 @@ def _get_travel_time_for_route(route, user_datetime_object):
     # route_total_time is in seconds and holds total amount of seconds the route takes
     route_total_time = 0
     # iterate through the steps and skip the start time dict which is the first element of each route's list
+    step_index = 0
+    # summing step duration to elapsed_time will give the start and end clock time of a step
+    elapsed_time = start_time_datetime_object
     for route_step_dict in route[1:]:
-        route_total_time += _get_step_time_estimation(
-            route_step_dict, user_datetime_object
+        (
+            step_time_estimation,
+            step_number_of_stops,
+            step_starts,
+            step_ends,
+            step_duration,
+        ) = _get_step_time_estimation(
+            route_step_dict, user_datetime_object, elapsed_time
         )
+        route_total_time += step_time_estimation
+
+        route_travel_prediction[f"step_{step_index}"] = {
+            "number_of_stops": step_number_of_stops,
+            "step_starts": step_starts,
+            "step_ends": step_ends,
+            "step_duration": step_duration,
+        }
+        elapsed_time += timedelta(seconds=step_time_estimation)
+        step_index += 1
 
     total_seconds = timedelta(seconds=route_total_time)
     end_time_datetime_object = start_time_datetime_object + total_seconds
@@ -291,22 +310,7 @@ def _get_travel_time_for_route(route, user_datetime_object):
     else:
         time_format_os_specific = "-"
     # convert route total time in seconds to string with hours and mins to send to frontend already formatted
-    if route_total_time > 3600:
-        if route_total_time < 7200:
-            route_duration = time.strftime(
-                f"%{time_format_os_specific}H hour %{time_format_os_specific}M mins",
-                time.gmtime(route_total_time),
-            )
-        else:
-            route_duration = time.strftime(
-                f"%{time_format_os_specific}H hours %{time_format_os_specific}M mins",
-                time.gmtime(route_total_time),
-            )
-    else:
-        route_duration = time.strftime(
-            f"%{time_format_os_specific}M mins", time.gmtime(route_total_time)
-        )
-
+    route_duration = _convert_number_of_seconds_to_time_string(route_total_time)
     # add total time in seconds we estimate the route will take to the routes predictions dict
     route_travel_prediction["route_duration"] = route_duration
 
@@ -318,12 +322,31 @@ def _get_travel_time_for_route(route, user_datetime_object):
     return route_travel_prediction
 
 
-def _get_step_time_estimation(route_step_dict, user_datetime_object):
+def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_time):
     step_time_estimation = 0
+    step_number_of_stops = 0
+    step_starts = ""
+    step_ends = ""
+    step_duration = ""
+
     if not "step" in route_step_dict or not "step_duration" in route_step_dict["step"]:
-        return step_time_estimation
+        return (
+            step_time_estimation,
+            step_number_of_stops,
+            step_starts,
+            step_ends,
+            step_duration,
+        )
 
     google_travel_time_prediction = route_step_dict["step"]["step_duration"]
+
+    # walking steps and some other bus providers don't have number_of_stops
+    if "number_of_stops" in route_step_dict["step"]:
+        step_number_of_stops = route_step_dict["step"]["number_of_stops"]
+
+    # if it is the first step of a route than it will have the same start time as the route itself
+    # since at first elapsed_time will be the same as the journey start time
+    step_starts = _datetime_to_hour_minutes_string(elapsed_time)
 
     if "departure_time" in route_step_dict["step"]:
         # use google's step's departure time to feed the date, time and weather to the models
@@ -351,7 +374,16 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object):
         or route_step_dict["step"]["provider"] != "Dublin Bus"
     ):
         step_time_estimation += google_travel_time_prediction
-        return step_time_estimation
+        elapsed_time += timedelta(seconds=step_time_estimation)
+        step_ends = _datetime_to_hour_minutes_string(elapsed_time)
+        step_duration = _convert_number_of_seconds_to_time_string(step_time_estimation)
+        return (
+            step_time_estimation,
+            step_number_of_stops,
+            step_starts,
+            step_ends,
+            step_duration,
+        )
     else:
         route_shortname = route_step_dict["step"]["bus_line_short_name"]
         matching_route_in_db = Route.objects.filter(short_name=route_shortname.lower())
@@ -359,7 +391,18 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object):
             f"main/ml_models/KNN_models/knn_{route_shortname}.joblib"
         ):
             step_time_estimation += google_travel_time_prediction
-            return step_time_estimation
+            elapsed_time += timedelta(seconds=step_time_estimation)
+            step_ends = _datetime_to_hour_minutes_string(elapsed_time)
+            step_duration = _convert_number_of_seconds_to_time_string(
+                step_time_estimation
+            )
+            return (
+                step_time_estimation,
+                step_number_of_stops,
+                step_starts,
+                step_ends,
+                step_duration,
+            )
 
         trip_headsign = route_step_dict["step"]["bus_line_long_name"]
         departure_stop = route_step_dict["step"]["departure_stop"]
@@ -380,7 +423,16 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object):
         # bus direction must be 1 or 2 in case we have a matching trip in the database
         if bus_direction == 0:
             step_time_estimation += google_travel_time_prediction
-            return step_time_estimation
+            step_duration = _convert_number_of_seconds_to_time_string(
+                step_time_estimation
+            )
+            return (
+                step_time_estimation,
+                step_number_of_stops,
+                step_starts,
+                step_ends,
+                step_duration,
+            )
 
         trip_id = matching_trip.id
         matching_departure_stop = Stop.objects.filter(Q(name=departure_stop)).first()
@@ -394,7 +446,18 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object):
         # progress numbers must be bigger than 0 in case we have a matching stop in the database
         if departure_stop_progress_number == 0:
             step_time_estimation += google_travel_time_prediction
-            return step_time_estimation
+            elapsed_time += timedelta(seconds=step_time_estimation)
+            step_ends = _datetime_to_hour_minutes_string(elapsed_time)
+            step_duration = _convert_number_of_seconds_to_time_string(
+                step_time_estimation
+            )
+            return (
+                step_time_estimation,
+                step_number_of_stops,
+                step_starts,
+                step_ends,
+                step_duration,
+            )
 
         matching_arrival_stop = Stop.objects.filter(Q(name=arrival_stop)).first()
         if matching_arrival_stop:
@@ -406,7 +469,18 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object):
 
         if arrival_stop_progress_number == 0:
             step_time_estimation += google_travel_time_prediction
-            return step_time_estimation
+            elapsed_time += timedelta(seconds=step_time_estimation)
+            step_ends = _datetime_to_hour_minutes_string(elapsed_time)
+            step_duration = _convert_number_of_seconds_to_time_string(
+                step_time_estimation
+            )
+            return (
+                step_time_estimation,
+                step_number_of_stops,
+                step_starts,
+                step_ends,
+                step_duration,
+            )
 
         # make predictions if all necessary values are available
         departure_stop_prediction = model_prediction(
@@ -433,7 +507,16 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object):
             arrival_stop_prediction - departure_stop_prediction
         )
         step_time_estimation += step_travel_time_prediction
-        return step_time_estimation
+        elapsed_time += timedelta(seconds=step_time_estimation)
+        step_ends = _datetime_to_hour_minutes_string(elapsed_time)
+        step_duration = _convert_number_of_seconds_to_time_string(step_time_estimation)
+        return (
+            step_time_estimation,
+            step_number_of_stops,
+            step_starts,
+            step_ends,
+            step_duration,
+        )
 
 
 # returns a string from a datetime in a format 'hh:mm'
@@ -443,3 +526,26 @@ def _datetime_to_hour_minutes_string(datetime):
         return f"{datetime.hour}:0{datetime.minute}"
     else:
         return f"{datetime.hour}:{datetime.minute}"
+
+
+def _convert_number_of_seconds_to_time_string(seconds):
+    if os.name == "nt":
+        time_format_os_specific = "#"
+    else:
+        time_format_os_specific = "-"
+    if seconds > 3600:
+        if seconds < 7200:
+            time_string = time.strftime(
+                f"%{time_format_os_specific}H hour %{time_format_os_specific}M mins",
+                time.gmtime(seconds),
+            )
+        else:
+            time_string = time.strftime(
+                f"%{time_format_os_specific}H hours %{time_format_os_specific}M mins",
+                time.gmtime(seconds),
+            )
+    else:
+        time_string = time.strftime(
+            f"%{time_format_os_specific}M mins", time.gmtime(seconds)
+        )
+    return time_string
