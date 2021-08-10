@@ -19,7 +19,7 @@ pip==21.1.2
 pytz==2021.1
 regex==2021.4.4
 requests==2.25.1
-scikit-learn==0.20.3 
+scikit-learn==0.24.2 
 setuptools==52.0.0
 six==1.16.0
 sqlparse==0.4.1
