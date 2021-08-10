@@ -26,13 +26,13 @@ function getAllBusStops() {
     })
     .then((busStopsResponse) => {
       markers = [];
-      for (const [stopName, coordinates] of Object.entries(busStopsResponse)) {
+      for (const [stopName, stop] of Object.entries(busStopsResponse)) {
         // set the infoWindow content to contain the name of the bus stop
         let contentString = stopName;
         const newMarker = new google.maps.Marker({
           position: {
-            lat: coordinates.latitude,
-            lng: coordinates.longitude,
+            lat: stop.latitude,
+            lng: stop.longitude,
           },
           icon: {
             url: "http://maps.google.com/mapfiles/kml/paddle/ylw-circle.png",
@@ -49,6 +49,7 @@ function getAllBusStops() {
           // Pan map to the selected marker
           map.panTo(newMarker.getPosition());
           stop_name_heading.innerText = contentString;
+          realtime_fetch(stop.id);
         });
       }
       new MarkerClusterer(map, markers, {
@@ -62,3 +63,344 @@ function getAllBusStops() {
 }
 
 getAllBusStops();
+
+//Return time to the second at function run.
+function get_time() {
+  var current_time = new Date();
+  var hour = current_time.getHours();
+  var minute = current_time.getMinutes();
+  var second = current_time.getSeconds();
+
+  const date_vars = [hour, minute, second];
+
+  for (var i = 0; i < date_vars.length; i++) {
+    if (date_vars[i] < 10) {
+      date_vars[i] = "0" + String(date_vars[i]);
+    } else {
+      date_vars[i] = String(date_vars[i]);
+    }
+  }
+
+  var time = date_vars[0] + ":" + date_vars[1] + ":" + date_vars[2];
+
+  return time;
+}
+
+//Realtime with GTFSR API and Backend
+const bus_results_div = document.getElementById("realtime_buses");
+
+function realtime_fetch(stop_id) {
+  stopTimesEndpoint = "/api/get_bus_stop_times/?stop_id=" + stop_id;
+
+  //Fetch request to backend
+  fetch(stopTimesEndpoint)
+    .then((response) => response.json())
+    .then((data) => {
+      realtime(data);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+function realtime(backend_data) {
+  //Set results table as empty.
+  document.getElementById("realtime_buses").innerHTML = `
+  <table class="table" id="results_table">
+    <thead>
+      <tr>
+        <th scope="col">Route</th>
+        <th scope="col">ETA</th>
+      </tr>
+    </thead>
+  <tbody id='results_rows'>`;
+
+  // Loop through backend data.
+  for (const [key, values] of Object.entries(backend_data)) {
+    backend_arrival_time = values.arrival_time;
+    backend_trip_id = values.trip_id;
+    bus_route = backend_trip_id.split("-")[1];
+
+    push_realtime_update(backend_arrival_time, bus_route);
+  }
+  hideFirstMenu();
+  sortTable();
+  make_table_data_readable();
+  displayAddOrRemoveFavouritesButton(
+    document.getElementById("stop_name_box").innerHTML
+  );
+}
+
+function push_realtime_update(estimated_arrival, bus_route) {
+  var row = document.createElement("tr");
+  var bus_route_td = document.createElement("td");
+  var eta_td = document.createElement("td");
+
+  bus_route_td.innerHTML = bus_route;
+
+  //Time
+  var current_time = new Date();
+  var eta = new Date(
+    current_time.getFullYear(),
+    current_time.getMonth(),
+    current_time.getDate(),
+    estimated_arrival.substring(0, 2),
+    estimated_arrival.substring(3, 5),
+    estimated_arrival.substring(6, 8)
+  );
+
+  var time_remaining = Math.floor(
+    (Math.round(eta.getTime() / 1000) -
+      Math.round(current_time.getTime() / 1000)) /
+      60
+  );
+
+  if (time_remaining < 10) {
+    time_remaining = "0" + time_remaining;
+  }
+
+  eta_td.innerHTML = time_remaining;
+
+  row.appendChild(bus_route_td);
+  row.appendChild(eta_td);
+
+  document.getElementById("results_rows").appendChild(row);
+}
+
+//Helped by W3 schools 'How TO - Sort a Table' https://www.w3schools.com/howto/howto_js_sort_table.asp.
+function sortTable() {
+  var table, rows, switching, i, x, y, shouldSwitch;
+  table = document.getElementById("results_table");
+  switching = true;
+  /* Make a loop that will continue until
+  no switching has been done: */
+  while (switching) {
+    // Start by saying: no switching is done:
+    switching = false;
+    rows = table.rows;
+    /* Loop through all table rows (except the
+    first, which contains table headers): */
+    for (i = 1; i < rows.length - 1; i++) {
+      // Start by saying there should be no switching:
+      shouldSwitch = false;
+      /* Get the two elements you want to compare,
+      one from current row and one from the next: */
+      x = rows[i].getElementsByTagName("TD")[1];
+      y = rows[i + 1].getElementsByTagName("TD")[1];
+      // Check if the two rows should switch place:
+      if (x.innerHTML > y.innerHTML) {
+        // If so, mark as a switch and break the loop:
+        shouldSwitch = true;
+        break;
+      }
+    }
+    if (shouldSwitch) {
+      /* If a switch has been marked, make the switch
+      and mark that a switch has been done: */
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+    }
+  }
+}
+
+function make_table_data_readable() {
+  table = document.getElementById("results_table");
+  rows = table.rows;
+
+  for (i = 1; i < rows.length; i++) {
+    this_row = rows[i].getElementsByTagName("TD")[1];
+
+    if (this_row.innerHTML < 10 && this_row.innerHTML > 0) {
+      this_row.innerHTML = this_row.innerHTML.substring(1, 2);
+      this_row.innerHTML += " mins";
+    } else if (this_row.innerHTML == 0) {
+      this_row.innerHTML = "NOW";
+    } else {
+      this_row.innerHTML += " mins";
+    }
+  }
+}
+
+window.onload = function afterWindowLoaded() {
+  displayFavourites();
+};
+
+//AnYi's favourites function from routeviewer.js, modified for stops.
+function displayFavourites() {
+  // run this function, only if the browser supports localstorage
+  if (typeof Storage !== "undefined") {
+    if (localStorage.getItem("favourite_stops") == null) {
+      return;
+    }
+    // display title
+    var para = document.createElement("P");
+    para.classList.add("font-weight-bold");
+    para.classList.add("text-center");
+    para.innerHTML = "Favourites";
+    document.getElementById("favourites").appendChild(para);
+    // display buttons
+    let favourites_array = JSON.parse(localStorage.getItem("favourite_stops"));
+    favourites_array.forEach(function (item, index, array) {
+      // create div
+      var favourites_div = document.createElement("DIV");
+      favourites_div.classList.add("d-grid");
+      favourites_div.classList.add("gap-2");
+      // create button
+      var btn = document.createElement("BUTTON");
+      btn.setAttribute("class", "btn btn-primary");
+      btn.setAttribute("type", "submit");
+      btn.addEventListener("click", function () {
+        call_realtime_by_stop_name(item);
+      });
+      btn.textContent = item;
+      // append the button to the div, and append the div to the favourite section
+      favourites_div.appendChild(btn);
+      document.getElementById("favourites").appendChild(favourites_div);
+    });
+  }
+}
+
+function call_realtime_by_stop_name(stop_name) {
+  stop_name_heading.innerText = stop_name;
+
+  busStopsEndpoint = "/api/get_all_bus_stops/?stop_name=" + stop_name;
+
+  //Fetch request to backend
+  fetch(busStopsEndpoint)
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(Object.entries(data)[0]);
+      realtime_fetch(Object.entries(data)[0][1]["id"]);
+      LatLng = {
+        lat: Object.entries(data)[0][1]["latitude"],
+        lng: Object.entries(data)[0][1]["longitude"],
+      };
+      map.panTo(LatLng);
+      map.setZoom(20);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+function call_realtime_from_search() {
+  var stop_name = document.getElementById("bus-stop-input").value;
+  call_realtime_by_stop_name(stop_name);
+}
+
+function addToLocalstorageByStopNum(stop_num) {
+  // run this function, only if the browser supports localstorage
+  if (typeof Storage !== "undefined") {
+    // localstorage is empty, then initialise it
+    if (localStorage.getItem("favourite_stops") == null) {
+      let favourites_array = [stop_num];
+      let favourites_str = JSON.stringify(favourites_array);
+      localStorage.setItem("favourite_stops", favourites_str);
+
+      // localstorage is not empty, then append new route to it
+    } else {
+      let favourites_array = JSON.parse(
+        localStorage.getItem("favourite_stops")
+      );
+      // only append the new favourite routes, if it's not duplicated
+      if (!favourites_array.includes(stop_num)) {
+        favourites_array.push(stop_num);
+        let favourites_str = JSON.stringify(favourites_array);
+        localStorage.setItem("favourite_stops", favourites_str);
+      }
+    }
+    displayAddOrRemoveFavouritesButton(stop_num);
+  }
+}
+
+function removeFromLocalstorage(stopNumber) {
+  // run this function, only if the browser supports localstorage
+  if (typeof Storage !== "undefined") {
+    // localstorage is null, then return
+    if (localStorage.getItem("favourite_stops") == null) {
+      return;
+    }
+
+    let favourites_array = JSON.parse(localStorage.getItem("favourite_stops"));
+    // remove the stop from localstorage, if the stop exists in localstorage
+    if (favourites_array.includes(stopNumber)) {
+      favourites_array = favourites_array.filter(function (item) {
+        return item !== stopNumber;
+      });
+      if (favourites_array.length == 0) {
+        localStorage.removeItem("favourite_stops");
+      } else {
+        let favourites_str = JSON.stringify(favourites_array);
+        localStorage.setItem("favourite_stops", favourites_str);
+      }
+    }
+    // reload buttons
+    displayAddOrRemoveFavouritesButton(stopNumber);
+  }
+}
+
+function addToLocalstorage() {
+  let stop_num = document.getElementById("stop_name_box").innerHTML;
+  if (stop_num != "") {
+    addToLocalstorageByStopNum(stop_num);
+  }
+}
+
+function displayAddOrRemoveFavouritesButton(stopNumber) {
+  // run this function, only if the browser supports localstorage
+  if (typeof Storage !== "undefined") {
+    // clear all
+    document.getElementById("add-to-favourites").style.display = "none";
+    document.getElementById("remove-from-favourites").style.display = "none";
+
+    let favourites_array = [];
+
+    // to avoid NullPointerException
+    if (localStorage.getItem("favourite_stops")) {
+      favourites_array = JSON.parse(localStorage.getItem("favourite_stops"));
+    }
+
+    // if localstorage doesn't contain the stop number, then display "add to favourite" button
+    if (
+      favourites_array.length == 0 ||
+      !favourites_array.includes(stopNumber)
+    ) {
+      let btn = document.getElementById("add-to-favourites");
+      btn.style.display = "block";
+      btn.addEventListener("click", function () {
+        addToLocalstorageByStopNum(stopNumber);
+      });
+      // else display "remove from favourite" button
+    } else {
+      document.getElementById("remove-from-favourites").style.display = "block";
+      let btn = document.getElementById("remove-from-favourites");
+      btn.addEventListener("click", function () {
+        removeFromLocalstorage(stopNumber);
+      });
+    }
+  }
+}
+
+function hideFirstMenu() {
+  document.getElementById("favourites").style.display = "none";
+  document.getElementById("searchStopUI").style.display = "none";
+  document.getElementById("back-to-stops").style.display = "block";
+}
+
+function goToStopsPage() {
+  window.location.reload();
+}
+
+// Autocomplete
+new Autocomplete("#autocomplete", {
+  search: (input) => {
+    const url = `/api/autocomple_stop?insert=${input}`;
+    return new Promise((resolve) => {
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          resolve(data.data);
+        });
+    });
+  },
+});

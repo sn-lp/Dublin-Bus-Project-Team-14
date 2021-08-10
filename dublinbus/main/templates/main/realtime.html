@@ -7,27 +7,54 @@
 {% block nav_title %}Real Time Info{% endblock %}
 
 {% block content %}
+<script src="https://unpkg.com/@trevoreyre/autocomplete-js"></script>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/@trevoreyre/autocomplete-js/dist/style.css"
+/>
+
   <div id="map"></div>
 
 
   <div id="over_map" class="container w-25 p-3 bg-white">
-    <p class="font-weight-bold text-center">Select a Bus Stop or Search</p>
 
-    <div class="form-group">
-      <p class="text-center" id="user-error-message"></p>
-      <div id="autocomplete" class="autocomplete">
-        <input class="autocomplete-input form-control" type="text" id="bus-route-input" placeholder="Bus Stop"/>
-        <ul class="autocomplete-result-list"></ul>
+    <div id="searchStopUI">
+      <p class="font-weight-bold text-center">Select a Bus Stop on Map or Search</p>
+
+      <div class="form-group">
+        <p class="text-center" id="user-error-message"></p>
+        <div id="autocomplete" class="autocomplete">
+          <input class="autocomplete-input form-control" type="text" id="bus-stop-input" placeholder="Bus Stop"/>
+          <ul class="autocomplete-result-list"></ul>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2">
+          <button id="submit" class="btn btn-primary" type="submit" onclick="call_realtime_from_search()">Submit</button>
+      </div>
+
+      <div id = "favourites">
+      
       </div>
     </div>
 
     <p class="font-weight-bold text-center" id="stop_name_box"></p>
-
-
     
+
+    <div class="d-grid gap-2">
+      <button id="add-to-favourites" class="btn btn-primary" type="button" onclick="addToLocalstorage()">Add to Favourites</button>
+      <button id="remove-from-favourites" class="btn btn-primary" type="button">Remove from Favourites</button>
+    </div>
+
+    <div id="realtime_buses">
+        
+    </div>
+
+    <div class="d-grid gap-2">
+      <button id="back-to-stops" class="btn btn-primary" type="submit" style="display: none;" onclick="goToStopsPage()">Back to Stops</button>
+    </div>
+
   </div>
-
-
 
   <script src="https://unpkg.com/@googlemaps/markerclustererplus/dist/index.min.js"></script>
 

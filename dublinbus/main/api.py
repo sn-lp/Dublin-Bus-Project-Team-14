@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.http.response import HttpResponse
-from main.models import Route, Trip, Trips_Stops, Stop
+from main.models import Route, Trip, Trips_Stops, Stop, Stop_Times
 from main.cache_manipulator import *
 import json
 from django.db import connection
@@ -10,6 +10,7 @@ import pandas as pd
 import joblib
 from datetime import timedelta
 import time
+
 
 # returns all bus stops for each direction of each bus route
 def get_bus_stops(request):
@@ -53,15 +54,70 @@ def get_bus_stops(request):
     return JsonResponse(json_result)
 
 
+def get_bus_stop_times(request):
+    # Will only return values which are within the next 1 hour.
+
+    if "stop_id" not in request.GET:
+        return JsonResponse({"error": '"stop_id" query parameter not found'})
+    requested_stop_id = request.GET["stop_id"]
+
+    now = datetime.now()
+    hour_ahead = now + timedelta(hours=1)
+
+    current_time = now.strftime("%H:%M:%S")
+    current_time_1hr = hour_ahead.strftime("%H:%M:%S")
+
+    stop_times = Stop_Times.objects.filter(
+        stop_id=requested_stop_id,
+        arrival_time__gte=current_time,
+        arrival_time__lte=current_time_1hr,
+    )
+    json_result = {}
+
+    day_of_week = datetime.today().weekday()
+    service_id_dict = {
+        "y1007": [0, 1, 2, 3, 4],
+        "y1008": [6],
+        "y1009": [5],
+    }
+
+    for stop_time in stop_times:
+        service_id = stop_time.trip_id.split(".")[1]
+        if day_of_week in service_id_dict[service_id]:
+
+            json_result[stop_time.id] = {
+                "arrival_time": stop_time.arrival_time,
+                "trip_id": stop_time.trip_id,
+                "stop_id": stop_time.stop_id,
+            }
+
+    return JsonResponse(json_result)
+
+
 def get_all_bus_stops(request):
 
-    stops = Stop.objects.all()
     json_result = {}
+
+    if "stop_name" in request.GET:
+        stop_name = request.GET["stop_name"]
+        stops = Stop.objects.filter(name=stop_name)
+
+        for stop in stops:
+            json_result[stop.name] = {
+                "latitude": stop.latitude,
+                "longitude": stop.longitude,
+                "id": stop.id,
+            }
+
+        return JsonResponse(json_result)
+
+    stops = Stop.objects.all()
 
     for stop in stops:
         json_result[stop.name] = {
             "latitude": stop.latitude,
             "longitude": stop.longitude,
+            "id": stop.id,
         }
     return JsonResponse(json_result)
 
@@ -92,6 +148,20 @@ def autocomple_route(request):
             routes.append(row)
 
     return JsonResponse({"status": 200, "data": routes})
+
+
+def autocomple_stop(request):
+    insert = request.GET.get("insert")
+    stops = []
+    if insert:
+        stop_objs = (
+            Stop.objects.filter(name__icontains=insert).values("name").distinct()
+        )
+
+        for route_obj in stop_objs:
+            stops.append(route_obj["name"])
+
+    return JsonResponse({"status": 200, "data": stops})
 
 
 def model_prediction(

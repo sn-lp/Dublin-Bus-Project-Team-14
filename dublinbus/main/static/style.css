@@ -135,3 +135,12 @@ input {
 #user-error-message {
   display: none;
 }
+
+#realtime_buses {
+  overflow: auto;
+  max-height: 60vh;
+}
+
+td {
+  font-weight: 500;
+}
