@@ -599,7 +599,7 @@ function replaceOrHideStepTimes() {
         return;
       }
       const stepEstimations = subStep.children[2];
-      // when step is walk we don't want to change anything because google walk time estimation is the one we are using for when a step is walking mode
+      // when step is walk we don't want to change anything because google walk time estimation is the one we are using when a step is walking mode
       // google's stepEstimations html element has style display "none" when it is a walking step
       // so we only do this when display style is "block" --> which means it is not a walking step
       if (stepEstimations.style.display != "none") {
@@ -612,9 +612,38 @@ function replaceOrHideStepTimes() {
         }
         const clockTimes = stepEstimations.children[0];
         const durationAndNumberOfStops = stepEstimations.children[1];
-        // for now hide this information --> there's a TODO needed in the backend so it also calculates each route's steps duration for the frontend to show here
-        clockTimes.style.display = "none";
-        durationAndNumberOfStops.style.display = "none";
+        // replace step time and number of stops details in "Route Details" view
+        if (
+          !travelTimeEstimations[`route_${selectedRouteIndex}`][`step_${i}`]
+        ) {
+          displayErrorMessageToUser();
+          return;
+        }
+        step_start_time =
+          travelTimeEstimations[`route_${selectedRouteIndex}`][`step_${i}`][
+            "step_starts"
+          ];
+        step_end_time =
+          travelTimeEstimations[`route_${selectedRouteIndex}`][`step_${i}`][
+            "step_ends"
+          ];
+        step_number_of_stops =
+          travelTimeEstimations[`route_${selectedRouteIndex}`][`step_${i}`][
+            "number_of_stops"
+          ];
+        step_duration =
+          travelTimeEstimations[`route_${selectedRouteIndex}`][`step_${i}`][
+            "step_duration"
+          ];
+        clockTimes.innerText = `${step_start_time}-${step_end_time}`;
+        // number of stops will always be 0 for walking steps and some bus providers
+        if (step_number_of_stops == 0) {
+          durationAndNumberOfStops.innerText = `     (${step_duration})`;
+        } else if (step_duration == "") {
+          durationAndNumberOfStops.innerText = `     (${step_number_of_stops} stops)`;
+        } else {
+          durationAndNumberOfStops.innerText = `     (${step_duration}, ${step_number_of_stops} stops)`;
+        }
       }
     }
   } catch (error) {
@@ -636,7 +665,6 @@ function getSelectedRouteIndex() {
 
 function displayErrorMessageToUser() {
   // display error message to the user if the injected html elements expected from calling "directionsRenderer.setPanel" are not available
-  console.log(document.getElementById("directions_results").children[1]);
   if (
     document.getElementById("directions_results").children[1].style.display ==
     "block"
