@@ -150,7 +150,6 @@ def autocomple_route(request):
     return JsonResponse({"status": 200, "data": routes})
 
 
-
 def autocomple_stop(request):
     insert = request.GET.get("insert")
     stops = []
@@ -163,6 +162,7 @@ def autocomple_stop(request):
             stops.append(route_obj["name"])
 
     return JsonResponse({"status": 200, "data": stops})
+
 
 def model_prediction(
     route, progress_number, direction, day, month, temp, weather, hour
@@ -226,7 +226,6 @@ def model_prediction(
             )
         )
     )
-
 
 
 # returns travel time estimations for all suggested routes
