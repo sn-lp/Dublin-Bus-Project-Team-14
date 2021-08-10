@@ -27,7 +27,7 @@ def get_weather(input_timestamp):
     current_timestamp = datetime.now().timestamp()
     # if input is before current time
     if input_timestamp < current_timestamp:
-        return None
+        input_timestamp = current_timestamp
 
     # set timezone
     current_datetime = datetime.fromtimestamp(
