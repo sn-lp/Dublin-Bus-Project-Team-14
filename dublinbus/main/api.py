@@ -10,6 +10,7 @@ import pandas as pd
 import joblib
 from datetime import timedelta
 import time
+import os
 
 
 # returns all bus stops for each direction of each bus route
@@ -285,18 +286,26 @@ def _get_travel_time_for_route(route, user_datetime_object):
 
     total_seconds = timedelta(seconds=route_total_time)
     end_time_datetime_object = start_time_datetime_object + total_seconds
+    if os.name == "nt":
+        time_format_os_specific = "#"
+    else:
+        time_format_os_specific = "-"
     # convert route total time in seconds to string with hours and mins to send to frontend already formatted
     if route_total_time > 3600:
         if route_total_time < 7200:
             route_duration = time.strftime(
-                "%-H hour %-M mins", time.gmtime(route_total_time)
+                f"%{time_format_os_specific}H hour %{time_format_os_specific}M mins",
+                time.gmtime(route_total_time),
             )
         else:
             route_duration = time.strftime(
-                "%-H hours %-M mins", time.gmtime(route_total_time)
+                f"%{time_format_os_specific}H hours %{time_format_os_specific}M mins",
+                time.gmtime(route_total_time),
             )
     else:
-        route_duration = time.strftime("%-M mins", time.gmtime(route_total_time))
+        route_duration = time.strftime(
+            f"%{time_format_os_specific}M mins", time.gmtime(route_total_time)
+        )
 
     # add total time in seconds we estimate the route will take to the routes predictions dict
     route_travel_prediction["route_duration"] = route_duration

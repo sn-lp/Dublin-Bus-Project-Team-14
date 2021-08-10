@@ -636,7 +636,6 @@ function getSelectedRouteIndex() {
 
 function displayErrorMessageToUser() {
   // display error message to the user if the injected html elements expected from calling "directionsRenderer.setPanel" are not available
-  console.log(document.getElementById("directions_results").children[1]);
   if (
     document.getElementById("directions_results").children[1].style.display ==
     "block"
