@@ -240,7 +240,9 @@ locationButton.addEventListener("click", () => {
       },
       () => {
         // User rejected geolocation services.
-        alert("Error: Location services were rejected. Please allow location permissions in your browser to use this feature.");
+        alert(
+          "Error: Location services were rejected. Please allow location permissions in your browser to use this feature."
+        );
       }
     );
   } else {
