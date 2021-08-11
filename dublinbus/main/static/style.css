@@ -38,11 +38,14 @@ h3 {
 
 /* JOURNEY PLANNER INTERFACE */
 button.btn,
-button.btn:active,
-button.btn:target,
-button.btn:hover {
+button.btn:target {
   background-color: #ffcc00;
   border: none;
+
+}
+
+button.btn:active, button.btn:hover {
+  background-color: #ffff50;
 }
 
 #over_map {
@@ -143,4 +146,13 @@ input {
 
 td {
   font-weight: 500;
+}
+
+a:hover {
+  color: black;
+  font-weight: bold;
+}
+
+.mdc-list-item:active, .mdc-list-item:active {
+  background-color: rgb(228, 228, 228);
 }
