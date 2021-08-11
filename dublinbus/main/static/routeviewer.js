@@ -247,12 +247,14 @@ function drawMarkers(stops) {
 
 function getBusStopsFromBackend() {
   routeName = document.getElementById("bus-route-input").value;
+  document.getElementById("route-header").innerHTML = "Route " + document.getElementById("bus-route-input").value.split(" -")[0];
   routeNumber = routeName.split(" ")[0];
   document.getElementById("bus-route-input").value = routeNumber;
   getBusStopsByBusNum(routeNumber);
 }
 
 function getBusStopsByBusNum(routeNumber) {
+  document.getElementById("route-header").innerHTML = "Route " + routeNumber;
   busRoutesEndpoint = "/api/get_bus_stops/?route_number=" + routeNumber;
   fetch(busRoutesEndpoint)
     .then((response) => {

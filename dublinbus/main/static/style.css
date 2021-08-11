@@ -135,6 +135,10 @@ input {
   background-color: #25b5f1;
 }
 
+#remove-from-favourites:hover, #remove-from-favourites:active {
+  background-color: #70e8ff;
+}
+
 #user-error-message {
   display: none;
 }
@@ -155,4 +159,8 @@ a:hover {
 
 .mdc-list-item:active, .mdc-list-item:active {
   background-color: rgb(228, 228, 228);
+}
+
+.btn, btn-primary, ripple-surface {
+  min-width:fit-content;
 }
