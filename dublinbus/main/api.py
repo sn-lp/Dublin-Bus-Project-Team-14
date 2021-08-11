@@ -305,10 +305,6 @@ def _get_travel_time_for_route(route, user_datetime_object):
 
     total_seconds = timedelta(seconds=route_total_time)
     end_time_datetime_object = start_time_datetime_object + total_seconds
-    if os.name == "nt":
-        time_format_os_specific = "#"
-    else:
-        time_format_os_specific = "-"
     # convert route total time in seconds to string with hours and mins to send to frontend already formatted
     route_duration = _convert_number_of_seconds_to_time_string(route_total_time)
     # add total time in seconds we estimate the route will take to the routes predictions dict
