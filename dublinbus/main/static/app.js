@@ -16,8 +16,10 @@ const toggleBtn = document.getElementById("map_toggle");
 toggleBtn.onclick = function () {
   if (targetDiv.style.display !== "none") {
     targetDiv.style.display = "none";
+    toggleBtn.style.color = "#ffff50";
   } else {
     targetDiv.style.display = "block";
+    toggleBtn.style.color = "black";
   }
 };
 
