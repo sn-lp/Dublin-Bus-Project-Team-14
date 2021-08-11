@@ -169,7 +169,6 @@ ripple-surface {
   min-width: fit-content;
 }
 
-#geolocation_button {
-  background-color: #25b5f1;
-  margin-bottom: 2vh;
+.gm-style-iw-d {
+  font-weight: normal;
 }

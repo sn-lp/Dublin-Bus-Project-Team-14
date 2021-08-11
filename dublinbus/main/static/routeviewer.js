@@ -67,6 +67,39 @@ function initMap() {
     infowindow.close();
   }
   infowindow = new google.maps.InfoWindow();
+  //Gelocation button.
+  const locationButton = document.createElement("button");
+  locationButton.textContent = "My Location";
+  locationButton.classList.add("btn");
+  locationButton.classList.add("btn-primary");
+  locationButton.setAttribute("id", "locationButton");
+  locationButton.setAttribute("style", "margin-bottom: 2vh;");
+  map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(locationButton);
+  locationButton.addEventListener("click", () => {
+    // Try HTML5 geolocation.
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          infowindow.setPosition(pos);
+          infowindow.setContent("Your Location");
+          infowindow.open(map);
+          map.panTo(pos);
+          map.setZoom(18);
+        },
+        () => {
+          // User rejected geolocation services.
+          alert("Error: Location services were rejected. Please allow location permissions in your browser to use this feature.");
+        }
+      );
+    } else {
+      // Browser doesn't support Geolocation.
+      alert("Error: Browser does not support Location services.");
+    }
+  });
 }
 
 function hideSubmitForm() {
