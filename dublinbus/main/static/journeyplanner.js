@@ -417,8 +417,15 @@ function getRouteData(route) {
 
 // displays detailed steps, for the selected route when the user clicks the "route details" button
 function displayRouteDetails() {
+  if (document.getElementById("estimated_step_cost")) {
+    document.getElementById("estimated_step_cost").remove();
+  }
+  if (document.getElementById("info")) {
+    document.getElementById("info").remove();
+  }
   // replace or hide steps' details of a selected route when user clicks on the "Route Details" button
   replaceOrHideStepTimes();
+  displayCostCalculationInfo();
   document.getElementById("directions_results").children[0].style.display =
     "none";
   if (
@@ -438,6 +445,15 @@ function displaySuggestedRoutes() {
   // if a route's details triggered an error message, remove it when going back to suggested routes
   if (document.getElementById("user-error-message").style.display == "block") {
     document.getElementById("user-error-message").style.display = "none";
+  }
+  if (document.getElementById("info").style.display == "block") {
+    document.getElementById("info").style.display = "none";
+  }
+  if (document.getElementById("estimated_step_cost")) {
+    document.getElementById("estimated_step_cost").remove();
+  }
+  if (document.getElementById("info")) {
+    document.getElementById("info").remove();
   }
   // change display style of divs injected in "directions_results" when
   // directionsRenderer.setPanel(document.getElementById("directions_results")) is called
@@ -644,11 +660,41 @@ function replaceOrHideStepTimes() {
         } else {
           durationAndNumberOfStops.innerText = `     (${step_duration}, ${step_number_of_stops} stops)`;
         }
+
+        stepCost =
+          travelTimeEstimations[`route_${selectedRouteIndex}`][`step_${i}`][
+            "step_cost"
+          ];
+        if (stepCost) {
+          // display estimated step cost only for Dublin Bus steps, other steps will have stepCost to null
+          displayStepCost(stepEstimations, stepCost);
+        }
       }
     }
   } catch (error) {
     console.log(error);
   }
+}
+
+function displayStepCost(stepEstimationsDiv, stepCost) {
+  const node = document.createElement("SPAN");
+  node.id = "estimated_step_cost";
+  node.setAttribute("data-tooltip", "Adult fare paying with Leap Card.");
+  node.setAttribute("data-tooltip-position", "right");
+  node.innerText = `Estimated cost: ${stepCost}`;
+  stepEstimationsDiv.parentNode.insertBefore(
+    node,
+    stepEstimationsDiv.nextSibling
+  );
+}
+
+function displayCostCalculationInfo() {
+  const info = document.createElement("div");
+  info.id = "info";
+  info.innerText =
+    "Estimated costs for Dublin Bus are calculated using Transport for Ireland Bus Fares. The total cost of the journey may depend on other provider's fares.";
+  const resultsDiv = document.getElementById("directions_results");
+  resultsDiv.appendChild(info);
 }
 
 function getSelectedRouteIndex() {

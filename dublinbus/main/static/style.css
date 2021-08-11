@@ -136,11 +136,89 @@ input {
   display: none;
 }
 
-#realtime_buses {
+#realtime_buses,
+#directions_results {
   overflow: auto;
   max-height: 60vh;
 }
 
-td {
+/* apply bold only to td elements in realtime page */
+#results_table td {
   font-weight: 500;
+}
+
+#estimated_step_cost {
+  font-size: 80%;
+  padding: 0;
+}
+
+#info {
+  font-size: 12px;
+  font-family: Roboto, Arial, sans-serif;
+  margin: 3px;
+  font-weight: 300;
+}
+
+/* tooltip display style adapted from code from https://stackoverflow.com/questions/1055581/how-do-i-add-a-tool-tip-to-a-span-element */
+[data-tooltip] {
+  display: inline-block;
+  position: relative;
+  padding: 2px;
+}
+/* Tooltip styling */
+[data-tooltip]:before {
+  content: attr(data-tooltip);
+  display: none;
+  position: absolute;
+  background: #ffcc00;
+  color: black;
+  padding: 4px 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  min-width: 190px;
+  text-align: center;
+  border-radius: 2px;
+}
+
+/* Dynamic vertical centering */
+[data-tooltip-position="right"]:before {
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+[data-tooltip-position="right"]:before {
+  left: 100%;
+  margin-left: 6px;
+}
+
+/* Tooltip arrow styling/placement */
+[data-tooltip]:after {
+  content: "";
+  display: none;
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+}
+
+/* Dynamic vertical centering for the tooltip */
+[data-tooltip-position="right"]:after {
+  top: 50%;
+  margin-top: 3px;
+}
+
+[data-tooltip-position="right"]:after {
+  left: 100%;
+  border-width: 3px 3px 3px 0;
+  border-right-color: #ffcc00;
+}
+/* Show the tooltip when hovering */
+[data-tooltip]:hover:before,
+[data-tooltip]:hover:after {
+  display: block;
+  z-index: 50;
 }

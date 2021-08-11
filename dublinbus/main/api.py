@@ -289,6 +289,7 @@ def _get_travel_time_for_route(route, user_datetime_object):
             step_starts,
             step_ends,
             step_duration,
+            step_estimated_cost,
         ) = _get_step_time_estimation(
             route_step_dict, user_datetime_object, elapsed_time
         )
@@ -299,6 +300,7 @@ def _get_travel_time_for_route(route, user_datetime_object):
             "step_starts": step_starts,
             "step_ends": step_ends,
             "step_duration": step_duration,
+            "step_cost": step_estimated_cost,
         }
         elapsed_time += timedelta(seconds=step_time_estimation)
         step_index += 1
@@ -324,6 +326,7 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
     step_starts = ""
     step_ends = ""
     step_duration = ""
+    step_estimated_cost = ""
 
     if not "step" in route_step_dict or not "step_duration" in route_step_dict["step"]:
         return (
@@ -332,6 +335,7 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
             step_starts,
             step_ends,
             step_duration,
+            step_estimated_cost,
         )
 
     google_travel_time_prediction = route_step_dict["step"]["step_duration"]
@@ -343,6 +347,13 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
     # if it is the first step of a route than it will have the same start time as the route itself
     # since at first elapsed_time will be the same as the journey start time
     step_starts = _datetime_to_hour_minutes_string(elapsed_time)
+
+    # calculate estimated cost of step if it is using a Dublin Bus bus
+    if "provider" in route_step_dict["step"]:
+        if route_step_dict["step"]["provider"] == "Dublin Bus":
+            step_estimated_cost = _calculate_step_cost(
+                route_step_dict["step"]["number_of_stops"]
+            )
 
     if "departure_time" in route_step_dict["step"]:
         # use google's step's departure time to feed the date, time and weather to the models
@@ -379,6 +390,7 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
             step_starts,
             step_ends,
             step_duration,
+            step_estimated_cost,
         )
     else:
         route_shortname = route_step_dict["step"]["bus_line_short_name"]
@@ -398,6 +410,7 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
                 step_starts,
                 step_ends,
                 step_duration,
+                step_estimated_cost,
             )
 
         trip_headsign = route_step_dict["step"]["bus_line_long_name"]
@@ -428,6 +441,7 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
                 step_starts,
                 step_ends,
                 step_duration,
+                step_estimated_cost,
             )
 
         trip_id = matching_trip.id
@@ -453,6 +467,7 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
                 step_starts,
                 step_ends,
                 step_duration,
+                step_estimated_cost,
             )
 
         matching_arrival_stop = Stop.objects.filter(Q(name=arrival_stop)).first()
@@ -476,6 +491,7 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
                 step_starts,
                 step_ends,
                 step_duration,
+                step_estimated_cost,
             )
 
         # make predictions if all necessary values are available
@@ -512,6 +528,7 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
             step_starts,
             step_ends,
             step_duration,
+            step_estimated_cost,
         )
 
 
@@ -545,3 +562,14 @@ def _convert_number_of_seconds_to_time_string(seconds):
             f"%{time_format_os_specific}M mins", time.gmtime(seconds)
         )
     return time_string
+
+
+# this function uses bus fares calculations from https://www.transportforireland.ie/fares/bus-fares/
+def _calculate_step_cost(number_of_stops):
+    if number_of_stops <= 3:
+        adult_leap_cost = "€1.55"
+    elif number_of_stops <= 13:
+        adult_leap_cost = "€2.25"
+    else:
+        adult_leap_cost = "€2.50"
+    return adult_leap_cost
