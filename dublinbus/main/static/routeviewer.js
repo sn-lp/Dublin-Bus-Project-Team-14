@@ -15,6 +15,9 @@ window.onload = function afterWindowLoaded() {
   displayFavourites();
 };
 
+//Make page title bold in navbar
+document.getElementById("routes_nav").setAttribute("style", "font-weight: bold;");
+
 function displayFavourites() {
   // run this function, only if the browser supports localstorage
   if (typeof Storage !== "undefined") {

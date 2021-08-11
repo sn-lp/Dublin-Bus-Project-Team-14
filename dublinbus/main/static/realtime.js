@@ -13,6 +13,9 @@ function initMap() {
   }
 }
 
+//Make page title bold in navbar
+document.getElementById("realtime_nav").setAttribute("style", "font-weight: bold;");
+
 const stop_name_heading = document.getElementById("stop_name_box");
 
 function getAllBusStops() {

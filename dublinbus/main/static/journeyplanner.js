@@ -35,6 +35,9 @@ function initDirectionsRenderer() {
   directionsRenderer1 = new google.maps.DirectionsRenderer();
 }
 
+//Make page title bold in navbar
+document.getElementById("journeyplanner_nav").setAttribute("style", "font-weight: bold;");
+
 //Directions
 function calculateAndDisplayRoute(directionsService, directionsRenderer) {
   // hide over_map until we replaced the times in the suggested routes div
