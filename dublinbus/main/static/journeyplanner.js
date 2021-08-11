@@ -36,7 +36,9 @@ function initDirectionsRenderer() {
 }
 
 //Make page title bold in navbar
-document.getElementById("journeyplanner_nav").setAttribute("style", "font-weight: bold;");
+document
+  .getElementById("journeyplanner_nav")
+  .setAttribute("style", "font-weight: bold;");
 
 //Directions
 function calculateAndDisplayRoute(directionsService, directionsRenderer) {
@@ -375,9 +377,8 @@ function getRouteData(route) {
           const step_duration = routeSteps[i].duration.value;
           const travel_mode = "TRANSIT";
           const provider = routeSteps[i].transit.line.agencies[j].name;
-          const departure_time = routeSteps[
-            i
-          ].transit.departure_time.value.toString();
+          const departure_time =
+            routeSteps[i].transit.departure_time.value.toString();
           routeStepsData.step = {
             step_duration: step_duration,
             travel_mode: travel_mode,
@@ -393,9 +394,8 @@ function getRouteData(route) {
           const headsign = routeSteps[i].transit.headsign;
           const departure_stop = routeSteps[i].transit.departure_stop.name;
           const arrival_stop = routeSteps[i].transit.arrival_stop.name;
-          const departure_time = routeSteps[
-            i
-          ].transit.departure_time.value.toString();
+          const departure_time =
+            routeSteps[i].transit.departure_time.value.toString();
           // getting the number of stops should be useful to display cost of Dublin Bus journey
           const number_of_stops = routeSteps[i].transit.num_stops;
           routeStepsData.step = {

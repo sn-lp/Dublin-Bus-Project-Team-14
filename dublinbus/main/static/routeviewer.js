@@ -16,7 +16,9 @@ window.onload = function afterWindowLoaded() {
 };
 
 //Make page title bold in navbar
-document.getElementById("routes_nav").setAttribute("style", "font-weight: bold;");
+document
+  .getElementById("routes_nav")
+  .setAttribute("style", "font-weight: bold;");
 
 function displayFavourites() {
   // run this function, only if the browser supports localstorage
@@ -247,7 +249,8 @@ function drawMarkers(stops) {
 
 function getBusStopsFromBackend() {
   routeName = document.getElementById("bus-route-input").value;
-  document.getElementById("route-header").innerHTML = "Route " + document.getElementById("bus-route-input").value.split(" -")[0];
+  document.getElementById("route-header").innerHTML =
+    "Route " + document.getElementById("bus-route-input").value.split(" -")[0];
   routeNumber = routeName.split(" ")[0];
   document.getElementById("bus-route-input").value = routeNumber;
   getBusStopsByBusNum(routeNumber);

@@ -11,10 +11,18 @@ function initMap() {
   if (infowindow) {
     infowindow.close();
   }
+  const locationButton = document.createElement("button");
+  locationButton.textContent = "My Location";
+  locationButton.classList.add("btn");
+  locationButton.classList.add("btn-primary");
+  locationButton.setAttribute("id", "geolocation_button");
+  map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(locationButton);
 }
 
 //Make page title bold in navbar
-document.getElementById("realtime_nav").setAttribute("style", "font-weight: bold;");
+document
+  .getElementById("realtime_nav")
+  .setAttribute("style", "font-weight: bold;");
 
 const stop_name_heading = document.getElementById("stop_name_box");
 

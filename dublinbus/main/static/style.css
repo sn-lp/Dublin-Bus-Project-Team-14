@@ -41,10 +41,10 @@ button.btn,
 button.btn:target {
   background-color: #ffcc00;
   border: none;
-
 }
 
-button.btn:active, button.btn:hover {
+button.btn:active,
+button.btn:hover {
   background-color: #ffff50;
 }
 
@@ -135,7 +135,8 @@ input {
   background-color: #25b5f1;
 }
 
-#remove-from-favourites:hover, #remove-from-favourites:active {
+#remove-from-favourites:hover,
+#remove-from-favourites:active {
   background-color: #70e8ff;
 }
 
@@ -157,10 +158,18 @@ a:hover {
   font-weight: bold;
 }
 
-.mdc-list-item:active, .mdc-list-item:active {
+.mdc-list-item:active,
+.mdc-list-item:active {
   background-color: rgb(228, 228, 228);
 }
 
-.btn, btn-primary, ripple-surface {
-  min-width:fit-content;
+.btn,
+btn-primary,
+ripple-surface {
+  min-width: fit-content;
+}
+
+#geolocation_button {
+  background-color: #25b5f1;
+  margin-bottom: 2vh;
 }
