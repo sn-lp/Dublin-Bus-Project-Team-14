@@ -1,5 +1,5 @@
 from django.urls import reverse
-from django.test import TestCase
+from django.test import TestCase, Client
 from main.cache_manipulator import get_weather
 from datetime import datetime
 import pytz
@@ -7,6 +7,14 @@ from main.models import Route, Trip, Trips_Stops, Stop
 import json
 from django.core.files.storage import default_storage as bucketStorage
 import joblib
+from main.api import (
+    _get_travel_time_for_route,
+    _get_step_time_estimation,
+    _convert_number_of_seconds_to_time_string,
+    _datetime_to_hour_minutes_string,
+    _calculate_step_cost,
+)
+from datetime import timedelta
 
 
 class AwsS3BucketTest(TestCase):
@@ -250,3 +258,337 @@ class ApiTests(TestCase):
         self.assertEqual(
             len(db_response_when_insert_88), len(api_response_when_insert_88)
         )
+
+    def test_get_journey_travel_time_estimation_post_request_without_data(self):
+        client = Client()
+        api_response = client.post("/api/get_journey_travel_time_estimation/")
+        response_json = api_response.json()
+        self.assertEqual(
+            response_json, {"error": "request.body cannot be parsed as a JSON object"}
+        )
+
+    def test_get_journey_travel_time_estimation_get_request(self):
+        client = Client()
+        api_response = client.get("/api/get_journey_travel_time_estimation/")
+        response_json = api_response.json()
+        self.assertEqual(
+            response_json, {"error": "endpoint only accepts POST requests"}
+        )
+
+    def test_get_journey_travel_time_estimation_incorrect_keys(self):
+        client = Client()
+        api_response = client.post(
+            "/api/get_journey_travel_time_estimation/",
+            {"departure": "2021-08-12T12:53", "routes": []},
+            content_type="application/json",
+        )
+        response_json = api_response.json()
+        self.assertEqual(
+            response_json,
+            {"error": "JSON object must have 'routesData' and 'departureTime'"},
+        )
+
+    def test_get_journey_travel_time_estimation_with_correct_example_data(self):
+        routes_data_example_correct = {
+            "departureTime": "2021-08-12T13:00",
+            "routesData": [
+                [
+                    {
+                        "start_time": "Thu Aug 12 2021 13:03:44 GMT+0100 (Irish Standard Time)"
+                    },
+                    {"step": {"step_duration": 224, "travel_mode": "WALKING"}},
+                    {
+                        "step": {
+                            "step_duration": 568,
+                            "travel_mode": "TRANSIT",
+                            "provider": "Dublin Bus",
+                            "bus_line_long_name": "Mountjoy Square Park - Bride's Glen Bus Stop",
+                            "bus_line_short_name": "7",
+                            "headsign": "Mountjoy Square",
+                            "departure_stop": "Clarence Place, stop 7825",
+                            "arrival_stop": "Frascati SC, stop 3084",
+                            "departure_time": "Thu Aug 12 2021 13:07:28 GMT+0100 (Irish Standard Time)",
+                            "number_of_stops": 8,
+                        }
+                    },
+                    {"step": {"step_duration": 392, "travel_mode": "WALKING"}},
+                ],
+                [
+                    {
+                        "start_time": "Thu Aug 12 2021 13:18:44 GMT+0100 (Irish Standard Time)"
+                    },
+                    {"step": {"step_duration": 197, "travel_mode": "WALKING"}},
+                    {
+                        "step": {
+                            "step_duration": 887,
+                            "travel_mode": "TRANSIT",
+                            "provider": "Dublin Bus",
+                            "bus_line_long_name": "Mountjoy Square Park - Loughlinstown Wood Estate",
+                            "bus_line_short_name": "7A",
+                            "headsign": "Mountjoy Square",
+                            "departure_stop": "Dun Laoghaire SC, stop 3070",
+                            "arrival_stop": "Patrick's Row, stop 3081",
+                            "departure_time": "Thu Aug 12 2021 13:22:01 GMT+0100 (Irish Standard Time)",
+                            "number_of_stops": 12,
+                        }
+                    },
+                    {"step": {"step_duration": 250, "travel_mode": "WALKING"}},
+                ],
+                [
+                    {
+                        "start_time": "Thu Aug 12 2021 13:04:31 GMT+0100 (Irish Standard Time)"
+                    },
+                    {"step": {"step_duration": 749, "travel_mode": "WALKING"}},
+                    {
+                        "step": {
+                            "step_duration": 240,
+                            "travel_mode": "TRANSIT",
+                            "provider": "Irish Rail",
+                            "departure_time": "Thu Aug 12 2021 13:17:00 GMT+0100 (Irish Standard Time)",
+                        }
+                    },
+                ],
+                [
+                    {
+                        "start_time": "Thu Aug 12 2021 13:33:44 GMT+0100 (Irish Standard Time)"
+                    },
+                    {"step": {"step_duration": 224, "travel_mode": "WALKING"}},
+                    {
+                        "step": {
+                            "step_duration": 568,
+                            "travel_mode": "TRANSIT",
+                            "provider": "Dublin Bus",
+                            "bus_line_long_name": "Mountjoy Square Park - Bride's Glen Bus Stop",
+                            "bus_line_short_name": "7",
+                            "headsign": "Mountjoy Square",
+                            "departure_stop": "Clarence Place, stop 7825",
+                            "arrival_stop": "Frascati SC, stop 3084",
+                            "departure_time": "Thu Aug 12 2021 13:37:28 GMT+0100 (Irish Standard Time)",
+                            "number_of_stops": 8,
+                        }
+                    },
+                    {"step": {"step_duration": 392, "travel_mode": "WALKING"}},
+                ],
+            ],
+        }
+        client = Client()
+        api_response = client.post(
+            "/api/get_journey_travel_time_estimation/",
+            routes_data_example_correct,
+            content_type="application/json",
+        )
+        response_json = api_response.json()
+        # assert api returns a dictionary
+        self.assertIs(type(response_json), dict)
+        # assert api response returns information for the same number of routes sent to backend
+        self.assertEqual(
+            len(response_json), len(routes_data_example_correct["routesData"])
+        )
+        # assert response dict has the expected keys for first route
+        self.assertIn("route_0", response_json)
+        self.assertIn("journey_starts", response_json["route_0"])
+        self.assertIn("journey_ends", response_json["route_0"])
+        self.assertIn("route_duration", response_json["route_0"])
+        # assert route has time estimations for all steps (3) of the first route
+        self.assertIn("step_0", response_json["route_0"])
+        self.assertIn("step_1", response_json["route_0"])
+        self.assertIn("step_2", response_json["route_0"])
+
+    def test_get_travel_time_for_route_correct_data(self):
+        route_data_example = [
+            {"start_time": "Thu Aug 12 2021 13:03:44 GMT+0100 (Irish Standard Time)"},
+            {"step": {"step_duration": 224, "travel_mode": "WALKING"}},
+            {
+                "step": {
+                    "step_duration": 568,
+                    "travel_mode": "TRANSIT",
+                    "provider": "Dublin Bus",
+                    "bus_line_long_name": "Mountjoy Square Park - Bride's Glen Bus Stop",
+                    "bus_line_short_name": "7",
+                    "headsign": "Mountjoy Square",
+                    "departure_stop": "Clarence Place, stop 7825",
+                    "arrival_stop": "Frascati SC, stop 3084",
+                    "departure_time": "Thu Aug 12 2021 13:07:28 GMT+0100 (Irish Standard Time)",
+                    "number_of_stops": 8,
+                }
+            },
+            {"step": {"step_duration": 392, "travel_mode": "WALKING"}},
+        ]
+        datetime_object = datetime.strptime("2021-08-12T13:00", "%Y-%m-%dT%H:%M")
+        response = _get_travel_time_for_route(route_data_example, datetime_object)
+        self.assertIs(type(response), dict)
+        self.assertIn("journey_starts", response)
+        self.assertIn("journey_ends", response)
+        self.assertIn("route_duration", response)
+        # route index keys are added by get_journey_travel_time_estimation not this function
+        self.assertNotIn("route_0", response)
+        # assert dict has time estimations for all steps (3) of the route_data_example
+        self.assertIn("step_0", response)
+        self.assertIn("step_1", response)
+        self.assertIn("step_2", response)
+        # assert first step has all the expected keys
+        self.assertIn("step_starts", response["step_0"])
+        self.assertIn("step_ends", response["step_0"])
+        self.assertIn("number_of_stops", response["step_0"])
+        self.assertIn("step_duration", response["step_0"])
+        self.assertIn("step_cost", response["step_0"])
+
+    def test_get_step_time_estimation_step_walking(self):
+        step_data_example = {"step": {"step_duration": 224, "travel_mode": "WALKING"}}
+        datetime_object = datetime.strptime("2021-08-12T13:00", "%Y-%m-%dT%H:%M")
+        elapsed_time = datetime.strptime(
+            "Thu Aug 12 2021 13:03:44 GMT+0100", f"%a %b %d %Y %H:%M:%S %Z%z"
+        )
+        (
+            step_time_estimation,
+            step_number_of_stops,
+            step_starts,
+            step_ends,
+            step_duration,
+            step_estimated_cost,
+        ) = _get_step_time_estimation(step_data_example, datetime_object, elapsed_time)
+        # assert returned values are as expected for this step
+        self.assertEqual(
+            step_time_estimation, step_data_example["step"]["step_duration"]
+        )
+        self.assertEqual(step_number_of_stops, 0)
+        self.assertEqual(
+            step_duration,
+            _convert_number_of_seconds_to_time_string(step_time_estimation),
+        )
+        self.assertEqual(step_starts, _datetime_to_hour_minutes_string(elapsed_time))
+        self.assertEqual(
+            step_ends,
+            _datetime_to_hour_minutes_string(
+                elapsed_time + timedelta(seconds=step_time_estimation)
+            ),
+        )
+        self.assertEqual(step_estimated_cost, "")
+
+    def test_get_step_time_estimation_step_not_dublin_bus(self):
+        step_data_example = {
+            "step": {
+                "step_duration": 960,
+                "travel_mode": "TRANSIT",
+                "provider": "Go-Ahead",
+                "departure_time": "Thu Aug 12 2021 18:08:00 GMT+0100 (Irish Standard Time)",
+            }
+        }
+        datetime_object = datetime.strptime("2021-08-12T17:10", "%Y-%m-%dT%H:%M")
+        elapsed_time = datetime.strptime(
+            "Thu Aug 12 2021 18:08:00 GMT+0100", f"%a %b %d %Y %H:%M:%S %Z%z"
+        )
+        (
+            step_time_estimation,
+            step_number_of_stops,
+            step_starts,
+            step_ends,
+            step_duration,
+            step_estimated_cost,
+        ) = _get_step_time_estimation(step_data_example, datetime_object, elapsed_time)
+        # assert returned values are as expected for this step
+        self.assertEqual(
+            step_time_estimation, step_data_example["step"]["step_duration"]
+        )
+        self.assertEqual(step_number_of_stops, 0)
+        self.assertEqual(
+            step_duration,
+            _convert_number_of_seconds_to_time_string(step_time_estimation),
+        )
+        self.assertEqual(step_starts, _datetime_to_hour_minutes_string(elapsed_time))
+        self.assertEqual(
+            step_ends,
+            _datetime_to_hour_minutes_string(
+                elapsed_time + timedelta(seconds=step_time_estimation)
+            ),
+        )
+        self.assertEqual(step_estimated_cost, "")
+
+    def test_get_step_time_estimation_step_dublin_bus_not_in_db(self):
+        dublin_bus_step_not_exists_in_db = {
+            "step": {
+                "step_duration": 921,
+                "travel_mode": "TRANSIT",
+                "provider": "Dublin Bus",
+                "bus_line_long_name": "Phoenix Park Gate - University College Dublin",
+                "bus_line_short_name": "46A",
+                "headsign": "Dun Laoghaire",
+                "departure_stop": "Stephen's Green East",
+                "arrival_stop": "Booterstown, Woodbine Road",
+                "departure_time": "Thu Aug 12 2021 17:56:17 GMT+0100 (Irish Standard Time)",
+                "number_of_stops": 14,
+            }
+        }
+        datetime_object = datetime.strptime("2021-08-12T17:50", "%Y-%m-%dT%H:%M")
+        elapsed_time = datetime.strptime(
+            "Thu Aug 12 2021 17:51:00 GMT+0100", f"%a %b %d %Y %H:%M:%S %Z%z"
+        )
+        (
+            step_time_estimation,
+            step_number_of_stops,
+            step_starts,
+            step_ends,
+            step_duration,
+            step_estimated_cost,
+        ) = _get_step_time_estimation(
+            dublin_bus_step_not_exists_in_db, datetime_object, elapsed_time
+        )
+        # assert returned values are as expected for this step that will not be predicted by the app since we don't have all bus stops in the database
+        self.assertEqual(
+            step_time_estimation,
+            dublin_bus_step_not_exists_in_db["step"]["step_duration"],
+        )
+        self.assertEqual(step_number_of_stops, 14)
+        self.assertEqual(
+            step_duration,
+            _convert_number_of_seconds_to_time_string(step_time_estimation),
+        )
+        self.assertEqual(step_starts, _datetime_to_hour_minutes_string(elapsed_time))
+        self.assertEqual(
+            step_ends,
+            _datetime_to_hour_minutes_string(
+                elapsed_time + timedelta(seconds=step_time_estimation)
+            ),
+        )
+        self.assertEqual(step_estimated_cost, "€2.50")
+
+    def test_datetime_to_hour_minutes_string_until_10_mins(self):
+        datetime_object = datetime.strptime(
+            "Thu Aug 12 2021 18:08:00 GMT+0100", f"%a %b %d %Y %H:%M:%S %Z%z"
+        )
+        time_string = _datetime_to_hour_minutes_string(datetime_object)
+        self.assertEqual(time_string, "18:08")
+
+    def test_datetime_to_hour_minutes_string_after_10_mins(self):
+        datetime_object = datetime.strptime(
+            "Thu Aug 12 2021 15:18:00 GMT+0100", f"%a %b %d %Y %H:%M:%S %Z%z"
+        )
+        time_string = _datetime_to_hour_minutes_string(datetime_object)
+        self.assertEqual(time_string, "15:18")
+
+    def test_datetime_to_hour_minutes_string_before_12pm(self):
+        datetime_object = datetime.strptime(
+            "Thu Aug 12 2021 05:18:00 GMT+0100", f"%a %b %d %Y %H:%M:%S %Z%z"
+        )
+        time_string = _datetime_to_hour_minutes_string(datetime_object)
+        self.assertEqual(time_string, "5:18")
+
+    def test_convert_number_of_seconds_to_time_string_before_2_hours(self):
+        seconds = 4200
+        time_string = _convert_number_of_seconds_to_time_string(seconds)
+        self.assertEqual(time_string, "1 hour 10 mins")
+
+    def test_convert_number_of_seconds_to_time_string_after_2_hours(self):
+        seconds = 7400
+        time_string = _convert_number_of_seconds_to_time_string(seconds)
+        self.assertEqual(time_string, "2 hours 3 mins")
+
+    def test_calculate_step_cost(self):
+        for i in range(1, 20):
+            cost = _calculate_step_cost(i)
+            if i <= 3:
+                self.assertEqual(cost, "€1.55")
+            elif i <= 13:
+                self.assertEqual(cost, "€2.25")
+            else:
+                self.assertEqual(cost, "€2.50")
