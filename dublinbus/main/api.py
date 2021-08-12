@@ -650,6 +650,8 @@ def get_gtfsr_response(request):
 # function to plot quantile dot plot given the normalised data and model prediction
 def quantile_dotplot_generator(lineid, pred):
 
+    pred = int(pred)
+
     linedist = pd.read_csv("main/knn_dist_csvs/knn_dist_{}".format(lineid), header=None)
     normdata = linedist[0].to_list()
 
@@ -1024,11 +1026,28 @@ def quantile_dotplot_generator(lineid, pred):
 
 
 # testing the function (line 39A, prediction of 40.5)
-lineid = "39A"
-quantile_dotplot_generator(lineid, 40.5)
+# lineid = "39A"
+# quantile_dotplot_generator(lineid, 40.5)
 
 
-# def quantile_dot_plot_request(request):
+def quantile_dot_plot_request(request):
+    if "line_id" not in request.GET:
+        return JsonResponse({"error": '"line_id" query parameter not found'})
+    line_id = request.GET["line_id"]
+    print("line_id = " + line_id)
+
+    if "prediction" not in request.GET:
+        return JsonResponse({"error": '"prediction" query parameter not found'})
+    prediction = request.GET["prediction"]
+    print("prediction = " + prediction)
+
+    image_id = quantile_dotplot_generator(line_id, prediction)
+
+    jsonResult = {
+        "image_id": image_id,
+    }
+
+    return JsonResponse(jsonResult)
 
 
 # def delete_dot_plot(request):

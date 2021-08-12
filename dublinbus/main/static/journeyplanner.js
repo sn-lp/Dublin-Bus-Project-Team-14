@@ -706,3 +706,23 @@ function displayErrorMessageToUser() {
   document.getElementById("user-error-message").innerText =
     "Sorry, something went wrong, please try again";
 }
+
+function QDP_request(lineid, prediction) {
+
+  endpoint = "/api/quantile_dot_plot_request/?line_id=" + lineid + "&prediction=" + prediction;
+  console.log("endpoint = " + endpoint);
+
+  //Fetch request to backend
+  fetch(endpoint)
+    .then((response) => response.json())
+    .then((data) => {
+      image_id = data['image_id'];
+      console.log(image_id);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
+}
+
+QDP_request("46A", 120);
