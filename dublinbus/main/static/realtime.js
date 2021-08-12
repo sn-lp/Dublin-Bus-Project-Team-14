@@ -4,14 +4,54 @@ let map;
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: 53.3498, lng: -6.2603 },
-    zoom: 15,
+    zoom: 12,
     disableDefaultUI: true,
   });
   infowindow = new google.maps.InfoWindow();
   if (infowindow) {
     infowindow.close();
   }
+  //Gelocation button.
+  const locationButton = document.createElement("button");
+  locationButton.textContent = "My Location";
+  locationButton.classList.add("btn");
+  locationButton.classList.add("btn-primary");
+  locationButton.setAttribute("id", "locationButton");
+  locationButton.setAttribute("style", "margin-bottom: 2vh;");
+  map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(locationButton);
+  locationButton.addEventListener("click", () => {
+    // Try HTML5 geolocation.
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          infowindow.setPosition(pos);
+          infowindow.setContent("Your Location");
+          infowindow.open(map);
+          map.panTo(pos);
+          map.setZoom(15);
+        },
+        () => {
+          // User rejected geolocation services.
+          alert(
+            "Error: Location services were rejected. Please allow location permissions in your browser to use this feature."
+          );
+        }
+      );
+    } else {
+      // Browser doesn't support Geolocation.
+      alert("Error: Browser does not support Location services.");
+    }
+  });
 }
+
+//Make page title bold in navbar
+document
+  .getElementById("realtime_nav")
+  .setAttribute("style", "font-weight: bold;");
 
 const stop_name_heading = document.getElementById("stop_name_box");
 

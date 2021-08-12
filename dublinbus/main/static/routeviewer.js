@@ -15,6 +15,11 @@ window.onload = function afterWindowLoaded() {
   displayFavourites();
 };
 
+//Make page title bold in navbar
+document
+  .getElementById("routes_nav")
+  .setAttribute("style", "font-weight: bold;");
+
 function displayFavourites() {
   // run this function, only if the browser supports localstorage
   if (typeof Storage !== "undefined") {
@@ -62,6 +67,40 @@ function initMap() {
     infowindow.close();
   }
   infowindow = new google.maps.InfoWindow();
+  //Gelocation button.
+  const locationButton = document.createElement("button");
+  locationButton.textContent = "My Location";
+  locationButton.classList.add("btn");
+  locationButton.classList.add("btn-primary");
+  locationButton.setAttribute("id", "locationButton");
+  locationButton.setAttribute("style", "margin-bottom: 2vh;");
+  map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(locationButton);
+  locationButton.addEventListener("click", () => {
+    // Try HTML5 geolocation.
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          infowindow.setPosition(pos);
+          infowindow.setContent("Your Location");
+          infowindow.open(map);
+          map.panTo(pos);
+        },
+        () => {
+          // User rejected geolocation services.
+          alert(
+            "Error: Location services were rejected. Please allow location permissions in your browser to use this feature."
+          );
+        }
+      );
+    } else {
+      // Browser doesn't support Geolocation.
+      alert("Error: Browser does not support Location services.");
+    }
+  });
 }
 
 function hideSubmitForm() {
@@ -244,12 +283,15 @@ function drawMarkers(stops) {
 
 function getBusStopsFromBackend() {
   routeName = document.getElementById("bus-route-input").value;
+  document.getElementById("route-header").innerHTML =
+    "Route " + document.getElementById("bus-route-input").value.split(" -")[0];
   routeNumber = routeName.split(" ")[0];
   document.getElementById("bus-route-input").value = routeNumber;
   getBusStopsByBusNum(routeNumber);
 }
 
 function getBusStopsByBusNum(routeNumber) {
+  document.getElementById("route-header").innerHTML = "Route " + routeNumber;
   busRoutesEndpoint = "/api/get_bus_stops/?route_number=" + routeNumber;
   fetch(busRoutesEndpoint)
     .then((response) => {

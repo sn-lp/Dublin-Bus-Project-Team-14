@@ -35,6 +35,11 @@ function initDirectionsRenderer() {
   directionsRenderer1 = new google.maps.DirectionsRenderer();
 }
 
+//Make page title bold in navbar
+document
+  .getElementById("journeyplanner_nav")
+  .setAttribute("style", "font-weight: bold;");
+
 //Directions
 function calculateAndDisplayRoute(directionsService, directionsRenderer) {
   // hide over_map until we replaced the times in the suggested routes div
@@ -234,38 +239,17 @@ locationButton.addEventListener("click", () => {
         reverse_geocoder(pos.lat, pos.lng);
       },
       () => {
-        alert("Error: Location services were rejected.");
-        locationButton.style.display = "none";
-        setLocationPrefs(1);
+        // User rejected geolocation services.
+        alert(
+          "Error: Location services were rejected. Please allow location permissions in your browser to use this feature."
+        );
       }
     );
   } else {
-    // Browser doesn't support Geolocation
+    // Browser doesn't support Geolocation.
     alert("Error: Browser does not support Location services.");
-    locationButton.style.display = "none";
-    setLocationPrefs(1);
   }
 });
-
-//Local Storage for locations preference
-function setLocationPrefs(num) {
-  // run this function, only if the browser supports localstorage
-  if (typeof Storage !== "undefined") {
-    if (localStorage.getItem("locations_pref") == null) {
-      localStorage.setItem("locations_pref", num);
-    }
-  }
-}
-
-function readLocationPrefs() {
-  if (typeof Storage !== "undefined") {
-    if (localStorage.getItem("locations_pref") == 1) {
-      locationButton.style.display = "none";
-    }
-  }
-}
-
-readLocationPrefs();
 
 // returns travel time estimation for all suggested routes that come in the google directions API
 function getRoutesTravelEstimationsFromModels(
