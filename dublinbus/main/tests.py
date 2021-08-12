@@ -5,7 +5,15 @@ from datetime import datetime
 import pytz
 from main.models import Route, Trip, Trips_Stops, Stop
 import json
+from django.core.files.storage import default_storage as bucketStorage
+import joblib
 
+class AwsS3BucketTest(TestCase):
+    def test_loading_predictive_model(self):
+        with bucketStorage.open('ml_models/KNN_models/knn_1.joblib', 'rb') as f:
+            route_model = joblib.load(f)
+        self.assertTrue(bucketStorage.exists('ml_models/'))
+        self.assertTrue(route_model is not None)
 
 class ViewTests(TestCase):
     def test_index_view(self):
