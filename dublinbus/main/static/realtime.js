@@ -32,7 +32,7 @@ function initMap() {
           infowindow.setContent("Your Location");
           infowindow.open(map);
           map.panTo(pos);
-          map.setZoom(18);
+          map.setZoom(15);
         },
         () => {
           // User rejected geolocation services.

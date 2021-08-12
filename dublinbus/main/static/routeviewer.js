@@ -88,7 +88,6 @@ function initMap() {
           infowindow.setContent("Your Location");
           infowindow.open(map);
           map.panTo(pos);
-          map.setZoom(18);
         },
         () => {
           // User rejected geolocation services.
