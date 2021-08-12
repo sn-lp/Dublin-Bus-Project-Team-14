@@ -22,6 +22,7 @@ import numpy as np
 import pandas as pd
 from statistics import variance
 from scipy.stats import lognorm
+import random, string
 
 
 # returns all bus stops for each direction of each bus route
@@ -647,7 +648,11 @@ def get_gtfsr_response(request):
 
 # code adapted from https://gist.github.com/tupui/c8dd181fd1e732584bbd7109b96177e3
 # function to plot quantile dot plot given the normalised data and model prediction
-def quantile_dotplot(lineid, normdata, pred):
+def quantile_dotplot_generator(lineid, pred):
+
+    linedist = pd.read_csv("main/knn_dist_csvs/knn_dist_{}".format(lineid), header=None)
+    normdata = linedist[0].to_list()
+
     sample = 20
     p_less_than_x = np.linspace(1 / sample / 2, 1 - (1 / sample / 2), sample)
 
@@ -1006,11 +1011,24 @@ def quantile_dotplot(lineid, normdata, pred):
     # adding vertical line for the mean
     plt.axvline(x=pred, color="r")
 
-    # showing the plot in the interface (won't work like this in the app)
-    plt.savefig("QDTtest.png")
+    # filename generator
+    image_id = "".join(
+        random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits)
+        for _ in range(8)
+    )
+    print(image_id)
+
+    plt.savefig("main/temp/" + image_id + ".png")
+
+    return image_id
 
 
 # testing the function (line 39A, prediction of 40.5)
 lineid = "39A"
-linedist = pd.read_csv("main/knn_dist_csvs/knn_dist_{}".format(lineid), header=None)
-quantile_dotplot(lineid, linedist[0].to_list(), 40.5)
+quantile_dotplot_generator(lineid, 40.5)
+
+
+# def quantile_dot_plot_request(request):
+
+
+# def delete_dot_plot(request):
