@@ -599,7 +599,7 @@ def get_gtfsr_response(request):
             # can add a log here, when we have log functionality
             pass
 
-    # failure could be caused by both http connection or json conversion, so it cannot be put in json's try-except only
+    # failure could be caused by both http connection or json conversion, so the following statement cannot be put in json's try-except only
     # no matter what made the previous process failed, we still need to have a record in cache
     # for telling the function caller to cool down for 1 minute
     if get_last_gtfsr_response() is None:
