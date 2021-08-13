@@ -714,7 +714,6 @@ function QDP_request(lineid, prediction) {
     lineid +
     "&prediction=" +
     prediction;
-  console.log("endpoint = " + endpoint);
 
   //Fetch request to backend
   fetch(endpoint)
@@ -727,6 +726,7 @@ function QDP_request(lineid, prediction) {
       dot_plot_element = document.createElement("img");
       dot_plot_element.setAttribute("src", "data:image/png;base64," + base64);
       dot_plot_div = document.getElementById("dotplot");
+
       dot_plot_div.appendChild(dot_plot_element);
       dot_plot_element.setAttribute(
         "style",
