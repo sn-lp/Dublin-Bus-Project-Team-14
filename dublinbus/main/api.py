@@ -13,6 +13,8 @@ import time
 import os
 import requests
 from django.conf import settings
+from django.core.files.storage import default_storage as bucketStorage
+
 
 # returns all bus stops for each direction of each bus route
 def get_bus_stops(request):
@@ -169,8 +171,8 @@ def autocomple_stop(request):
 def model_prediction(
     route, progress_number, direction, day, month, temp, weather, hour
 ):
-    route_model_file = f"main/ml_models/KNN_models/knn_{route}.joblib"
-    with open(route_model_file, "rb") as f:
+    route_model_file = f"ml_models/KNN_models/knn_{route}.joblib"
+    with bucketStorage.open(route_model_file, "rb") as f:
         route_model = joblib.load(f)
     # convert the data to a list of parameters for the predictive KNN model
 
@@ -396,8 +398,8 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
     else:
         route_shortname = route_step_dict["step"]["bus_line_short_name"]
         matching_route_in_db = Route.objects.filter(short_name=route_shortname.lower())
-        if not matching_route_in_db or not os.path.isfile(
-            f"main/ml_models/KNN_models/knn_{route_shortname}.joblib"
+        if not matching_route_in_db or not bucketStorage.exists(
+            f"ml_models/KNN_models/knn_{route_shortname}.joblib"
         ):
             step_time_estimation += google_travel_time_prediction
             elapsed_time += timedelta(seconds=step_time_estimation)
