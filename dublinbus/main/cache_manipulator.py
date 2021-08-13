@@ -89,9 +89,8 @@ def get_weather(input_timestamp):
 
 
 def update_gtfsr_response(gtfsr_response):
-    cache.set(
-        "gtfsr", gtfsr_response, 60
-    )  # will be kept in cache for 60 seconds
+    cache.set("gtfsr", gtfsr_response, 60)  # will be kept in cache for 60 seconds
+
 
 def get_last_gtfsr_response():
     return cache.get("gtfsr")
