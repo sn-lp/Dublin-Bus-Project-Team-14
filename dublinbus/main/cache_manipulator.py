@@ -89,20 +89,9 @@ def get_weather(input_timestamp):
 
 
 def update_gtfsr_response(gtfsr_response):
-    # check if the input is valid, check timestamp
-    if gtfsr_response["header"] is not None:
-        if gtfsr_response["header"]["timestamp"] is not None:
-            # store in cache
-            cache.set(
-                "gtfsr", gtfsr_response, 60
-            )  # will be kept in cache for 60 seconds
-            return True  # successfully stored in cache
-    return False  # not successfully stored in cache
-
+    cache.set(
+        "gtfsr", gtfsr_response, 60
+    )  # will be kept in cache for 60 seconds
 
 def get_last_gtfsr_response():
-    # if cache exist
-    if cache.get("gtfsr") is not None:
-        return cache.get("gtfsr")
-    # not exist
-    return None
+    return cache.get("gtfsr")
