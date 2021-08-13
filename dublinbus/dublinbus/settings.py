@@ -186,3 +186,5 @@ CACHES = {
         "LOCATION": os.path.join(BASE_DIR, "django_cache"),
     }
 }
+
+GTFSR_APIKEY = os.getenv("GTFSR_APIKEY", "")

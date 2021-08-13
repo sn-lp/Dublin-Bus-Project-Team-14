@@ -38,4 +38,7 @@ urlpatterns = [
     path(
         "api/get_bus_stop_times/", main_api.get_bus_stop_times, name="getbusstoptimes"
     ),
+    path(
+        "api/get_gtfsr_response/", main_api.get_gtfsr_response, name="getgtfsrresponse"
+    ),
 ]

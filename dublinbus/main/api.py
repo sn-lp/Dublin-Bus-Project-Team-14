@@ -11,7 +11,8 @@ import joblib
 from datetime import timedelta
 import time
 import os
-
+import requests
+from django.conf import settings
 
 # returns all bus stops for each direction of each bus route
 def get_bus_stops(request):
@@ -573,3 +574,29 @@ def _calculate_step_cost(number_of_stops):
     else:
         adult_leap_cost = "€2.50"
     return adult_leap_cost
+
+
+def get_gtfsr_response(request):
+    cache_res = get_last_gtfsr_response()
+    if cache_res is not None:
+        return JsonResponse(cache_res)
+
+    gtfsr_res = None
+    url = "https://gtfsr.transportforireland.ie/v1/?format=json"
+    headers_dic = {
+        "Cache-Control": "no-cache",
+        "x-api-key": settings.GTFSR_APIKEY,
+    }
+
+    with requests.get(url, headers=headers_dic) as response:
+        try:
+            gtfsr_res = json.loads(response.content)
+            update_gtfsr_response(gtfsr_res)
+        except:
+            pass
+
+    return (
+        JsonResponse(gtfsr_res)
+        if gtfsr_res is not None
+        else JsonResponse({"error": "please check gtfsr api or backend cache"})
+    )
