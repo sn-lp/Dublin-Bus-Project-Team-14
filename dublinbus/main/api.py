@@ -291,6 +291,8 @@ def _get_travel_time_for_route(route, user_datetime_object):
             step_ends,
             step_duration,
             step_estimated_cost,
+            route_name,
+            predicted_by_app,
         ) = _get_step_time_estimation(
             route_step_dict, user_datetime_object, elapsed_time
         )
@@ -301,7 +303,10 @@ def _get_travel_time_for_route(route, user_datetime_object):
             "step_starts": step_starts,
             "step_ends": step_ends,
             "step_duration": step_duration,
+            "prediction_in_seconds": step_time_estimation,
             "step_cost": step_estimated_cost,
+            "route_name": route_name,
+            "predicted_by_app": predicted_by_app,
         }
         elapsed_time += timedelta(seconds=step_time_estimation)
         step_index += 1
@@ -328,6 +333,8 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
     step_ends = ""
     step_duration = ""
     step_estimated_cost = ""
+    route_name = ""
+    predicted_by_app = False
 
     if not "step" in route_step_dict or not "step_duration" in route_step_dict["step"]:
         return (
@@ -337,6 +344,8 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
             step_ends,
             step_duration,
             step_estimated_cost,
+            route_name,
+            predicted_by_app,
         )
 
     google_travel_time_prediction = route_step_dict["step"]["step_duration"]
@@ -355,6 +364,8 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
             step_estimated_cost = _calculate_step_cost(
                 route_step_dict["step"]["number_of_stops"]
             )
+            if "bus_line_short_name" in route_step_dict["step"]:
+                route_name = route_step_dict["step"]["bus_line_short_name"]
 
     if "departure_time" in route_step_dict["step"]:
         # use google's step's departure time to feed the date, time and weather to the models
@@ -392,6 +403,8 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
             step_ends,
             step_duration,
             step_estimated_cost,
+            route_name,
+            predicted_by_app,
         )
     else:
         route_shortname = route_step_dict["step"]["bus_line_short_name"]
@@ -412,6 +425,8 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
                 step_ends,
                 step_duration,
                 step_estimated_cost,
+                route_name,
+                predicted_by_app,
             )
 
         trip_headsign = route_step_dict["step"]["bus_line_long_name"]
@@ -443,6 +458,8 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
                 step_ends,
                 step_duration,
                 step_estimated_cost,
+                route_name,
+                predicted_by_app,
             )
 
         trip_id = matching_trip.id
@@ -469,6 +486,8 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
                 step_ends,
                 step_duration,
                 step_estimated_cost,
+                route_name,
+                predicted_by_app,
             )
 
         matching_arrival_stop = Stop.objects.filter(Q(name=arrival_stop)).first()
@@ -493,6 +512,8 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
                 step_ends,
                 step_duration,
                 step_estimated_cost,
+                route_name,
+                predicted_by_app,
             )
 
         # make predictions if all necessary values are available
@@ -523,6 +544,7 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
         elapsed_time += timedelta(seconds=step_time_estimation)
         step_ends = _datetime_to_hour_minutes_string(elapsed_time)
         step_duration = _convert_number_of_seconds_to_time_string(step_time_estimation)
+        predicted_by_app = True
         return (
             step_time_estimation,
             step_number_of_stops,
@@ -530,6 +552,8 @@ def _get_step_time_estimation(route_step_dict, user_datetime_object, elapsed_tim
             step_ends,
             step_duration,
             step_estimated_cost,
+            route_name,
+            predicted_by_app,
         )
 
 

@@ -446,6 +446,8 @@ class ApiTests(TestCase):
             step_ends,
             step_duration,
             step_estimated_cost,
+            route_name,
+            predicted_by_app,
         ) = _get_step_time_estimation(step_data_example, datetime_object, elapsed_time)
         # assert returned values are as expected for this step
         self.assertEqual(
@@ -464,6 +466,8 @@ class ApiTests(TestCase):
             ),
         )
         self.assertEqual(step_estimated_cost, "")
+        self.assertEqual(route_name, "")
+        self.assertEqual(predicted_by_app, False)
 
     def test_get_step_time_estimation_step_not_dublin_bus(self):
         step_data_example = {
@@ -485,6 +489,8 @@ class ApiTests(TestCase):
             step_ends,
             step_duration,
             step_estimated_cost,
+            route_name,
+            predicted_by_app,
         ) = _get_step_time_estimation(step_data_example, datetime_object, elapsed_time)
         # assert returned values are as expected for this step
         self.assertEqual(
@@ -503,6 +509,8 @@ class ApiTests(TestCase):
             ),
         )
         self.assertEqual(step_estimated_cost, "")
+        self.assertEqual(route_name, "")
+        self.assertEqual(predicted_by_app, False)
 
     def test_get_step_time_estimation_step_dublin_bus_not_in_db(self):
         dublin_bus_step_not_exists_in_db = {
@@ -530,6 +538,8 @@ class ApiTests(TestCase):
             step_ends,
             step_duration,
             step_estimated_cost,
+            route_name,
+            predicted_by_app,
         ) = _get_step_time_estimation(
             dublin_bus_step_not_exists_in_db, datetime_object, elapsed_time
         )
@@ -551,6 +561,8 @@ class ApiTests(TestCase):
             ),
         )
         self.assertEqual(step_estimated_cost, "€2.50")
+        self.assertEqual(route_name, "46A")
+        self.assertEqual(predicted_by_app, False)
 
     def test_datetime_to_hour_minutes_string_until_10_mins(self):
         datetime_object = datetime.strptime(
