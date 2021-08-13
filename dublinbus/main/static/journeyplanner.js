@@ -707,22 +707,35 @@ function displayErrorMessageToUser() {
     "Sorry, something went wrong, please try again";
 }
 
+//Quantile Dot Plot Javascript function
 function QDP_request(lineid, prediction) {
-
-  endpoint = "/api/quantile_dot_plot_request/?line_id=" + lineid + "&prediction=" + prediction;
+  endpoint =
+    "/api/quantile_dotplot_generator/?line_id=" +
+    lineid +
+    "&prediction=" +
+    prediction;
   console.log("endpoint = " + endpoint);
 
   //Fetch request to backend
   fetch(endpoint)
     .then((response) => response.json())
     .then((data) => {
-      image_id = data['image_id'];
-      console.log(image_id);
+      //base64 will hold the bytestream which contains the image data.
+      base64 = data["image_base64"];
+
+      //Display the dotplot [This is just an example which will display it in the bottom part of the UI window]
+      dot_plot_element = document.createElement("img");
+      dot_plot_element.setAttribute("src", "data:image/png;base64," + base64);
+      dot_plot_div = document.getElementById("dotplot");
+      dot_plot_div.appendChild(dot_plot_element);
+      dot_plot_element.setAttribute(
+        "style",
+        "max-width:100%; margin-top: 20px;"
+      );
     })
     .catch((error) => {
       console.log(error);
     });
-
 }
 
-QDP_request("46A", 120);
+QDP_request("66", 500);

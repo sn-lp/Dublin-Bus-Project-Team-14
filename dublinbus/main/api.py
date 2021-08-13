@@ -1,3 +1,11 @@
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+from io import BytesIO
+import base64
+
 from django.http import JsonResponse
 from django.http.response import HttpResponse
 from main.models import Route, Trip, Trips_Stops, Stop, Stop_Times
@@ -22,7 +30,6 @@ import numpy as np
 import pandas as pd
 from statistics import variance
 from scipy.stats import lognorm
-import random, string
 
 
 # returns all bus stops for each direction of each bus route
@@ -648,9 +655,18 @@ def get_gtfsr_response(request):
 
 # code adapted from https://gist.github.com/tupui/c8dd181fd1e732584bbd7109b96177e3
 # function to plot quantile dot plot given the normalised data and model prediction
-def quantile_dotplot_generator(lineid, pred):
+def quantile_dotplot_generator(request):
 
-    pred = int(pred)
+    if "line_id" not in request.GET:
+        return JsonResponse({"error": '"line_id" query parameter not found'})
+    lineid = request.GET["line_id"]
+
+    if "prediction" not in request.GET:
+        return JsonResponse({"error": '"prediction" query parameter not found'})
+    pred = request.GET["prediction"]
+
+    # Conversion needed as predictions are given in seconds, while this function uses minutes.
+    pred = int(pred) / 60
 
     linedist = pd.read_csv("main/knn_dist_csvs/knn_dist_{}".format(lineid), header=None)
     normdata = linedist[0].to_list()
@@ -1013,41 +1029,12 @@ def quantile_dotplot_generator(lineid, pred):
     # adding vertical line for the mean
     plt.axvline(x=pred, color="r")
 
-    # filename generator
-    image_id = "".join(
-        random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits)
-        for _ in range(8)
-    )
-    print(image_id)
+    # Sendign image data as as base64 data (https://deeplearning.lipingyang.org/2018/07/21/django-sending-matplotlib-generated-figure-to-django-web-app/)
+    buf = BytesIO()
+    plt.savefig(buf, format="png", dpi=300)
+    image_base64 = base64.b64encode(buf.getvalue()).decode("utf-8").replace("\n", "")
+    buf.close()
 
-    plt.savefig("main/temp/" + image_id + ".png")
-
-    return image_id
-
-
-# testing the function (line 39A, prediction of 40.5)
-# lineid = "39A"
-# quantile_dotplot_generator(lineid, 40.5)
-
-
-def quantile_dot_plot_request(request):
-    if "line_id" not in request.GET:
-        return JsonResponse({"error": '"line_id" query parameter not found'})
-    line_id = request.GET["line_id"]
-    print("line_id = " + line_id)
-
-    if "prediction" not in request.GET:
-        return JsonResponse({"error": '"prediction" query parameter not found'})
-    prediction = request.GET["prediction"]
-    print("prediction = " + prediction)
-
-    image_id = quantile_dotplot_generator(line_id, prediction)
-
-    jsonResult = {
-        "image_id": image_id,
-    }
+    jsonResult = {"image_base64": image_base64}
 
     return JsonResponse(jsonResult)
-
-
-# def delete_dot_plot(request):

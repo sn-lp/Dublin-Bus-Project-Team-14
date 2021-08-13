@@ -20,8 +20,8 @@ urlpatterns = [
     path("api/get_bus_stop_times", api.get_bus_stop_times, name="getbusstoptimes"),
     path("api/get_gtfsr_response/", api.get_gtfsr_response, name="getgtfsrresponse"),
     path(
-        "api/quantile_dot_plot_request",
-        api.quantile_dot_plot_request,
-        name="quantile_dot_plot_request",
+        "api/quantile_dotplot_generator",
+        api.quantile_dotplot_generator,
+        name="quantile_dotplot_generator",
     ),
 ]
