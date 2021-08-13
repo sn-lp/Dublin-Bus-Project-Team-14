@@ -605,7 +605,7 @@ def get_gtfsr_response(request):
     if get_last_gtfsr_response() is None:
         update_gtfsr_response(
             {
-                "statusCode": 429,
+                "statusCode": 500,
                 "message": "there was something wrong with gtfr, please cool down, and wait for one minute.",
             }
         )
