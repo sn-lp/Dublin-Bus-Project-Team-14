@@ -591,6 +591,8 @@ def get_gtfsr_response(request):
     }
 
     with requests.get(url, headers=headers_dic) as response:
+        if response.status_code != 200:
+            pass
         try:
             gtfsr_res = json.loads(response.content)
             update_gtfsr_response(gtfsr_res)

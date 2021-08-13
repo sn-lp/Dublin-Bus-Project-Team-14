@@ -94,7 +94,7 @@ def update_gtfsr_response(gtfsr_response):
         if gtfsr_response["header"]["timestamp"] is not None:
             # store in cache
             cache.set(
-                "gtfsr", gtfsr_response, 10
+                "gtfsr", gtfsr_response, 60
             )  # will be kept in cache for 60 seconds
             return True  # successfully stored in cache
     return False  # not successfully stored in cache
