@@ -86,3 +86,11 @@ def get_weather(input_timestamp):
             (truncated_input_timestamp - truncated_current_timestamp) / (24 * 3600)
         )
         return cache.get("daily_weather_dic")[daily_index]
+
+
+def update_gtfsr_response(gtfsr_response):
+    cache.set("gtfsr", gtfsr_response, 60)  # will be kept in cache for 60 seconds
+
+
+def get_last_gtfsr_response():
+    return cache.get("gtfsr")

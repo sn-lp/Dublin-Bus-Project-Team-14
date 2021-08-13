@@ -11,6 +11,8 @@ import joblib
 from datetime import timedelta
 import time
 import os
+import requests
+from django.conf import settings
 from django.core.files.storage import default_storage as bucketStorage
 
 
@@ -598,3 +600,38 @@ def _calculate_step_cost(number_of_stops):
     else:
         adult_leap_cost = "€2.50"
     return adult_leap_cost
+
+
+def get_gtfsr_response(request):
+    cache_res = get_last_gtfsr_response()
+    if cache_res is not None:
+        return JsonResponse(cache_res)
+
+    url = "https://gtfsr.transportforireland.ie/v1/?format=json"
+    headers_dic = {
+        "Cache-Control": "no-cache",
+        "x-api-key": settings.GTFSR_APIKEY,
+    }
+
+    with requests.get(url, headers=headers_dic) as response:
+        try:
+            # even if the response status is not 200, we still need to keep it in cache for two reasons:
+            # 1. revealing the actual error message will make it easier to debug
+            # 2. have something in cache, so the function caller have to cool down for 1 minute
+            update_gtfsr_response(json.loads(response.content))
+        except:
+            # can add a log here, when we have log functionality
+            pass
+
+    # failure could be caused by both http connection or json conversion, so the following statement cannot be put in json's try-except only
+    # no matter what made the previous process failed, we still need to have a record in cache
+    # for telling the function caller to cool down for 1 minute
+    if get_last_gtfsr_response() is None:
+        update_gtfsr_response(
+            {
+                "statusCode": 500,
+                "message": "there was something wrong with gtfr, please cool down, and wait for one minute.",
+            }
+        )
+
+    return JsonResponse(get_last_gtfsr_response())
