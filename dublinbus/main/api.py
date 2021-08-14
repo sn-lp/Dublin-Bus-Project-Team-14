@@ -666,7 +666,7 @@ def quantile_dotplot_generator(request):
     pred = request.GET["prediction"]
 
     # Conversion needed as predictions are given in seconds, while this function uses minutes.
-    pred = int(pred) / 60
+    pred = int(float(pred)) / 60
 
     linedist = pd.read_csv("main/knn_dist_csvs/knn_dist_{}".format(lineid), header=None)
     normdata = linedist[0].to_list()
