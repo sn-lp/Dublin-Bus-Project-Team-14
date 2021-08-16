@@ -142,12 +142,12 @@ def setupTestData():
     for i in range(0, 24):
         for day in trip_day_type:
             Stop_Times.objects.create(
-                trip_id = '7712.' + day + '.60-1-d12-1.1.O',
-                arrival_time = str(i) + ':00:10',
-                stop_id = '8220DB000044',
-                id = count
+                trip_id="7712." + day + ".60-1-d12-1.1.O",
+                arrival_time=str(i) + ":00:10",
+                stop_id="8220DB000044",
+                id=count,
             )
-            count+=1
+            count += 1
 
     # set up a simplified dataset for route 44b
     Route.objects.create(id="60-44B-b12-1", short_name="44b")
@@ -222,7 +222,9 @@ class ApiTests(TestCase):
         self.assertEqual(len(api_response_for_route88), 0)
 
         # post request
-        api_response_for_post = json.loads(self.client.post("/api/get_bus_stops/").content)
+        api_response_for_post = json.loads(
+            self.client.post("/api/get_bus_stops/").content
+        )
         self.assertTrue(api_response_for_post["error"] is not None)
 
     def test_weather_widget(self):
@@ -626,16 +628,12 @@ class ApiTests(TestCase):
     def test_gtfsr_response(self):
 
         # test cache initialisation
-        api_response = json.loads(
-            self.client.get("/api/get_gtfsr_response/").content
-        )
+        api_response = json.loads(self.client.get("/api/get_gtfsr_response/").content)
         cache_response = get_last_gtfsr_response()
         self.assertEqual(api_response, cache_response)
 
         # test cache after initialisation
-        api_response = json.loads(
-            self.client.get("/api/get_gtfsr_response/").content
-        )
+        api_response = json.loads(self.client.get("/api/get_gtfsr_response/").content)
         self.assertEqual(api_response, cache_response)
 
     def test_get_bus_stop_times(self):
@@ -647,7 +645,9 @@ class ApiTests(TestCase):
 
         # normal case
         response_normal = json.loads(
-            self.client.get("/api/get_bus_stop_times/", {"stop_id": "8220DB000044"}).content
+            self.client.get(
+                "/api/get_bus_stop_times/", {"stop_id": "8220DB000044"}
+            ).content
         )
 
         now = datetime.now()
