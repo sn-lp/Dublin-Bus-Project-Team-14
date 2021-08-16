@@ -3,7 +3,7 @@ from django.test import TestCase, Client
 from main.cache_manipulator import get_weather
 from datetime import datetime
 import pytz
-from main.models import Route, Trip, Trips_Stops, Stop
+from main.models import Route, Trip, Trips_Stops, Stop, Stop_Times, Stop_Times
 import json
 from django.core.files.storage import default_storage as bucketStorage
 import joblib
@@ -15,6 +15,7 @@ from main.api import (
     _calculate_step_cost,
 )
 from datetime import timedelta
+from main.cache_manipulator import *
 
 
 class AwsS3BucketTest(TestCase):
@@ -135,6 +136,19 @@ def setupTestData():
         trip=Trip.objects.filter(id="10490.y1006.60-44-d12-1.245.O")[0],
     )
 
+    # To keep the test avaible for every day and every hour, I create only "one trip" for every hour every day
+    trip_day_type = ["y1007", "y1008", "y1009"]
+    count = 0
+    for i in range(0, 24):
+        for day in trip_day_type:
+            Stop_Times.objects.create(
+                trip_id = '7712.' + day + '.60-1-d12-1.1.O',
+                arrival_time = str(i) + ':00:10',
+                stop_id = '8220DB000044',
+                id = count
+            )
+            count+=1
+
     # set up a simplified dataset for route 44b
     Route.objects.create(id="60-44B-b12-1", short_name="44b")
     Trip.objects.create(
@@ -206,6 +220,10 @@ class ApiTests(TestCase):
             self.client.get("/api/get_bus_stops/", {"route_number": "88"}).content
         )
         self.assertEqual(len(api_response_for_route88), 0)
+
+        # post request
+        api_response_for_post = json.loads(self.client.post("/api/get_bus_stops/").content)
+        self.assertTrue(api_response_for_post["error"] is not None)
 
     def test_weather_widget(self):
         # compare the response from api and cache
@@ -604,3 +622,43 @@ class ApiTests(TestCase):
                 self.assertEqual(cost, "€2.25")
             else:
                 self.assertEqual(cost, "€2.50")
+
+    def test_gtfsr_response(self):
+
+        # test cache initialisation
+        api_response = json.loads(
+            self.client.get("/api/get_gtfsr_response/").content
+        )
+        cache_response = get_last_gtfsr_response()
+        self.assertEqual(api_response, cache_response)
+
+        # test cache after initialisation
+        api_response = json.loads(
+            self.client.get("/api/get_gtfsr_response/").content
+        )
+        self.assertEqual(api_response, cache_response)
+
+    def test_get_bus_stop_times(self):
+        # when stop_id is not set
+        response_no_stop_id = json.loads(
+            self.client.get("/api/get_bus_stop_times/").content
+        )
+        self.assertTrue(response_no_stop_id["error"] is not None)
+
+        # normal case
+        response_normal = json.loads(
+            self.client.get("/api/get_bus_stop_times/", {"stop_id": "8220DB000044"}).content
+        )
+
+        now = datetime.now()
+        hour_ahead = now + timedelta(hours=1)
+        current_time = now.strftime("%H:%M:%S")
+        current_time_1hr = hour_ahead.strftime("%H:%M:%S")
+
+        stop_times = Stop_Times.objects.filter(
+            stop_id="8220DB000044",
+            arrival_time__gte=current_time,
+            arrival_time__lte=current_time_1hr,
+        )
+        # there are 3 types of service days, today must be seen as one type, so divide it by 3
+        self.assertEqual(len(stop_times) / 3, len(response_normal))
