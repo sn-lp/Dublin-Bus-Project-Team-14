@@ -143,6 +143,22 @@ function realtime_fetch(stop_id) {
     });
 }
 
+function gtfsr_api_fetch() {
+  endpoint = "/api/get_gtfsr_response";
+
+  //Fetch request to backend
+  fetch(endpoint)
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+gtfsr_api_fetch();
+
 function realtime(backend_data) {
   //Set results table as empty.
   document.getElementById("realtime_buses").innerHTML = `
