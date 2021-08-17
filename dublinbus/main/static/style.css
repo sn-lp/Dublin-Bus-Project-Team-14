@@ -1,4 +1,7 @@
-body, html, #wrapper, #container-fluid {
+body,
+html,
+#wrapper,
+#container-fluid {
   height: 100%;
   width: 100%;
 }
