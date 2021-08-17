@@ -42,6 +42,7 @@ document
 
 //Directions
 function calculateAndDisplayRoute(directionsService, directionsRenderer) {
+  document.getElementById("loading").style.display = "block";
   // hide over_map until we replaced the times in the suggested routes div
   document.getElementById("over_map").style.display = "none";
 
@@ -106,6 +107,9 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer) {
     .catch((e) => {
       console.log(e);
       window.alert("No bus directions could be found");
+      document.getElementById("loading").style.display = "none";
+      // make window reload to prompt the user to enter a new origin/destination address if no bus connection could be found for the previous submission
+      window.location.reload();
     });
 }
 
@@ -296,6 +300,7 @@ function getRoutesTravelEstimationsFromModels(
       travelTimeEstimations = estimationsResponse;
       replaceTravelTimeEstimations(travelTimeEstimations);
       timeEstimationReplaced = true;
+      document.getElementById("loading").style.display = "none";
       document.getElementById("directions_results").children[0].style.display =
         "block";
       document.getElementById("over_map").style.display = "block";
