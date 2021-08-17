@@ -630,7 +630,7 @@ def get_gtfsr_response(request):
         update_gtfsr_response(
             {
                 "statusCode": 500,
-                "message": "there was something wrong with gtfr, please cool down, and wait for one minute.",
+                "message": "There was something wrong with GTFS-R. Try again in one minute.",
             }
         )
 
