@@ -5,4 +5,3 @@ __pycache__
 *.sql
 *.djcache
 *.joblib
-knn_dist_csvs

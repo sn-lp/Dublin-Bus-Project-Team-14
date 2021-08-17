@@ -41,4 +41,9 @@ urlpatterns = [
     path(
         "api/get_gtfsr_response/", main_api.get_gtfsr_response, name="getgtfsrresponse"
     ),
+    path(
+        "api/quantile_dotplot_generator/",
+        main_api.quantile_dotplot_generator,
+        name="quantile_dotplot_generator",
+    ),
 ]

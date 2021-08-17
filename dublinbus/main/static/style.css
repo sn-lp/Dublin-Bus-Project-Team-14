@@ -155,6 +155,11 @@ input {
   font-weight: 500;
 }
 
+#resultsUI {
+  overflow: auto;
+  max-height: 80vh;
+}
+
 a:hover {
   color: black;
   font-weight: bold;
@@ -180,7 +185,8 @@ ripple-surface {
   padding: 0;
 }
 
-#info {
+#info,
+#plot-info {
   font-size: 12px;
   font-family: Roboto, Arial, sans-serif;
   margin: 3px;

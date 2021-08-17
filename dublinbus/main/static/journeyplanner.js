@@ -401,12 +401,7 @@ function getRouteData(route) {
 
 // displays detailed steps, for the selected route when the user clicks the "route details" button
 function displayRouteDetails() {
-  if (document.getElementById("estimated_step_cost")) {
-    document.getElementById("estimated_step_cost").remove();
-  }
-  if (document.getElementById("info")) {
-    document.getElementById("info").remove();
-  }
+  removeAppendedElements();
   // replace or hide steps' details of a selected route when user clicks on the "Route Details" button
   replaceOrHideStepTimes();
   displayCostCalculationInfo();
@@ -433,12 +428,7 @@ function displaySuggestedRoutes() {
   if (document.getElementById("info").style.display == "block") {
     document.getElementById("info").style.display = "none";
   }
-  if (document.getElementById("estimated_step_cost")) {
-    document.getElementById("estimated_step_cost").remove();
-  }
-  if (document.getElementById("info")) {
-    document.getElementById("info").remove();
-  }
+  removeAppendedElements();
   // change display style of divs injected in "directions_results" when
   // directionsRenderer.setPanel(document.getElementById("directions_results")) is called
   document.getElementById("directions_results").children[0].style.display =
@@ -601,7 +591,7 @@ function replaceOrHideStepTimes() {
       const stepEstimations = subStep.children[2];
       // when step is walk we don't want to change anything because google walk time estimation is the one we are using when a step is walking mode
       // google's stepEstimations html element has style display "none" when it is a walking step
-      // so we only do this when display style is "block" --> which means it is not a walking step
+      // so we only do display cost and plot when display style is "block" --> which means it is not a walking step
       if (stepEstimations.style.display != "none") {
         if (
           !stepEstimations.hasChildNodes() ||
@@ -652,6 +642,47 @@ function replaceOrHideStepTimes() {
         if (stepCost) {
           // display estimated step cost only for Dublin Bus steps, other steps will have stepCost to null
           displayStepCost(stepEstimations, stepCost);
+        }
+        // step_predicted_by_app will be true if it is a dubliin bus step predicted by the app
+        // in which case we want to display the dot plot
+        step_predicted_by_app =
+          travelTimeEstimations[`route_${selectedRouteIndex}`][`step_${i}`][
+            "predicted_by_app"
+          ];
+        if (step_predicted_by_app) {
+          step_route_name =
+            travelTimeEstimations[`route_${selectedRouteIndex}`][`step_${i}`][
+              "route_name"
+            ];
+          step_prediction_in_seconds =
+            travelTimeEstimations[`route_${selectedRouteIndex}`][`step_${i}`][
+              "prediction_in_seconds"
+            ];
+          if (step_route_name && step_prediction_in_seconds) {
+            let quantilePlotDiv = document.createElement("DIV");
+            quantilePlotDiv.id = "quantile-dot-plot-div";
+            subStep.insertBefore(quantilePlotDiv, subStep.previousSibling);
+            let displayPlotButton = document.createElement("BUTTON");
+            displayPlotButton.id = "quantile-dot-plot-button";
+            displayPlotButton.innerText =
+              "Show probabilistc travel time estimate";
+            quantilePlotDiv.insertBefore(
+              displayPlotButton,
+              quantilePlotDiv.firstChild
+            );
+            document
+              .getElementById("quantile-dot-plot-button")
+              .classList.add("btn");
+            document
+              .getElementById("quantile-dot-plot-button")
+              .classList.add("btn-primary");
+            displayPlotButton.onclick = function () {
+              QDP_request(
+                `${step_route_name}`,
+                `${step_prediction_in_seconds}`
+              );
+            };
+          }
         }
       }
     }
@@ -705,4 +736,97 @@ function displayErrorMessageToUser() {
   document.getElementById("user-error-message").style.display = "block";
   document.getElementById("user-error-message").innerText =
     "Sorry, something went wrong, please try again";
+}
+
+//Quantile Dot Plot Javascript function
+function QDP_request(lineid, prediction) {
+  endpoint =
+    "/api/quantile_dotplot_generator/?line_id=" +
+    lineid +
+    "&prediction=" +
+    prediction;
+  plotDiv = document.getElementById("plot");
+  if (!plotDiv) {
+    //Fetch request to backend
+    fetch(endpoint)
+      .then((response) => response.json())
+      .then((data) => {
+        //base64 will hold the bytestream which contains the image data.
+        base64 = data["image_base64"];
+        displayDotPlot(base64);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+}
+
+function displayDotPlot(dotPlotData) {
+  // create new element to be parent of plot image and append to quantile-dot-plot-div created for each step
+  let plotDiv = document.createElement("DIV");
+  plotDiv.id = "plot";
+  plotDiv.setAttribute("style", "height:400px");
+  plotDiv.setAttribute(
+    "style",
+    "display:flex; flex-direction:column; overflow:scroll"
+  );
+  quantilePlotDiv = document.getElementById("quantile-dot-plot-div");
+  quantilePlotDiv.insertBefore(plotDiv, quantilePlotDiv.nextSibling);
+  // add img element as child to new element plotDiv and style display
+  dot_plot_element = document.createElement("img");
+  dot_plot_element.setAttribute("src", "data:image/png;base64," + dotPlotData);
+  dot_plot_element.setAttribute(
+    "alt",
+    "This image shows the probabilities of your bus trip duration. Each dot represents a 5% chance of how long your trip will take. The red line represents the most likely time duration for your trip."
+  );
+  // add div with info explaining the plot interpretation
+  let plotInfo = document.createElement("div");
+  plotInfo.id = "plot-info";
+  plotInfo.innerText =
+    "This image shows the probabilities of your bus trip duration. Each dot represents a 5% chance of how long your trip will take. The red line represents the most likely time duration for your trip.";
+
+  plotInfo.setAttribute("style", "max-width:100%; order:2");
+  dot_plot_element.setAttribute("style", "width:100%; height:100%; order:1");
+  dot_plot_div = document.getElementById("plot");
+  dot_plot_div.appendChild(dot_plot_element);
+  dot_plot_div.appendChild(plotInfo);
+
+  // change button text
+  plotButton = document.getElementById("quantile-dot-plot-button");
+  plotButton.innerText = "Hide probabilist travel time estimate";
+  plotButton.onclick = function () {
+    hidePlot();
+  };
+}
+
+function removeAppendedElements() {
+  if (document.getElementById("estimated_step_cost")) {
+    document.getElementById("estimated_step_cost").remove();
+  }
+  if (document.getElementById("quantile-dot-plot-div")) {
+    document.getElementById("quantile-dot-plot-div").remove();
+  }
+  if (document.getElementById("info")) {
+    document.getElementById("info").remove();
+  }
+}
+
+function hidePlot() {
+  plotDiv = document.getElementById("plot");
+  plotDiv.style.display = "none";
+  plotButton = document.getElementById("quantile-dot-plot-button");
+  plotButton.innerText = "Show probabilistc travel time estimate";
+  plotButton.onclick = function () {
+    showPlot();
+  };
+}
+
+function showPlot() {
+  plotDiv = document.getElementById("plot");
+  plotButton = document.getElementById("quantile-dot-plot-button");
+  plotDiv.style.display = "block";
+  plotButton.innerText = "Hide probabilist travel time estimate";
+  plotButton.onclick = function () {
+    hidePlot();
+  };
 }
