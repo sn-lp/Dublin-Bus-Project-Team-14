@@ -663,7 +663,7 @@ class ApiTests(TestCase):
         )
         # there are 3 types of service days, today must be seen as one type, so divide it by 3
         self.assertEqual(len(stop_times) / 3, len(response_normal))
-    
+
     def test_get_all_bus_stops(self):
         # stop_name is not set
         response_no_stop_name = json.loads(
@@ -673,10 +673,12 @@ class ApiTests(TestCase):
 
         # stop_name is set
         response_with_stop_name = json.loads(
-            self.client.get("/api/get_all_bus_stops/", {"stop_name": "Dun Emer Road, stop 2830"}).content
+            self.client.get(
+                "/api/get_all_bus_stops/", {"stop_name": "Dun Emer Road, stop 2830"}
+            ).content
         )
         self.assertEqual(len(response_with_stop_name), 1)
-        
+
     def test_autocomple_stop(self):
         response_normal = json.loads(
             self.client.get("/api/autocomple_stop", {"insert": "Dun Emer"}).content
@@ -684,7 +686,7 @@ class ApiTests(TestCase):
         self.assertEqual(len(response_normal), 1)
 
     def test_model_prediction(self):
-        weather_types = ['Clouds', 'Drizzle', 'Fog', 'Mist', 'Rain', 'Smoke', 'Snow']
+        weather_types = ["Clouds", "Drizzle", "Fog", "Mist", "Rain", "Smoke", "Snow"]
         for weather in weather_types:
             prediction = main.api.model_prediction(123, 3, 1, 1, 6, 12, weather, 13)
             self.assertTrue(prediction > 0 or prediction == 0)
