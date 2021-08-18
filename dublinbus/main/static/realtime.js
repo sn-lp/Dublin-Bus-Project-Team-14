@@ -136,30 +136,60 @@ function realtime_fetch(stop_id) {
   fetch(stopTimesEndpoint)
     .then((response) => response.json())
     .then((data) => {
-      realtime(data);
+      //Returns a dictionary with all relevant GTFSR info for this stop.
+      var gtfsr_dict = gtfsr_api_fetch(stop_id);
+      //Sends frontend and backend data to be matched.
+      realtime(data, gtfsr_dict);
     })
     .catch((error) => {
       console.log(error);
     });
 }
 
-function gtfsr_api_fetch() {
+function gtfsr_api_fetch(stop_id) {
   endpoint = "/api/get_gtfsr_response";
+
+  var gtfsr_dict = {};
 
   //Fetch request to backend
   fetch(endpoint)
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
+
+      parsedGTFSR = data;
+      for (var i = 0; i < parsedGTFSR["entity"].length; i++) {
+        try {
+          var stop_time_update_object =
+            parsedGTFSR["entity"][i]["trip_update"]["stop_time_update"];
+          var trip_id = parsedGTFSR["entity"][i]["trip_update"]["trip"].trip_id;
+          var bus_route = trip_id.split("-")[1];
+
+          //For each stop_time_update from GTFSR.
+          for (var x = 0; x < stop_time_update_object.length; x++) {
+            var stop_id_response = stop_time_update_object[x].stop_id;
+            var delay = stop_time_update_object[x].departure["delay"];
+
+            if (stop_id_response == stop_id) {
+              gtfsr_dict[trip_id] = {
+                "delay": delay,
+                "bus_route": bus_route,
+              }
+            }
+          }
+          // return gtfsr_dict;
+        } catch (e) {
+          //All errors are caught.
+        }
+      }
     })
     .catch((error) => {
       console.log(error);
     });
+
+    return gtfsr_dict;
 }
 
-gtfsr_api_fetch();
-
-function realtime(backend_data) {
+function realtime(backend_data, gtfsr_dict) {
   //Set results table as empty.
   document.getElementById("realtime_buses").innerHTML = `
   <table class="table" id="results_table">
@@ -171,14 +201,30 @@ function realtime(backend_data) {
     </thead>
   <tbody id='results_rows'>`;
 
+  console.log(JSON.parse(JSON.stringify(gtfsr_dict)));
+
+  console.log(gtfsr_dict);
+
   // Loop through backend data.
   for (const [key, values] of Object.entries(backend_data)) {
     backend_arrival_time = values.arrival_time;
     backend_trip_id = values.trip_id;
     bus_route = backend_trip_id.split("-")[1];
 
+    try {
+      var delay = gtfsr_dict[backend_trip_id]['delay'];
+      console.log("Delay is " + delay);
+    } catch(err) {
+    }
+
     push_realtime_update(backend_arrival_time, bus_route);
   }
+
+  for (const [key, values] of Object.entries(gtfsr_dict)) {
+    delay = values.delay;
+    console.log(delay);
+  }
+
   hideFirstMenu();
   sortTable();
   make_table_data_readable();
@@ -325,7 +371,6 @@ function call_realtime_by_stop_name(stop_name) {
   fetch(busStopsEndpoint)
     .then((response) => response.json())
     .then((data) => {
-      console.log(Object.entries(data)[0]);
       realtime_fetch(Object.entries(data)[0][1]["id"]);
       LatLng = {
         lat: Object.entries(data)[0][1]["latitude"],
