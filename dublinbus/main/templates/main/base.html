@@ -52,7 +52,15 @@
               <h3>{% block nav_title %}{{ nav_title }}{% endblock %}</h3>
             </div>
 
-            <button class="mdc-icon-button material-icons" id="map_toggle" style="color: black;">map</button>
+            <button 
+              class="mdc-icon-button material-icons" 
+              id="map_toggle" 
+              type="button"
+              data-mdb-toggle="tooltip"
+              data-mdb-placement="bottom"
+              data-mdb-trigger="manual"
+              title="Click this button to view the Map" 
+              style="color: black;">map</button>
 
             <img class="d-none d-lg-block" src="{% static 'img/db_logo.png' %}" alt="dublin_bus_logo" height="45px" /></img>
             <div class="d-none d-lg-block">
@@ -72,10 +80,10 @@
 
     <main id="container-fluid">{% block content %}{% endblock %}</main>
     
-    <script src="{% static 'app.js' %}"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLEMAPS_APIKEY }}&callback=initMap&libraries=places&v=weekly" async></script>
     <script src="{% static 'main/js/bootstrap.js' %}"></script>
     <script src="{% static 'main/MDB/js/mdb.min.js' %}"></script>
+    <script src="{% static 'app.js' %}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLEMAPS_APIKEY }}&callback=initMap&libraries=places&v=weekly" async></script>
   </body>
 
 </html>
