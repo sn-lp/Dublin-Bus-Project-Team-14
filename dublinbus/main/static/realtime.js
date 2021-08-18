@@ -1,3 +1,6 @@
+//Fetch initial API response
+fetch("/api/get_gtfsr_response");
+
 //Google Maps
 let map;
 
@@ -138,14 +141,15 @@ function realtime_fetch(stop_id) {
     .then((data) => {
       //Returns a dictionary with all relevant GTFSR info for this stop.
       var gtfsr_dict = gtfsr_api_fetch(stop_id);
-      //Sends frontend and backend data to be matched.
-      realtime(data, gtfsr_dict);
+      //Sends frontend and backend data to be matched. Small delay of 50ms is needed here to allow gtfsr_dict to populate correctly.
+      setTimeout(realtime, 50, data, gtfsr_dict);
     })
     .catch((error) => {
       console.log(error);
     });
 }
 
+//Returns a dictionary with all GTFSR data relevant to a given stop_id.
 function gtfsr_api_fetch(stop_id) {
   endpoint = "/api/get_gtfsr_response";
 
@@ -216,6 +220,7 @@ function realtime(backend_data, gtfsr_dict) {
     backend_trip_id = values.trip_id;
     bus_route = backend_trip_id.split("-")[1];
 
+    //If these is a GTFSR dictionary entry for this trip_id, try to get the delay.
     try {
       var delay = gtfsr_dict[backend_trip_id]['delay'];
       console.log("Delay is " + delay);
@@ -223,11 +228,6 @@ function realtime(backend_data, gtfsr_dict) {
     }
 
     push_realtime_update(backend_arrival_time, bus_route);
-  }
-
-  for (const [key, values] of Object.entries(gtfsr_dict)) {
-    delay = values.delay;
-    console.log(delay);
   }
 
   hideFirstMenu();
