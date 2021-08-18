@@ -141,8 +141,8 @@ function realtime_fetch(stop_id) {
     .then((data) => {
       //Returns a dictionary with all relevant GTFSR info for this stop.
       var gtfsr_dict = gtfsr_api_fetch(stop_id);
-      //Sends frontend and backend data to be matched. Small delay of 50ms is needed here to allow gtfsr_dict to populate correctly.
-      setTimeout(realtime, 50, data, gtfsr_dict);
+      //Sends frontend and backend data to be matched. Small delay of 200ms is needed here to allow gtfsr_dict to populate correctly.
+      setTimeout(realtime, 200, data, gtfsr_dict);
     })
     .catch((error) => {
       console.log(error);
@@ -208,22 +208,20 @@ function realtime(backend_data, gtfsr_dict) {
   //Log at time of execution
   console.log(JSON.parse(JSON.stringify(gtfsr_dict)));
 
-  //Regular log
-  console.log(gtfsr_dict);
-
-  //Object.entries log
-  console.log(Object.entries(gtfsr_dict));
-
   // Loop through backend data.
   for (const [key, values] of Object.entries(backend_data)) {
     backend_arrival_time = values.arrival_time;
     backend_trip_id = values.trip_id;
     bus_route = backend_trip_id.split("-")[1];
 
-    //If these is a GTFSR dictionary entry for this trip_id, try to get the delay.
+    //If there is a GTFSR dictionary entry for this trip_id, try to get the delay.
     try {
       var delay = gtfsr_dict[backend_trip_id]['delay'];
-      console.log("Delay is " + delay);
+
+      var new_dt = add_delay_to_eta(backend_arrival_time, delay);
+
+      console.log(new_dt);
+  
     } catch(err) {
     }
 
@@ -236,6 +234,20 @@ function realtime(backend_data, gtfsr_dict) {
   displayAddOrRemoveFavouritesButton(
     document.getElementById("stop_name_box").innerHTML
   );
+}
+
+function add_delay_to_eta(eta, delay) {
+
+  console.log("Delay is " + delay);
+  console.log("ETA is " + eta);
+
+  var dt = new Date(null);
+  dt.setUTCHours(eta.split(":")[0], eta.split(":")[1], eta.split(":")[2]);
+  console.log(dt);
+  dt.setSeconds( dt.getSeconds() + delay );
+
+  return dt;
+
 }
 
 function push_realtime_update(estimated_arrival, bus_route) {
