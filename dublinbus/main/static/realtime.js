@@ -201,9 +201,14 @@ function realtime(backend_data, gtfsr_dict) {
     </thead>
   <tbody id='results_rows'>`;
 
+  //Log at time of execution
   console.log(JSON.parse(JSON.stringify(gtfsr_dict)));
 
+  //Regular log
   console.log(gtfsr_dict);
+
+  //Object.entries log
+  console.log(Object.entries(gtfsr_dict));
 
   // Loop through backend data.
   for (const [key, values] of Object.entries(backend_data)) {
