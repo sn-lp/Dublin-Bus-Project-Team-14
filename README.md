@@ -2,6 +2,22 @@
 
 A web app for predicting and displaying accurate bus travel times within the Dublin Bus network in Ireland.
 
+### Plan Your Journey
+
+We display the quickest bus route between any two locations connected by Dublin Bus.
+
+### Travel Time Predictions
+
+We display accurate travel times in a probabilistic sense as a dot plot, with predictions made using a k-nearest neighbours regression model.
+
+### Real-time Information
+
+View all bus arrivals within the next hour for any Dublin Bus stop, with stops grouped in clusters. Save your favourite stops.
+
+### Route Viewer
+
+View all bus stops for any Dublin Bus route. Save your favourite routes for easy access.
+
 ## Technologies
 
 - Django 3.2.4
