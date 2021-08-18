@@ -42,6 +42,17 @@ document
 
 //Directions
 function calculateAndDisplayRoute(directionsService, directionsRenderer) {
+  if (
+    (document.getElementById("origin").value = document.getElementById(
+      "destination"
+    ).value)
+  ) {
+    window.alert(
+      "The starting location and the destination should be different!"
+    );
+    return;
+  }
+
   document.getElementById("loading").style.display = "block";
   // hide over_map until we replaced the times in the suggested routes div
   document.getElementById("over_map").style.display = "none";
