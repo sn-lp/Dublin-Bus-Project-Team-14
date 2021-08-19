@@ -107,28 +107,6 @@ function getAllBusStops() {
 
 getAllBusStops();
 
-//Return time to the second at function run.
-function get_time() {
-  var current_time = new Date();
-  var hour = current_time.getHours();
-  var minute = current_time.getMinutes();
-  var second = current_time.getSeconds();
-
-  const date_vars = [hour, minute, second];
-
-  for (var i = 0; i < date_vars.length; i++) {
-    if (date_vars[i] < 10) {
-      date_vars[i] = "0" + String(date_vars[i]);
-    } else {
-      date_vars[i] = String(date_vars[i]);
-    }
-  }
-
-  var time = date_vars[0] + ":" + date_vars[1] + ":" + date_vars[2];
-
-  return time;
-}
-
 //Realtime with GTFSR API and Backend
 const bus_results_div = document.getElementById("realtime_buses");
 
