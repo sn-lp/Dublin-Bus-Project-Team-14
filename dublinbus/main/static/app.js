@@ -54,7 +54,8 @@ function getWeatherFromBackend() {
     })
     .then((weatherDict) => {
       const weather_icon_id = weatherDict["_Weather__weather_icon"];
-      const weather_temperature = weatherDict["_Weather__temp"] + "° C";
+      const weather_temperature =
+        Math.round(weatherDict["_Weather__temp"]) + "° C";
 
       var weather_widget_image = document.createElement("img");
       weather_widget_image.setAttribute(
