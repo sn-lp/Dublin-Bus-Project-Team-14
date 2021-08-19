@@ -43,9 +43,8 @@ document
 //Directions
 function calculateAndDisplayRoute(directionsService, directionsRenderer) {
   if (
-    (document.getElementById("origin").value == document.getElementById(
-      "destination"
-    ).value)
+    document.getElementById("origin").value ==
+    document.getElementById("destination").value
   ) {
     window.alert(
       "The starting location and the destination should be different!"
