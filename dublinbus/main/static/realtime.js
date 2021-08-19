@@ -1,4 +1,4 @@
-//Fetch initial API response
+//Fetch initial API response to create a cache.
 fetch("/api/get_gtfsr_response");
 
 //Google Maps
@@ -214,7 +214,9 @@ function realtime(backend_data, gtfsr_dict) {
   );
 }
 
+//Function which handles the addition and subtraction of delays to buses via the API.
 function add_delay_to_eta(eta, delay) {
+
   var dt = new Date(null);
   dt.setHours(eta.split(":")[0], eta.split(":")[1], eta.split(":")[2]);
 
@@ -239,6 +241,7 @@ function add_delay_to_eta(eta, delay) {
   return dt_string;
 }
 
+//Pushes to the frontend a resulting bus and ETA.
 function push_realtime_update(estimated_arrival, bus_route) {
   var row = document.createElement("tr");
   var bus_route_td = document.createElement("td");
@@ -311,6 +314,7 @@ function sortTable() {
   }
 }
 
+//Removes 0's where minutes are less than 10 for nicer display.
 function make_table_data_readable() {
   table = document.getElementById("results_table");
   rows = table.rows;
@@ -496,7 +500,7 @@ function goToStopsPage() {
   window.location.reload();
 }
 
-// Autocomplete
+//Autocomplete
 new Autocomplete("#autocomplete", {
   search: (input) => {
     const url = `/api/autocomple_stop?insert=${input}`;
