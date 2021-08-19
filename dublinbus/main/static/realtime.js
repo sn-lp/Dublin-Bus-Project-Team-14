@@ -194,8 +194,13 @@ function gtfsr_api_fetch(stop_id) {
 }
 
 function realtime(backend_data, gtfsr_dict) {
-  //Set results table as empty.
-  document.getElementById("realtime_buses").innerHTML = `
+  if (Object.keys(backend_data).length < 1) {
+    document.getElementById(
+      "realtime_buses"
+    ).innerHTML = `<p class="font-weight-bold text-center">No buses were found within the next hour</p>`;
+  } else {
+    //Set results table as empty.
+    document.getElementById("realtime_buses").innerHTML = `
   <table class="table" id="results_table">
     <thead>
       <tr>
@@ -205,38 +210,39 @@ function realtime(backend_data, gtfsr_dict) {
     </thead>
   <tbody id='results_rows'>`;
 
-  //Log at time of execution
-  console.log("GTFSR");
-  console.log(JSON.parse(JSON.stringify(gtfsr_dict)));
+    //Log at time of execution
+    console.log("GTFSR");
+    console.log(JSON.parse(JSON.stringify(gtfsr_dict)));
 
-  console.log("BACKEND");
-  console.log(JSON.parse(JSON.stringify(backend_data)));
+    console.log("BACKEND");
+    console.log(JSON.parse(JSON.stringify(backend_data)));
 
-  var new_dt = add_delay_to_eta("15:00:00", "120");
+    var new_dt = add_delay_to_eta("15:00:00", "120");
 
-  // Loop through backend data.
-  for (const [key, values] of Object.entries(backend_data)) {
-    arrival_time = values.arrival_time;
-    backend_trip_id = values.trip_id;
-    bus_route = backend_trip_id.split("-")[1];
+    // Loop through backend data.
+    for (const [key, values] of Object.entries(backend_data)) {
+      arrival_time = values.arrival_time;
+      backend_trip_id = values.trip_id;
+      bus_route = backend_trip_id.split("-")[1];
 
-    //If there is a GTFSR dictionary entry for this trip_id, try to get the delay.
-    try {
-      var delay = gtfsr_dict[backend_trip_id]["delay"];
-    } catch (err) {}
+      //If there is a GTFSR dictionary entry for this trip_id, try to get the delay.
+      try {
+        var delay = gtfsr_dict[backend_trip_id]["delay"];
+      } catch (err) {}
 
-    if (typeof delay != "undefined") {
-      console.log("match");
-      console.log(delay);
-      var arrival_time = add_delay_to_eta(arrival_time, delay);
+      if (typeof delay != "undefined") {
+        console.log("match");
+        console.log(delay);
+        var arrival_time = add_delay_to_eta(arrival_time, delay);
+      }
+
+      push_realtime_update(arrival_time, bus_route);
     }
 
-    push_realtime_update(arrival_time, bus_route);
+    sortTable();
+    make_table_data_readable();
   }
-
   hideFirstMenu();
-  sortTable();
-  make_table_data_readable();
   displayAddOrRemoveFavouritesButton(
     document.getElementById("stop_name_box").innerHTML
   );
@@ -397,10 +403,7 @@ function displayFavourites() {
 }
 
 function call_realtime_by_stop_name(stop_name) {
-  stop_name_heading.innerText = stop_name;
-
   busStopsEndpoint = "/api/get_all_bus_stops/?stop_name=" + stop_name;
-
   //Fetch request to backend
   fetch(busStopsEndpoint)
     .then((response) => response.json())
@@ -412,6 +415,7 @@ function call_realtime_by_stop_name(stop_name) {
       };
       map.panTo(LatLng);
       map.setZoom(20);
+      stop_name_heading.innerText = stop_name;
     })
     .catch((error) => {
       console.log(error);
