@@ -143,6 +143,7 @@ function realtime_fetch(stop_id) {
       var gtfsr_dict = gtfsr_api_fetch(stop_id);
       //Sends frontend and backend data to be matched. Small delay of 200ms is needed here to allow gtfsr_dict to populate correctly.
       setTimeout(realtime, 200, data, gtfsr_dict);
+      // realtime(data, gtfsr_dict);
     })
     .catch((error) => {
       console.log(error);
@@ -159,7 +160,6 @@ function gtfsr_api_fetch(stop_id) {
   fetch(endpoint)
     .then((response) => response.json())
     .then((data) => {
-
       parsedGTFSR = data;
       for (var i = 0; i < parsedGTFSR["entity"].length; i++) {
         try {
@@ -175,9 +175,9 @@ function gtfsr_api_fetch(stop_id) {
 
             if (stop_id_response == stop_id) {
               gtfsr_dict[trip_id] = {
-                "delay": delay,
-                "bus_route": bus_route,
-              }
+                delay: delay,
+                bus_route: bus_route,
+              };
             }
           }
           // return gtfsr_dict;
@@ -190,7 +190,7 @@ function gtfsr_api_fetch(stop_id) {
       console.log(error);
     });
 
-    return gtfsr_dict;
+  return gtfsr_dict;
 }
 
 function realtime(backend_data, gtfsr_dict) {
@@ -206,26 +206,32 @@ function realtime(backend_data, gtfsr_dict) {
   <tbody id='results_rows'>`;
 
   //Log at time of execution
+  console.log("GTFSR");
   console.log(JSON.parse(JSON.stringify(gtfsr_dict)));
+
+  console.log("BACKEND");
+  console.log(JSON.parse(JSON.stringify(backend_data)));
+
+  var new_dt = add_delay_to_eta("15:00:00", "120");
 
   // Loop through backend data.
   for (const [key, values] of Object.entries(backend_data)) {
-    backend_arrival_time = values.arrival_time;
+    arrival_time = values.arrival_time;
     backend_trip_id = values.trip_id;
     bus_route = backend_trip_id.split("-")[1];
 
     //If there is a GTFSR dictionary entry for this trip_id, try to get the delay.
     try {
-      var delay = gtfsr_dict[backend_trip_id]['delay'];
+      var delay = gtfsr_dict[backend_trip_id]["delay"];
+    } catch (err) {}
 
-      var new_dt = add_delay_to_eta(backend_arrival_time, delay);
-
-      console.log(new_dt);
-  
-    } catch(err) {
+    if (typeof delay != "undefined") {
+      console.log("match");
+      console.log(delay);
+      var arrival_time = add_delay_to_eta(arrival_time, delay);
     }
 
-    push_realtime_update(backend_arrival_time, bus_route);
+    push_realtime_update(arrival_time, bus_route);
   }
 
   hideFirstMenu();
@@ -237,17 +243,28 @@ function realtime(backend_data, gtfsr_dict) {
 }
 
 function add_delay_to_eta(eta, delay) {
-
-  console.log("Delay is " + delay);
-  console.log("ETA is " + eta);
-
   var dt = new Date(null);
-  dt.setUTCHours(eta.split(":")[0], eta.split(":")[1], eta.split(":")[2]);
-  console.log(dt);
-  dt.setSeconds( dt.getSeconds() + delay );
+  dt.setHours(eta.split(":")[0], eta.split(":")[1], eta.split(":")[2]);
 
-  return dt;
+  dt.setSeconds(dt.getSeconds() + delay);
 
+  var dt_hour_string = dt.getHours();
+  var dt_minutes_string = dt.getMinutes();
+  var dt_seconds_string = dt.getSeconds();
+
+  var dt_vars = [dt_hour_string, dt_minutes_string, dt_seconds_string];
+
+  for (var i = 0; i < dt_vars.length; i++) {
+    if (dt_vars[i] < 10) {
+      dt_vars[i] = "0" + String(dt_vars[i]);
+    } else {
+      dt_vars[i] = String(dt_vars[i]);
+    }
+  }
+
+  var dt_string = dt_vars[0] + ":" + dt_vars[1] + ":" + dt_vars[2];
+
+  return dt_string;
 }
 
 function push_realtime_update(estimated_arrival, bus_route) {
