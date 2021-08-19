@@ -1,3 +1,23 @@
+// initialise map button tooltip
+const mapToggle = document.getElementById("map_toggle");
+const tooltip = new mdb.Tooltip(mapToggle);
+
+displayMapButtonTooltip(tooltip);
+
+// display the tooltip only the first time the user opens the app in one browser
+function displayMapButtonTooltip(mapButtonTooltip) {
+  if (typeof Storage !== "undefined") {
+    if (localStorage.getItem("map_tooltip_displayed") == null) {
+      tooltip.show();
+      // display toggle map button for 4 seconds and then hide it
+      setTimeout(function () {
+        mapButtonTooltip.hide();
+      }, 4000);
+      localStorage.setItem("map_tooltip_displayed", true);
+    }
+  }
+}
+
 //Navigation Drawer
 const drawer = mdc.drawer.MDCDrawer.attachTo(
   document.querySelector(".mdc-drawer")

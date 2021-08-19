@@ -59,7 +59,7 @@ button.btn:hover {
 
 #over_map {
   position: absolute;
-  top: 10vh;
+  top: 120px;
   left: 3vw;
   z-index: 0;
   min-width: 370px;
@@ -280,4 +280,22 @@ ripple-surface {
   color: black;
   padding: 12px 16px; /* Some padding */
   font-size: 16px; /* Set a font size */
+}
+
+/* Using color tool guidelines https://material.io/resources/color/#!/?view.left=1&view.right=1&primary.color=25B5F1&secondary.color=FFCC00 */
+/* setting !important to be able to overwrite mdb and bootstrap default styling */
+.tooltip,
+.tooltip-arrow {
+  display: block !important;
+  border-bottom-color: #c79c00 !important;
+}
+
+.tooltip-inner {
+  background-color: #c79c00 !important;
+  color: black !important;
+  opacity: 90% !important;
+}
+
+.tooltip-arrow::before {
+  border-bottom-color: #c79c00 !important;
 }
