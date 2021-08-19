@@ -221,14 +221,6 @@ function removeFromLocalstorage(routeNumber) {
   }
 }
 
-// KYLE COMMENTED OUT FOR NOW - I THINK THIS MAKES THE UI LESS USABLE
-// function resetMapPositionAndZoom() {
-//   map.setZoom(defaultMapZoomLevel);
-//   map.setCenter(
-//     new google.maps.LatLng(defaultMapPositionLat, defaultMapPositionLong)
-//   );
-// }
-
 function changeDirection(directionNumber) {
   // resetMapPositionAndZoom();
   // Get the container element
