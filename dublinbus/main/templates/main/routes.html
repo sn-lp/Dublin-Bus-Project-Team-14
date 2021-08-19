@@ -19,34 +19,35 @@
 
     <p class="font-weight-bold text-center" id="route-header">Search by Route</p>
 
-    <div id="searchRouteUI">
+    <div id="searchRouteUI" role="search" aria-label="search for a bus route">
       
 
       <div class="form-group">
         <p class="text-center" id="user-error-message"></p>
         <div id="autocomplete" class="autocomplete">
-          <input class="autocomplete-input form-control" type="text" id="bus-route-input" placeholder="Bus Route"/>
+          <input class="autocomplete-input form-control" type="text" id="bus-route-input" placeholder="Bus Route" aria-label="bus route"/>
           <ul class="autocomplete-result-list"></ul>
         </div>
       </div>
 
       <div class="d-grid gap-2">
-          <button id="submit" class="btn btn-primary" type="submit" onclick="getBusStopsFromBackend()">Submit</button>
+          <button id="submit" class="btn btn-primary" type="submit" aria-label="submit bus route" onclick="getBusStopsFromBackend()">Submit</button>
       </div>
     </div>
 
-    <div id = "favourites">
+    <div id="favourites" aria-label="favourite routes">
       
     </div>
     
     <div id="directions-buttons" style="display: none;">
-      <ul class="nav nav-tabs mb-3" id="directions-tab" role="tablist">
+      <ul class="nav nav-tabs mb-3" id="directions-tab" role="tablist" aria-label="select bus direction">
         <li class="nav-item" role="presentation">
           <button
             class="nav-link active"
             id="direction-button-0"
             type="button"
             role="tab"
+            aria-label="change bus direction"
             aria-controls="direction-0"
             aria-selected="true"
             onclick="changeDirection(0)"
@@ -58,6 +59,7 @@
             id="direction-button-1"
             type="button"
             role="tab"
+            aria-label="change bus direction"
             aria-controls="direction-1"
             aria-selected="false"
             onclick="changeDirection(1)"
@@ -66,9 +68,25 @@
     </div>
 
     <div class="d-grid gap-2">
-      <button id="add-to-favourites" class="btn btn-primary" type="button" onclick="addToLocalstorage()">Add to Favourites</button>
-      <button id="remove-from-favourites" class="btn btn-primary" type="button">Remove from Favourites</button>
-      <button id="back-to-routes" class="btn btn-primary" type="submit" onclick="goToRoutesPage()">Back to Routes</button>
+      <button
+        id="add-to-favourites"
+        class="btn btn-primary"
+        type="button"
+        aria-label="add bus route to favourites"
+        onclick="addToLocalstorage()">Add to Favourites</button>
+
+      <button 
+        id="remove-from-favourites" 
+        class="btn btn-primary"
+        type="button"
+        aria-label="remove bus route from favourites">Remove from Favourites</button>
+
+      <button
+        id="back-to-routes"
+        class="btn btn-primary"
+        type="submit"
+        aria-label="go back to search for another route"
+        onclick="goToRoutesPage()">Back to Routes</button>
     </div>
 
   </div>    

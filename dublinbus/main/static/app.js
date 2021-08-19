@@ -61,12 +61,15 @@ function getWeatherFromBackend() {
         "src",
         "http://openweathermap.org/img/wn/" + weather_icon_id + "@2x.png"
       );
+      weather_widget_image.setAttribute("alt", "weather widget");
       document
         .getElementById("weather_widget_top")
         .appendChild(weather_widget_image);
 
       var weather_widget_temperature = document.createElement("h5");
       weather_widget_temperature.innerText = weather_temperature;
+      weather_widget_temperature.id = "temperature";
+      weather_widget_temperature.setAttribute("aria-labelledby", "temperature");
       document
         .getElementById("weather_widget_top")
         .appendChild(weather_widget_temperature);

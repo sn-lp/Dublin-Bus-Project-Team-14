@@ -18,40 +18,64 @@
 
   <div id="over_map" class="container w-25 p-3 bg-white">
 
-    <div id="searchStopUI">
+    <div id="searchStopUI" role="search" aria-label="search a bus stop">
       <p class="font-weight-bold text-center">Select a Bus Stop on Map or Search</p>
 
       <div class="form-group">
         <p class="text-center" id="user-error-message"></p>
         <div id="autocomplete" class="autocomplete">
-          <input class="autocomplete-input form-control" type="text" id="bus-stop-input" placeholder="Bus Stop"/>
+          <input
+            class="autocomplete-input form-control"
+            type="text" id="bus-stop-input"
+            placeholder="Bus Stop"
+            aria-label="bus stop"/>
           <ul class="autocomplete-result-list"></ul>
         </div>
       </div>
 
       <div class="d-grid gap-2">
-          <button id="submit" class="btn btn-primary" type="submit" onclick="call_realtime_from_search()">Submit</button>
+        <button 
+          id="submit"
+          class="btn btn-primary"
+          type="submit"
+          aria-label="submit bus stop"
+          onclick="call_realtime_from_search()">Submit</button>
       </div>
 
-      <div id = "favourites">
+      <div id="favourites" aria-label="favourite stops">
       
       </div>
     </div>
 
-    <p class="font-weight-bold text-center" id="stop_name_box"></p>
+    <p class="font-weight-bold text-center" id="stop_name_box" alt="bus stop name"></p>
     
 
     <div class="d-grid gap-2">
-      <button id="add-to-favourites" class="btn btn-primary" type="button" onclick="addToLocalstorage()">Add to Favourites</button>
-      <button id="remove-from-favourites" class="btn btn-primary" type="button">Remove from Favourites</button>
+      <button
+        id="add-to-favourites"
+        class="btn btn-primary"
+        type="button"
+        aria-label="add stop to favourites"
+        onclick="addToLocalstorage()">Add to Favourites</button>
+      <button
+        id="remove-from-favourites"
+        class="btn btn-primary"
+        type="button"
+        aria-label="remove stop from favourites">Remove from Favourites</button>
     </div>
 
-    <div id="realtime_buses">
+    <div id="realtime_buses" role="real time" aria-label="real time schedule for stop">
         
     </div>
 
     <div class="d-grid gap-2">
-      <button id="back-to-stops" class="btn btn-primary" type="submit" style="display: none;" onclick="goToStopsPage()">Back to Stops</button>
+      <button
+        id="back-to-stops"
+        class="btn btn-primary"
+        type="submit"
+        style="display: none;"
+        aria-label="go back to search another stop"
+        onclick="goToStopsPage()">Back to Stops</button>
     </div>
 
   </div>

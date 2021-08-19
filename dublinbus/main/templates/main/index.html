@@ -12,57 +12,72 @@
   <div id="map"></div>
 
   <div id="loading">
-    <button class="buttonload">
+    <button class="buttonload" alt="loading routes">
       <i class="fa fa-spinner fa-spin"></i>Loading routes
     </button>
   </div>
 
   <div id="over_map" class="container w-25 p-3 bg-white">
 
-    <div id="searchUI">
+    <div id="searchUI" role="journey planner" aria-label="search a route between origin and destination locations">
 
       <p class="font-weight-bold text-center"><label for="origin">Travelling From</label></p>
       <div class="d-grid gap-2">
-        <button id="location_button" class="btn btn-primary" type="button">
+        <button id="location_button" class="btn btn-primary" type="button" aria-label="use my location for origin address">
           <img src="{% static 'img/location.png' %}" alt="my_location" height="15px" /></img>
           Use My Location
         </button>
       </div>
     
       <div class="form-group">
-        <input type="text" class="form-control" id="origin" placeholder="Enter Location">
+        <input type="text" class="form-control" id="origin" placeholder="Enter Location" aria-label="origin address">
       </div>
       
       <p class="font-weight-bold text-center"><label for="destination">Destination</label></p>
       <div class="form-group">
-        <input type="text" class="form-control" id="destination" placeholder="Enter Destination">
+        <input type="text" class="form-control" id="destination" placeholder="Enter Destination" aria-label="destination address">
       </div>
 
       <p class="font-weight-bold text-center"><label for="departure-time">Departure Time</label></p>
 
       <div class="form-outline datepicker">
-        <input type="datetime-local" id="departure-time" name="departure-time">
+        <input type="datetime-local" id="departure-time" name="departure-time" aria-label="departure time">
       </div>
 
       <div class="d-grid gap-2">
-          <button id="submit" class="btn btn-primary" type="submit" onclick="calculateAndDisplayRoute(directionsService1, directionsRenderer1)">Submit</button>
+        <button
+          id="submit"
+          class="btn btn-primary"
+          type="submit"
+          aria-label="submit"
+          onclick="calculateAndDisplayRoute(directionsService1, directionsRenderer1)">Submit</button>
       </div>
 
     </div>
 
     <div id="resultsUI" style="display: none">
 
-      <div id="directions_results"></div>
+      <div id="directions_results"  role="routes" aria-label="suggested routes"></div>
       <p class="text-center" id="user-error-message"></p>
 
       <div class="d-grid gap-2">
-        <button id="submit-selected-route" class="btn btn-primary" type="submit" onclick="displayRouteDetails()">Route details</button>
-        <button id="clear" class="btn btn-primary" type="submit" onclick="clearDirections(directionsRenderer1)">Back to search</button>
-        <button id="back-to-routes" class="btn btn-primary" type="submit" onclick="displaySuggestedRoutes()">Back to routes</button>
-      </div>
-
-      <div id="dotplot">
-
+        <button
+          id="submit-selected-route"
+          class="btn btn-primary"
+          type="submit"
+          aria-label="see route details"
+          onclick="displayRouteDetails()">Route details</button>
+        <button
+          id="clear"
+          class="btn btn-primary"
+          type="submit"
+          onclick="clearDirections(directionsRenderer1)">Back to search</button>
+        <button
+          id="back-to-routes"
+          class="btn btn-primary"
+          type="submit"
+          aria-label="go back to suggested routes"
+          onclick="displaySuggestedRoutes()">Back to routes</button>
       </div>
 
     </div>
