@@ -101,7 +101,7 @@ function getAllBusStops() {
       });
     })
     .catch((error) => {
-      console.log(error);
+      console.log("Error.");
     });
 }
 
@@ -121,10 +121,9 @@ function realtime_fetch(stop_id) {
       var gtfsr_dict = gtfsr_api_fetch(stop_id);
       //Sends frontend and backend data to be matched. Small delay of 200ms is needed here to allow gtfsr_dict to populate correctly.
       setTimeout(realtime, 200, data, gtfsr_dict);
-      // realtime(data, gtfsr_dict);
     })
     .catch((error) => {
-      console.log(error);
+      console.log("Error: Realtime request failed.");
     });
 }
 
@@ -165,7 +164,7 @@ function gtfsr_api_fetch(stop_id) {
       }
     })
     .catch((error) => {
-      console.log(error);
+      console.log("Error: Realtime request failed.");
     });
 
   return gtfsr_dict;
@@ -188,15 +187,6 @@ function realtime(backend_data, gtfsr_dict) {
     </thead>
   <tbody id='results_rows'>`;
 
-    //Log at time of execution
-    console.log("GTFSR");
-    console.log(JSON.parse(JSON.stringify(gtfsr_dict)));
-
-    console.log("BACKEND");
-    console.log(JSON.parse(JSON.stringify(backend_data)));
-
-    var new_dt = add_delay_to_eta("15:00:00", "120");
-
     // Loop through backend data.
     for (const [key, values] of Object.entries(backend_data)) {
       arrival_time = values.arrival_time;
@@ -209,8 +199,6 @@ function realtime(backend_data, gtfsr_dict) {
       } catch (err) {}
 
       if (typeof delay != "undefined") {
-        console.log("match");
-        console.log(delay);
         var arrival_time = add_delay_to_eta(arrival_time, delay);
       }
 
@@ -396,7 +384,7 @@ function call_realtime_by_stop_name(stop_name) {
       stop_name_heading.innerText = stop_name;
     })
     .catch((error) => {
-      console.log(error);
+      console.log("Error: Request failed.");
     });
 }
 
