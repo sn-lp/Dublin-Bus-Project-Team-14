@@ -43,7 +43,7 @@ document
 //Directions
 function calculateAndDisplayRoute(directionsService, directionsRenderer) {
   if (
-    (document.getElementById("origin").value = document.getElementById(
+    (document.getElementById("origin").value == document.getElementById(
       "destination"
     ).value)
   ) {
