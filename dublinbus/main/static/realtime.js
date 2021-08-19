@@ -216,7 +216,6 @@ function realtime(backend_data, gtfsr_dict) {
 
 //Function which handles the addition and subtraction of delays to buses via the API.
 function add_delay_to_eta(eta, delay) {
-
   var dt = new Date(null);
   dt.setHours(eta.split(":")[0], eta.split(":")[1], eta.split(":")[2]);
 
