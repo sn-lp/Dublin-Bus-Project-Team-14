@@ -73,7 +73,7 @@ function initMap() {
   locationButton.classList.add("btn");
   locationButton.classList.add("btn-primary");
   locationButton.setAttribute("id", "locationButton");
-  locationButton.setAttribute("style", "margin-bottom: 2vh;");
+  locationButton.setAttribute("style", "margin-bottom: 50px;");
   map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(locationButton);
   locationButton.addEventListener("click", () => {
     // Try HTML5 geolocation.

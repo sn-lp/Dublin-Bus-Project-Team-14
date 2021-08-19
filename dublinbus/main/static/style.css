@@ -1,8 +1,17 @@
+body,
+html,
+#wrapper,
+#container-fluid {
+  height: 100%;
+  width: 100%;
+}
+
 /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
 #map {
-  height: calc(100vh);
+  height: 100%;
   width: 100%;
+  position: relative;
 }
 
 .mdc-top-app-bar__row {
