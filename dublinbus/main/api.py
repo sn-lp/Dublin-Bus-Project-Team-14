@@ -107,7 +107,7 @@ def get_all_bus_stops(request):
             stop_name = request.GET["stop_name"]
             stops = Stop.objects.filter(name=stop_name)
         except:
-            return JsonResponse({"error": 'stop name not found'})
+            return JsonResponse({"error": "stop name not found"})
 
         for stop in stops:
             json_result[stop.name] = {
