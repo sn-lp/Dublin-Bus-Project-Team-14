@@ -156,7 +156,7 @@ input {
 #realtime_buses,
 #directions_results {
   overflow: auto;
-  max-height: 60vh;
+  max-height: 45vh;
 }
 
 /* apply bold only to td elements in realtime page */
