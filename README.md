@@ -1,6 +1,20 @@
 # Dublin Bus Django App
 
-A web app for predicting and displaying accurate bus travel times within the Dublin Bus network in Ireland.
+![Coverage-CI Status](https://github.com/sn-lp/Dublin-Bus-Project-Team-14/actions/workflows/coverage-ci.yml/badge.svg)
+![Django-CI Status](https://github.com/sn-lp/Dublin-Bus-Project-Team-14/actions/workflows/django-ci.yml/badge.svg)
+![Frontend-CI Status](https://github.com/sn-lp/Dublin-Bus-Project-Team-14/actions/workflows/frontend-ci.yml/badge.svg)
+
+This project is a web application for Dublin Bus users to conveniently plan their trips. The application can also suggest trips using other public transportation services (e.g. DART and Go-Ahead).
+
+We trained K-Nearest Neighbours regression models on Dublin Bus data from 2018, for each Dublin Bus route running at that time, to make travel time predictions for Dublin Bus trips. Whenever the app is not able to make a prediction using our trained models due to data differences it defaults to Google's estimations through their [Directions API](https://developers.google.com/maps/documentation/directions/overview).
+
+For the predictions made by the application, the users can see a probabilist travel time estimate in the format of a quantile dot plot. Each dot represents a 5% chance of how long the trip will take. The red line represents the most likely time duration for the trip. This work was inspired by the "Uncertainty Displays Using Quantile Dotplots or CDFs Improve Transit Decision-Making" white paper from Michael Fernandes1, Logan Walls1, Sean Munson1, Jessica Hullman1, and Matthew Kay.
+
+Our web app contains other functionalities other than the Journey Planner such as Real Time information for bus stops and a Route Viewer.
+
+Visit our Dublin Bus app [here](https://dublin-bus-team14.herokuapp.com/).
+
+## Features
 
 ### Plan Your Journey
 
@@ -20,10 +34,21 @@ View all bus stops for any Dublin Bus route. Save your favourite routes for easy
 
 ## Technologies
 
+- Python
 - Django 3.2.4
 - MySQL
+- Docker
+- HTML, Javascript & CSS
 - Bootstrap v5
 - Jupyter Notebooks
+- Heroku
+- AWS S3 bucket
+
+## Production
+
+We use [Heroku](https://www.heroku.com/what) as our production environment integrated with the Github repo for automated deployments.
+
+Our K-Nearest Neighbours regression models are stored at an AWS S3 storage bucket that the app has permissions to access to. Running the app locally will not use our predictive models for predicting the travel time.
 
 ## Installation
 
@@ -45,7 +70,7 @@ conda create --name <name_of_environment> python=3.8
 conda activate <name_of_environment>
 ```
 
-4. Install the `requirements.txt` file which has all the packages required for running the app.
+4. Install the `requirements.txt` file which has all the Python packages required for running the app.
 
 ```bash
 cd dublinbus/
@@ -122,22 +147,16 @@ docker stop mysql
 
 6. Now that the local MySQL instance is running it's time to create the tables and insert the data into the database.
 
-6.1. Unzip the file `dublinbus/main/migrations/sqldump.sql.zip` into the same folder. This has a sql file that contains the instructions to insert the data in the database.
+6.1. Unzip the file `dublinbus/main/migrations/dublinbus_team14_backendsqldump_200821.zip` into the same folder. This has a sql file that contains the instructions to insert the data in the database.
 - note: the file had to be compressed due to Github storage limits (100MB).
 
-6.2. Run the following command to create the tables in the database:
+6.2. Run the following command to insert the data in the database:
 
 ```bash
-cd dublinbus
-python manage.py migrate
+docker exec -i mysql mysql -u${DEVELOPMENT_DATABASE_USER} -p${DEVELOPMENT_DATABASE_PASSWORD} < ./main/migrations/dublinbus_team14_backendsqldump_200821.sql
 ```
-
-6.3. Run the following command to insert the data in the database:
-
-```bash
-docker exec -i mysql mysql -u${DEVELOPMENT_DATABASE_USER} -p${DEVELOPMENT_DATABASE_PASSWORD} < ./main/migrations/sqldump.sql
-```
-- note: this is quicker to insert the data than using Django data migrations and also allows our CI to easily create a test database without having to do the data migrations which would be very slow due to the amount of data. 
+- note 1: this sql file will create the necessary schema and tables in the database as well as insert the data. 
+- note 2: this is quicker to insert the data than using Django data migrations and also allows our CI to easily create a test database without having to do the data migrations which would be very slow due to the amount of data. 
 
 7. Create env variables for API keys
 - GOOGLEMAPS_APIKEY
