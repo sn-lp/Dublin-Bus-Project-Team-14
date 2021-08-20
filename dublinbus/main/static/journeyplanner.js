@@ -31,6 +31,9 @@ let travelTimeEstimations;
 let suggestedRoutesElements;
 let timeEstimationReplaced = false;
 
+// boolean used to prevent the dot plot to be requested to the backend more than once
+let isPlotBeingRequested = false;
+
 function initDirectionsService() {
   directionsService1 = new google.maps.DirectionsService();
 }
@@ -770,7 +773,8 @@ function QDP_request(lineid, prediction) {
     "&prediction=" +
     prediction;
   plotDiv = document.getElementById("plot");
-  if (!plotDiv) {
+  if (!plotDiv && !isPlotBeingRequested) {
+    isPlotBeingRequested = true;
     //Fetch request to backend
     fetch(endpoint)
       .then((response) => response.json())
@@ -778,6 +782,7 @@ function QDP_request(lineid, prediction) {
         //base64 will hold the bytestream which contains the image data.
         base64 = data["image_base64"];
         displayDotPlot(base64);
+        isPlotBeingRequested = false;
       })
       .catch((error) => {
         console.log(error);
