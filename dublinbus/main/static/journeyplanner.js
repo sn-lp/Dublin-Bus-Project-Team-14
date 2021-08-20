@@ -10,6 +10,10 @@ function initMap() {
   initAutocomplete();
   initDirectionsService();
   initDirectionsRenderer();
+  infowindow = new google.maps.InfoWindow();
+  if (infowindow) {
+    infowindow.close();
+  }
 }
 
 //Initialise Directions service and renderer
@@ -250,6 +254,11 @@ locationButton.addEventListener("click", () => {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         };
+        map.panTo(pos);
+        map.setZoom(15);
+        infowindow.setPosition(pos);
+        infowindow.setContent("Your Location");
+        infowindow.open(map);
         reverse_geocoder(pos.lat, pos.lng);
       },
       () => {

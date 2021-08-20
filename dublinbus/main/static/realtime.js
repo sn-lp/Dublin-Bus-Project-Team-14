@@ -101,7 +101,7 @@ function getAllBusStops() {
       });
     })
     .catch((error) => {
-      console.log("Error.");
+      console.log(error);
     });
 }
 
@@ -123,7 +123,7 @@ function realtime_fetch(stop_id) {
       setTimeout(realtime, 200, data, gtfsr_dict);
     })
     .catch((error) => {
-      console.log("Error: Realtime request failed.");
+      console.log(error);
     });
 }
 
@@ -164,7 +164,7 @@ function gtfsr_api_fetch(stop_id) {
       }
     })
     .catch((error) => {
-      console.log("Error: Realtime request failed.");
+      console.log(error);
     });
 
   return gtfsr_dict;
@@ -387,7 +387,7 @@ function call_realtime_by_stop_name(stop_name) {
       stop_name_heading.innerText = stop_name;
     })
     .catch((error) => {
-      console.log("Error: Request failed.");
+      console.log(error);
     });
 }
 
