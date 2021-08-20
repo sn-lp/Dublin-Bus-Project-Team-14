@@ -119,8 +119,11 @@ def get_all_bus_stops(request):
     json_result = {}
 
     if "stop_name" in request.GET:
-        stop_name = request.GET["stop_name"]
-        stops = Stop.objects.filter(name=stop_name)
+        try:
+            stop_name = request.GET["stop_name"]
+            stops = Stop.objects.filter(name=stop_name)
+        except:
+            return JsonResponse({"error": "stop name not found"})
 
         for stop in stops:
             json_result[stop.name] = {
@@ -646,7 +649,7 @@ def get_gtfsr_response(request):
         update_gtfsr_response(
             {
                 "statusCode": 500,
-                "message": "there was something wrong with gtfr, please cool down, and wait for one minute.",
+                "message": "There was something wrong with GTFS-R. Try again in one minute.",
             }
         )
 

@@ -1,3 +1,6 @@
+//Fetch initial API response to create a cache.
+fetch("/api/get_gtfsr_response");
+
 //Google Maps
 let map;
 
@@ -104,28 +107,6 @@ function getAllBusStops() {
 
 getAllBusStops();
 
-//Return time to the second at function run.
-function get_time() {
-  var current_time = new Date();
-  var hour = current_time.getHours();
-  var minute = current_time.getMinutes();
-  var second = current_time.getSeconds();
-
-  const date_vars = [hour, minute, second];
-
-  for (var i = 0; i < date_vars.length; i++) {
-    if (date_vars[i] < 10) {
-      date_vars[i] = "0" + String(date_vars[i]);
-    } else {
-      date_vars[i] = String(date_vars[i]);
-    }
-  }
-
-  var time = date_vars[0] + ":" + date_vars[1] + ":" + date_vars[2];
-
-  return time;
-}
-
 //Realtime with GTFSR API and Backend
 const bus_results_div = document.getElementById("realtime_buses");
 
@@ -136,16 +117,67 @@ function realtime_fetch(stop_id) {
   fetch(stopTimesEndpoint)
     .then((response) => response.json())
     .then((data) => {
-      realtime(data);
+      //Returns a dictionary with all relevant GTFSR info for this stop.
+      var gtfsr_dict = gtfsr_api_fetch(stop_id);
+      //Sends frontend and backend data to be matched. Small delay of 200ms is needed here to allow gtfsr_dict to populate correctly.
+      setTimeout(realtime, 200, data, gtfsr_dict);
     })
     .catch((error) => {
       console.log(error);
     });
 }
 
-function realtime(backend_data) {
-  //Set results table as empty.
-  document.getElementById("realtime_buses").innerHTML = `
+//Returns a dictionary with all GTFSR data relevant to a given stop_id.
+function gtfsr_api_fetch(stop_id) {
+  endpoint = "/api/get_gtfsr_response";
+
+  var gtfsr_dict = {};
+
+  //Fetch request to backend
+  fetch(endpoint)
+    .then((response) => response.json())
+    .then((data) => {
+      parsedGTFSR = data;
+      for (var i = 0; i < parsedGTFSR["entity"].length; i++) {
+        try {
+          var stop_time_update_object =
+            parsedGTFSR["entity"][i]["trip_update"]["stop_time_update"];
+          var trip_id = parsedGTFSR["entity"][i]["trip_update"]["trip"].trip_id;
+          var bus_route = trip_id.split("-")[1];
+
+          //For each stop_time_update from GTFSR.
+          for (var x = 0; x < stop_time_update_object.length; x++) {
+            var stop_id_response = stop_time_update_object[x].stop_id;
+            var delay = stop_time_update_object[x].departure["delay"];
+
+            if (stop_id_response == stop_id) {
+              gtfsr_dict[trip_id] = {
+                delay: delay,
+                bus_route: bus_route,
+              };
+            }
+          }
+          // return gtfsr_dict;
+        } catch (e) {
+          //All errors are caught.
+        }
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
+  return gtfsr_dict;
+}
+
+function realtime(backend_data, gtfsr_dict) {
+  if (Object.keys(backend_data).length < 1) {
+    document.getElementById(
+      "realtime_buses"
+    ).innerHTML = `<p class="font-weight-bold text-center">No buses were found within the next hour</p>`;
+  } else {
+    //Set results table as empty.
+    document.getElementById("realtime_buses").innerHTML = `
   <table class="table" id="results_table">
     <thead>
       <tr>
@@ -155,22 +187,60 @@ function realtime(backend_data) {
     </thead>
   <tbody id='results_rows'>`;
 
-  // Loop through backend data.
-  for (const [key, values] of Object.entries(backend_data)) {
-    backend_arrival_time = values.arrival_time;
-    backend_trip_id = values.trip_id;
-    bus_route = backend_trip_id.split("-")[1];
+    // Loop through backend data.
+    for (const [key, values] of Object.entries(backend_data)) {
+      arrival_time = values.arrival_time;
+      backend_trip_id = values.trip_id;
+      bus_route = backend_trip_id.split("-")[1];
 
-    push_realtime_update(backend_arrival_time, bus_route);
+      //If there is a GTFSR dictionary entry for this trip_id, try to get the delay.
+      try {
+        var delay = gtfsr_dict[backend_trip_id]["delay"];
+      } catch (err) {}
+
+      if (typeof delay != "undefined") {
+        var arrival_time = add_delay_to_eta(arrival_time, delay);
+      }
+
+      push_realtime_update(arrival_time, bus_route);
+    }
+
+    sortTable();
+    make_table_data_readable();
   }
   hideFirstMenu();
-  sortTable();
-  make_table_data_readable();
   displayAddOrRemoveFavouritesButton(
     document.getElementById("stop_name_box").innerHTML
   );
 }
 
+//Function which handles the addition and subtraction of delays to buses via the API.
+function add_delay_to_eta(eta, delay) {
+  var dt = new Date(null);
+  dt.setHours(eta.split(":")[0], eta.split(":")[1], eta.split(":")[2]);
+
+  dt.setSeconds(dt.getSeconds() + delay);
+
+  var dt_hour_string = dt.getHours();
+  var dt_minutes_string = dt.getMinutes();
+  var dt_seconds_string = dt.getSeconds();
+
+  var dt_vars = [dt_hour_string, dt_minutes_string, dt_seconds_string];
+
+  for (var i = 0; i < dt_vars.length; i++) {
+    if (dt_vars[i] < 10) {
+      dt_vars[i] = "0" + String(dt_vars[i]);
+    } else {
+      dt_vars[i] = String(dt_vars[i]);
+    }
+  }
+
+  var dt_string = dt_vars[0] + ":" + dt_vars[1] + ":" + dt_vars[2];
+
+  return dt_string;
+}
+
+//Pushes to the frontend a resulting bus and ETA.
 function push_realtime_update(estimated_arrival, bus_route) {
   var row = document.createElement("tr");
   var bus_route_td = document.createElement("td");
@@ -243,6 +313,7 @@ function sortTable() {
   }
 }
 
+//Removes 0's where minutes are less than 10 for nicer display.
 function make_table_data_readable() {
   table = document.getElementById("results_table");
   rows = table.rows;
@@ -301,15 +372,11 @@ function displayFavourites() {
 }
 
 function call_realtime_by_stop_name(stop_name) {
-  stop_name_heading.innerText = stop_name;
-
   busStopsEndpoint = "/api/get_all_bus_stops/?stop_name=" + stop_name;
-
   //Fetch request to backend
   fetch(busStopsEndpoint)
     .then((response) => response.json())
     .then((data) => {
-      console.log(Object.entries(data)[0]);
       realtime_fetch(Object.entries(data)[0][1]["id"]);
       LatLng = {
         lat: Object.entries(data)[0][1]["latitude"],
@@ -317,6 +384,7 @@ function call_realtime_by_stop_name(stop_name) {
       };
       map.panTo(LatLng);
       map.setZoom(20);
+      stop_name_heading.innerText = stop_name;
     })
     .catch((error) => {
       console.log(error);
@@ -431,7 +499,7 @@ function goToStopsPage() {
   window.location.reload();
 }
 
-// Autocomplete
+//Autocomplete
 new Autocomplete("#autocomplete", {
   search: (input) => {
     const url = `/api/autocomple_stop?insert=${input}`;
