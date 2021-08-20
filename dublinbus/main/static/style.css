@@ -153,15 +153,19 @@ input {
   display: none;
 }
 
-#realtime_buses,
 #directions_results {
   overflow: auto;
-  max-height: 45vh;
+  max-height: 60vh;
 }
 
 /* apply bold only to td elements in realtime page */
 #results_table td {
   font-weight: 500;
+}
+
+#realtime_buses {
+  overflow: auto;
+  max-height: 45vh;
 }
 
 #resultsUI {
